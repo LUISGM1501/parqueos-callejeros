@@ -47,6 +47,10 @@ public class EspacioParqueo {
         return vehiculoActual;
     }
 
+    public boolean estaDisponible() {
+        return !ocupado;
+    }
+
     @Override
     public String toString() {
         return "EspacioParqueo{" +

@@ -1,14 +1,18 @@
 package com.parqueos.modelo.vehiculo;
 
+import com.parqueos.modelo.usuario.UsuarioParqueo;
+
 public class Vehiculo {
     private String placa;
     private String marca;
     private String modelo;
+    private UsuarioParqueo propietario;
 
-    public Vehiculo(String placa, String marca, String modelo) {
+    public Vehiculo(String placa, String marca, String modelo, UsuarioParqueo propietario) {
         this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
+        this.propietario = propietario;
     }
 
     // Getters y setters
@@ -34,6 +38,14 @@ public class Vehiculo {
 
     public void setModelo(String modelo) {
         this.modelo = modelo;
+    }
+
+    public UsuarioParqueo getPropietario() {
+        return propietario;
+    }
+
+    public void setPropietario(UsuarioParqueo  propietario) {
+        this.propietario = propietario;
     }
 
     @Override
