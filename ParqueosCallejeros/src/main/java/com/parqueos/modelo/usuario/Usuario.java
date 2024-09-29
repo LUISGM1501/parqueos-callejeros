@@ -1,8 +1,11 @@
 package com.parqueos.modelo.usuario;
 
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.time.LocalDate; 
 
-public class Usuario {
+public class Usuario implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     protected String nombre;
     protected String apellidos;
     protected int telefono;

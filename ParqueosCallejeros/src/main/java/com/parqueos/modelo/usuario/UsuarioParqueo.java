@@ -1,11 +1,11 @@
 package com.parqueos.modelo.usuario;
 
-import com.parqueos.modelo.vehiculo.Vehiculo;
-import com.parqueos.modelo.parqueo.EspacioParqueo;
-import com.parqueos.modelo.parqueo.Reserva;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.modelo.parqueo.Reserva;
+import com.parqueos.modelo.vehiculo.Vehiculo;
 
 public class UsuarioParqueo extends Usuario {
     private String numeroTarjeta;

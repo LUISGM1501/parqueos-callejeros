@@ -1,12 +1,17 @@
 package com.parqueos.modelo.multa;
 
-import com.parqueos.modelo.vehiculo.Vehiculo;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.vehiculo.Vehiculo;
 
-import java.time.LocalDateTime;
-
-public class Multa {
+public class Multa implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private final String idMulta;
     private Vehiculo vehiculo;
     private EspacioParqueo espacio;
     private Inspector inspector;
@@ -14,6 +19,7 @@ public class Multa {
     private double monto;
 
     public Multa(Vehiculo vehiculo, EspacioParqueo espacio, Inspector inspector) {
+        this.idMulta = UUID.randomUUID().toString();
         this.vehiculo = vehiculo;
         this.espacio = espacio;
         this.inspector = inspector;
@@ -67,6 +73,11 @@ public class Multa {
     public void setEspacio(EspacioParqueo espacio) {
         this.espacio = espacio;
     }
+
+    public String getIdMulta() {
+        return idMulta;
+    }
+
 
     @Override
     public String toString() {

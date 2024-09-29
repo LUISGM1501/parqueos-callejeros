@@ -1,16 +1,32 @@
 package com.parqueos.modelo.parqueo;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfiguracionParqueo {
+public class ConfiguracionParqueo implements Serializable   {
+    private static final long serialVersionUID = 1L;
+    
+    private static ConfiguracionParqueo instancia;
     private LocalTime horarioInicio;
     private LocalTime horarioFin;
     private int precioHora;
     private int tiempoMinimo;
     private int costoMulta;
     private List<EspacioParqueo> espacios;
+
+    private ConfiguracionParqueo() {
+        // Constructor privado para evitar instanciacion directa
+        this.espacios = new ArrayList<>();
+    }
+
+    public static ConfiguracionParqueo obtenerInstancia() {
+        if (instancia == null) {
+            instancia = new ConfiguracionParqueo();
+        }
+        return instancia;
+    }
 
     public ConfiguracionParqueo(LocalTime horarioInicio, LocalTime horarioFin, int precioHora, int tiempoMinimo, int costoMulta) {
         this.horarioInicio = horarioInicio;

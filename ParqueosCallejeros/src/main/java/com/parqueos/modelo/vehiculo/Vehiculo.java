@@ -1,8 +1,12 @@
 package com.parqueos.modelo.vehiculo;
 
+import java.io.Serializable;
+
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 
-public class Vehiculo {
+public class Vehiculo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private String placa;
     private String marca;
     private String modelo;

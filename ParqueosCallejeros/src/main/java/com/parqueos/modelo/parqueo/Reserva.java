@@ -1,12 +1,17 @@
 package com.parqueos.modelo.parqueo;
 
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 
-import java.time.LocalDateTime;
-import java.time.Duration;
-
-public class Reserva {
+public class Reserva implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private String idReserva;
     private UsuarioParqueo usuario;
     private EspacioParqueo espacio;
     private Vehiculo vehiculo;
@@ -14,6 +19,7 @@ public class Reserva {
     private LocalDateTime horaFin;
 
     public Reserva(UsuarioParqueo usuario, EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
+        this.idReserva = UUID.randomUUID().toString();
         this.usuario = usuario;
         this.espacio = espacio;
         this.vehiculo = vehiculo;
@@ -64,6 +70,10 @@ public class Reserva {
 
     public LocalDateTime getHoraFin() {
         return horaFin;
+    }
+
+    public String getIdReserva() {
+        return idReserva;
     }
 
     @Override
