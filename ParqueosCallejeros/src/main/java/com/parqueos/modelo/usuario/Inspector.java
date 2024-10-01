@@ -1,10 +1,14 @@
 package com.parqueos.modelo.usuario;
 
-import com.parqueos.modelo.parqueo.EspacioParqueo;
-import com.parqueos.modelo.multa.Multa;
-import com.parqueos.reportes.Reporte;
-
 import java.time.LocalDate;
+import java.util.List;
+
+import com.parqueos.modelo.multa.Multa;
+import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.reportes.Reporte;
+import com.parqueos.reportes.ReporteEspacios;
+import com.parqueos.reportes.ReporteMultas;
+
 
 public class Inspector extends Usuario {
     private String terminalId;
@@ -29,14 +33,15 @@ public class Inspector extends Usuario {
         return multa;
     }
 
-    public Reporte generarReporteEspacios() {
-        // Falta implementar la logica para generar el reporte de espacios
-        return null; 
+    public Reporte generarReporteEspacios(List<EspacioParqueo> espacios) {
+        // Falta implementar la logica para generar el reporte de espacios  
+        Reporte reporte = new ReporteEspacios(espacios);
+        return reporte; 
     }
 
-    public Reporte generarReporteMultas(LocalDate fechaInicio, LocalDate fechaFin) {
-        // Falta implementar la logica para generar el reporte de multas
-        return null;
+    public Reporte generarReporteMultas(List<Multa> multas, LocalDate fechaInicio, LocalDate fechaFin) {
+        Reporte reporte = new ReporteMultas(fechaInicio, fechaFin, multas);
+        return reporte;
     }
 
     // Getter y setter para terminalId

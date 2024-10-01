@@ -2,7 +2,7 @@ package com.parqueos.builders;
 
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 
-public class UsuarioParqueoBuilder extends UsuarioBuilder {
+public class UsuarioParqueoBuilder extends UsuarioBuilder<UsuarioParqueoBuilder> {
     private String numeroTarjeta;
     private String fechaVencimientoTarjeta;
     private String codigoValidacionTarjeta;

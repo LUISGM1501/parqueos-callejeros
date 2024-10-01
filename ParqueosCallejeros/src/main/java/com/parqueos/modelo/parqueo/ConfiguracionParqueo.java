@@ -28,6 +28,11 @@ public class ConfiguracionParqueo implements Serializable   {
         return instancia;
     }
 
+    public static ConfiguracionParqueo setInstancia(ConfiguracionParqueo configuracion) {
+        instancia = configuracion;
+        return instancia;
+    }
+
     public ConfiguracionParqueo(LocalTime horarioInicio, LocalTime horarioFin, int precioHora, int tiempoMinimo, int costoMulta) {
         this.horarioInicio = horarioInicio;
         this.horarioFin = horarioFin;

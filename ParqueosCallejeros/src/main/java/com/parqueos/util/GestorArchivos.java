@@ -1,91 +1,90 @@
 package com.parqueos.util;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.CollectionType;
+
 public class GestorArchivos {
-    
-    public static <T> void agregarObjeto(T objeto, String nombreArchivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nombreArchivo, true)) {
-            protected void writeStreamHeader() throws IOException {
-                reset();
-            }
-        }) {
-            oos.writeObject(objeto);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error al agregar el objeto en " + nombreArchivo);
-        }
+
+    private static final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    // Método para añadir un nuevo elemento a un archivo JSON
+    public static <T> void addElemento(T elemento, String nombreArchivo, Class<T> tipoClase) {
+        List<T> elementos = cargarTodosLosElementos(nombreArchivo, tipoClase);
+        elementos.add(elemento);
+        guardarTodo(elementos, nombreArchivo);
     }
 
-    public static <T> List<T> cargarObjetos(String nombreArchivo) {
-        List<T> objetos = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nombreArchivo))) {
-            while (true) {
-                objetos.add((T) ois.readObject());
-            }
-        } catch (EOFException e) {
-            // Fin del archivo, no es un error
-        } catch (FileNotFoundException e) {
-            System.out.println("El archivo " + nombreArchivo + " no existe. Se creará uno nuevo.");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            System.err.println("Error al cargar los objetos desde " + nombreArchivo);
-        }
-        return objetos;
-    }
-
-    public static <T> void actualizarObjeto(T objeto, String id, String nombreArchivo) {
-        List<T> objetos = cargarObjetos(nombreArchivo);
-        boolean encontrado = false;
-        for (int i = 0; i < objetos.size(); i++) {
-            if (objetos.get(i).toString().equals(id)) {
-                objetos.set(i, objeto);
-                encontrado = true;
+    // Método para modificar un elemento existente en el archivo JSON
+    public static <T> void modificarElemento(String id, T elementoActualizado, String nombreArchivo, Class<T> tipoClase) {
+        List<T> elementos = cargarTodosLosElementos(nombreArchivo, tipoClase);
+        for (int i = 0; i < elementos.size(); i++) {
+            if (obtenerId(elementos.get(i)).equals(id)) { 
+                elementos.set(i, elementoActualizado);
                 break;
             }
         }
-        if (encontrado) {
-            guardarObjetos(objetos, nombreArchivo);
-        } else {
-            System.err.println("No se encontró el objeto con ID: " + id);
-        }
+        guardarTodo(elementos, nombreArchivo);
     }
 
-    public static <T> void eliminarObjeto(String id, String nombreArchivo) {
-        List<T> objetos = cargarObjetos(nombreArchivo);
-        boolean removido = objetos.removeIf(obj -> obj.toString().equals(id));
-        if (removido) {
-            guardarObjetos(objetos, nombreArchivo);
-        } else {
-            System.err.println("No se encontró el objeto con ID: " + id);
-        }
+    // Método para eliminar un elemento del archivo JSON
+    public static <T> void eliminarElemento(String id, String nombreArchivo, Class<T> tipoClase) {
+        List<T> elementos = cargarTodosLosElementos(nombreArchivo, tipoClase);
+        elementos.removeIf(elemento -> obtenerId(elemento).equals(id));
+        guardarTodo(elementos, nombreArchivo);
     }
 
-    private static <T> void guardarObjetos(List<T> objetos, String nombreArchivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nombreArchivo))) {
-            for (T objeto : objetos) {
-                oos.writeObject(objeto);
+    // Metodo para cargar un elemento de un archivo JSON
+    public static <T> T cargarElemento(String id, String nombreArchivo, Class<T> tipoClase) {
+        List<T> elementos = cargarTodosLosElementos(nombreArchivo, tipoClase);
+        for (T elemento : elementos) {
+            if (obtenerId(elemento).equals(id)) {
+                return elemento;
             }
+        }
+        return null;
+    }
+
+    // Método para cargar todos los elementos de un archivo JSON
+    public static <T> List<T> cargarTodosLosElementos(String nombreArchivo, Class<T> tipoClase) {
+        List<T> elementos = new ArrayList<>();
+        File file = new File(nombreArchivo);
+        if (file.exists()) {
+            try {
+                CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, tipoClase);
+                elementos = objectMapper.readValue(file, listType);
+                System.out.println("Elementos cargados correctamente desde " + nombreArchivo);
+            } catch (IOException e) {
+                System.err.println("Error al cargar los elementos: " + e.getMessage());
+            }
+        } else {
+            System.out.println("El archivo " + nombreArchivo + " no existe. Se creará uno nuevo.");
+        }
+        return elementos;
+    }
+
+    // Método para guardar todos los elementos en el archivo JSON
+    public static <T> void guardarTodo(List<T> elementos, String nombreArchivo) {
+        try {
+            objectMapper.writeValue(new File(nombreArchivo), elementos);
+            System.out.println("Elementos guardados correctamente en " + nombreArchivo);
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error al guardar los objetos en " + nombreArchivo);
+            System.err.println("Error al guardar los elementos: " + e.getMessage());
         }
     }
 
-    public static <T> void guardarObjeto(T objeto, String nombreArchivo) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nombreArchivo))) {
-            oos.writeObject(objeto);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error al guardar el objeto en " + nombreArchivo);
+    // Método auxiliar para obtener el ID de un elemento
+    private static <T> String obtenerId(T elemento) {
+        // Supongamos que cada elemento tiene un método `getId()`
+        try {
+            return (String) elemento.getClass().getMethod("getId").invoke(elemento);
+        } catch (Exception e) {
+            throw new RuntimeException("El elemento no tiene un método getId válido", e);
         }
     }
 }

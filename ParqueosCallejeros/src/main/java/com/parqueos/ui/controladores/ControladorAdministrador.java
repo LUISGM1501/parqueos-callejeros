@@ -23,6 +23,21 @@ public class ControladorAdministrador extends ControladorBase {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Falta la logica para abrir la ventana de configuracion de parqueo
+                System.out.println("Abriendo configuracion de parqueo");
+            }
+        });
+
+        vista.getBtnGestionarUsuarios().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gestionarUsuarios();
+            }
+        });
+
+        vista.getBtnGestionarEspacios().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gestionarEspacios();
             }
         });
 
@@ -66,5 +81,15 @@ public class ControladorAdministrador extends ControladorBase {
         // Falta la logica para generar el reporte correspondiente
         // Utilizando el ReporteFactory y el SistemaParqueo
         System.out.println("Generando reporte de tipo: " + tipoReporte);
+    }
+
+    private void gestionarUsuarios() {
+        // Falta la logica para abrir la ventana de gestion de usuarios
+        System.out.println("Abriendo gestion de usuarios");
+    }
+
+    private void gestionarEspacios() {
+        // Falta la logica para abrir la ventana de gestion de espacios
+        System.out.println("Abriendo gestion de espacios");
     }
 }

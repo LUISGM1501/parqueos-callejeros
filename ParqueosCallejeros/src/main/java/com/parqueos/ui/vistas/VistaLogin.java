@@ -1,11 +1,12 @@
 package com.parqueos.ui.vistas;
 
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
-
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JLabel;
 
 public class VistaLogin extends VistaBase {
     private JTextField campoUsuario;
@@ -17,12 +18,16 @@ public class VistaLogin extends VistaBase {
         inicializarComponentes();
     }
 
+    public void mostrarMensajeError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     @Override
     public void inicializarComponentes() {
         PanelPersonalizado panel = new PanelPersonalizado();
         setContentPane(panel);
 
-        JLabel labelUsuario = new JLabel("Usuario:");
+        JLabel labelUsuario = new JLabel("User:");
         labelUsuario.setBounds(50, 50, 100, 30);
         panel.add(labelUsuario);
 
@@ -30,7 +35,7 @@ public class VistaLogin extends VistaBase {
         campoUsuario.setBounds(150, 50, 200, 30);
         panel.add(campoUsuario);
 
-        JLabel labelContrasena = new JLabel("Contraseña:");
+        JLabel labelContrasena = new JLabel("Password:");
         labelContrasena.setBounds(50, 100, 100, 30);
         panel.add(labelContrasena);
 
@@ -38,7 +43,7 @@ public class VistaLogin extends VistaBase {
         campoContrasena.setBounds(150, 100, 200, 30);
         panel.add(campoContrasena);
 
-        botonLogin = new BotonPersonalizado("Iniciar Sesión");
+        botonLogin = new BotonPersonalizado("Login");
         botonLogin.setBounds(150, 150, 200, 40);
         panel.add(botonLogin);
 

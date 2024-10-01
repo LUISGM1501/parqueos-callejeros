@@ -2,7 +2,7 @@ package com.parqueos.builders;
 
 import com.parqueos.modelo.usuario.Inspector;
 
-public class InspectorBuilder extends UsuarioBuilder {
+public class InspectorBuilder extends UsuarioBuilder<InspectorBuilder> {
     private String terminalId;
 
     public InspectorBuilder conTerminalId(String terminalId) {

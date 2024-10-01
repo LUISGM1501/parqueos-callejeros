@@ -2,10 +2,11 @@ package com.parqueos.reportes;
 
 import java.time.LocalDate;
 import java.util.List;  
+
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 
 public class ReporteEspacios implements Reporte {
-    private List<EspacioParqueo> espacios;
+    private final List<EspacioParqueo> espacios;
 
     public ReporteEspacios(List<EspacioParqueo> espacios) {
         this.espacios = espacios;

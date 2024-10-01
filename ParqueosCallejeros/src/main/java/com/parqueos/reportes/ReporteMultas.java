@@ -1,13 +1,14 @@
 package com.parqueos.reportes;
 
-import com.parqueos.modelo.multa.Multa;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.parqueos.modelo.multa.Multa;
+
 public class ReporteMultas implements Reporte {
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private List<Multa> multas;
+    private final LocalDate fechaInicio;
+    private final LocalDate fechaFin;
+    private final List<Multa> multas;
 
     public ReporteMultas(LocalDate fechaInicio, LocalDate fechaFin, List<Multa> multas) {
         this.fechaInicio = fechaInicio;

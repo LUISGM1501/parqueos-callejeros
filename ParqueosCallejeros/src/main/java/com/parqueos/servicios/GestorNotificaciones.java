@@ -1,10 +1,10 @@
 package com.parqueos.servicios;
 
-import com.parqueos.modelo.usuario.Usuario;
-import com.parqueos.modelo.parqueo.Reserva;
-import com.parqueos.modelo.multa.Multa;
-
 import java.time.format.DateTimeFormatter;
+
+import com.parqueos.modelo.multa.Multa;
+import com.parqueos.modelo.parqueo.Reserva;
+import com.parqueos.modelo.usuario.Usuario;
 
 public class GestorNotificaciones {
     
@@ -50,7 +50,7 @@ public class GestorNotificaciones {
         enviarCorreo(usuario.getEmail(), "Multa Generada", mensaje);
     }
     
-    private void enviarCorreo(String destinatario, String asunto, String mensaje) {
+    public void enviarCorreo(String destinatario, String asunto, String mensaje) {
         // Falta implementar la logica para enviar correos 
         System.out.println("Enviando correo a: " + destinatario);
         System.out.println("Asunto: " + asunto);

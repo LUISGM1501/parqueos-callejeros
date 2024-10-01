@@ -1,10 +1,11 @@
 package com.parqueos.ui.vistas;
 
+import java.awt.GridLayout;
+
+import javax.swing.JLabel;
+
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class VistaUsuarioParqueo extends VistaBase {
     private BotonPersonalizado btnParquear;

@@ -2,7 +2,7 @@ package com.parqueos.builders;
 
 import com.parqueos.modelo.usuario.Usuario;
 
-public class UsuarioBuilder {
+public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
     protected String nombre;
     protected String apellidos;
     protected int telefono;
@@ -11,39 +11,46 @@ public class UsuarioBuilder {
     protected String idUsuario;
     protected String pin;
 
-    public UsuarioBuilder conNombre(String nombre) {
+    @SuppressWarnings("unchecked")
+    public T conNombre(String nombre) {
         this.nombre = nombre;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conApellidos(String apellidos) {
+    @SuppressWarnings("unchecked")
+    public T conApellidos(String apellidos) {
         this.apellidos = apellidos;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conTelefono(int telefono) {
+    @SuppressWarnings("unchecked")
+    public T conTelefono(int telefono) {
         this.telefono = telefono;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conEmail(String email) {
+    @SuppressWarnings("unchecked")
+    public T conEmail(String email) {
         this.email = email;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conDireccion(String direccion) {
+    @SuppressWarnings("unchecked")
+    public T conDireccion(String direccion) {
         this.direccion = direccion;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conIdUsuario(String idUsuario) {
+    @SuppressWarnings("unchecked")
+    public T conIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
-        return this;
+        return (T) this;
     }
 
-    public UsuarioBuilder conPin(String pin) {
+    @SuppressWarnings("unchecked")
+    public T conPin(String pin) {
         this.pin = pin;
-        return this;
+        return (T) this;
     }
 
     public Usuario construir() {

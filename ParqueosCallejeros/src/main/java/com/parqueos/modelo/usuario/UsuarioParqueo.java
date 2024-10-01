@@ -13,6 +13,7 @@ public class UsuarioParqueo extends Usuario {
     private String codigoValidacionTarjeta;
     private List<Vehiculo> vehiculos;
     private int tiempoGuardado; // en minutos
+    private List<Reserva> reservasActivas;
 
     public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, String direccion, 
                           String idUsuario, String pin, String numeroTarjeta, String fechaVencimientoTarjeta, 
@@ -23,6 +24,7 @@ public class UsuarioParqueo extends Usuario {
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
         this.vehiculos = new ArrayList<>();
         this.tiempoGuardado = 0;
+        this.reservasActivas = new ArrayList<>();
     }
 
     public void agregarVehiculo(Vehiculo vehiculo) {
@@ -36,16 +38,24 @@ public class UsuarioParqueo extends Usuario {
         // Logica para guardar la reserva en el sistema
         Reserva reserva = new Reserva(this, espacio, vehiculo, tiempoComprado);
         // Aquí iria la logica para guardar la reserva en el sistema
+        reservasActivas.add(reserva);
         return reserva;
     }
 
     public void agregarTiempo(Reserva reserva, int tiempoAdicional) {
+        if (!reservasActivas.contains(reserva)) {
+            throw new IllegalArgumentException("La reserva no está activa para este usuario");
+        }
         reserva.extenderTiempo(tiempoAdicional);
     }
 
     public void desaparcar(Reserva reserva) {
+        if (!reservasActivas.contains(reserva)) {
+            throw new IllegalArgumentException("La reserva no esta activa para este usuario");
+        }
         int tiempoNoUsado = reserva.finalizarReserva();
         this.tiempoGuardado += tiempoNoUsado;
+        reservasActivas.remove(reserva);
     }
 
     public List<EspacioParqueo> buscarParqueosDisponibles() {
@@ -90,4 +100,7 @@ public class UsuarioParqueo extends Usuario {
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
     }   
     
+    public List<Reserva> getReservasActivas() {
+        return new ArrayList<>(reservasActivas);
+    }
 }

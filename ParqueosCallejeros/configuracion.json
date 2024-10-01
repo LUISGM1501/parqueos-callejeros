@@ -1,0 +1,8 @@
+[ {
+  "horarioInicio" : null,
+  "horarioFin" : null,
+  "precioHora" : 0,
+  "tiempoMinimo" : 0,
+  "costoMulta" : 0,
+  "espacios" : [ ]
+} ]

@@ -1,8 +1,8 @@
 package com.parqueos.reportes;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -10,10 +10,10 @@ import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 
 public class ReporteEstadisticas implements Reporte {
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private List<EspacioParqueo> espacios;
-    private List<Reserva> reservas;
+    private final LocalDate fechaInicio;
+    private final LocalDate fechaFin;
+    private final List<EspacioParqueo> espacios;
+    private final List<Reserva> reservas;
 
     public ReporteEstadisticas(LocalDate fechaInicio, LocalDate fechaFin, List<EspacioParqueo> espacios, List<Reserva> reservas) {
         this.fechaInicio = fechaInicio;

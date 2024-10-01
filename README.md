@@ -3,7 +3,7 @@
 ## Integrantes
 
 - Luis Gerardo Urbina Salazar, carne 2023156802
-- Estebitan UwU
+- Victor Esteban Azofeifa Portuguez, carne 2023113603
 
 ## Descripción
 
@@ -42,4 +42,7 @@ javac -d out -sourcepath src/main/java src/main/java/com/parqueos/ui/Main.java
 ```bash
 java -cp out com.parqueos.ui.Main
 ```
+mvn clean install
+
+mvn clean compile exec:java
 

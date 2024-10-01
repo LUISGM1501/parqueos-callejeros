@@ -1,17 +1,17 @@
 package com.parqueos.reportes;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.time.temporal.ChronoUnit;
 
 import com.parqueos.modelo.parqueo.Reserva;
 
 public class ReporteHistorial implements Reporte {
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private List<Reserva> reservas;
+    private final LocalDate fechaInicio;
+    private final LocalDate fechaFin;
+    private final List<Reserva> reservas;
 
     public ReporteHistorial(LocalDate fechaInicio, LocalDate fechaFin, List<Reserva> reservas) {
         this.fechaInicio = fechaInicio;

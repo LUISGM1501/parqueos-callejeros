@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class ReporteIngresos implements Reporte {
-    private LocalDate fechaInicio;
-    private LocalDate fechaFin;
-    private List<Double> ingresosPorDia;
+    private final LocalDate fechaInicio;
+    private final LocalDate fechaFin;
+    private final List<Double> ingresosPorDia;
 
     public ReporteIngresos(LocalDate fechaInicio, LocalDate fechaFin, List<Double> ingresosPorDia) {
         this.fechaInicio = fechaInicio;
