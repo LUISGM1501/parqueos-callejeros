@@ -12,6 +12,7 @@ public class VistaLogin extends VistaBase {
     private JTextField campoUsuario;
     private JPasswordField campoContrasena;
     private BotonPersonalizado botonLogin;
+    private BotonPersonalizado botonNuevo;
 
     public VistaLogin() {
         super("Login");
@@ -46,6 +47,10 @@ public class VistaLogin extends VistaBase {
         botonLogin = new BotonPersonalizado("Login");
         botonLogin.setBounds(150, 150, 200, 40);
         panel.add(botonLogin);
+        
+        botonNuevo = new BotonPersonalizado("Esteban :p");
+        botonNuevo.setBounds(250,250,100,40);
+        panel.add(botonNuevo);
 
         pack();
     }
