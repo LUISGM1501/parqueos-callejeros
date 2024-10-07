@@ -34,15 +34,14 @@ Pendiente subir la foto del diagrama de clases.
 1. Compilar el proyecto:
 
 ```bash
-javac -d out -sourcepath src/main/java src/main/java/com/parqueos/ui/Main.java
+mvn clean compile
+
 ```
 
 2. Ejecutar el proyecto:
 
 ```bash
-java -cp out com.parqueos.ui.Main
-```
-mvn clean install
+mvn exec:java
 
-mvn clean compile exec:java
+```
 

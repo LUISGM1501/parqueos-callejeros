@@ -1,20 +1,23 @@
 package com.parqueos.ui.vistas;
 
-import java.awt.GridLayout;
-
-import javax.swing.JLabel;
-
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
 
+import javax.swing.*;
+import java.awt.*;
+
 public class VistaUsuarioParqueo extends VistaBase {
+    private JTabbedPane tabbedPane;
     private BotonPersonalizado btnParquear;
     private BotonPersonalizado btnAgregarTiempo;
     private BotonPersonalizado btnDesaparcar;
     private BotonPersonalizado btnVerEspaciosDisponibles;
     private BotonPersonalizado btnVerHistorial;
     private BotonPersonalizado btnVerMultas;
+    private BotonPersonalizado btnPagarMulta;
     private JLabel lblTiempoGuardado;
+    private JTable tblReservasActivas;
+    private JTable tblMultas;
 
     public VistaUsuarioParqueo() {
         super("Panel de Usuario de Parqueo");
@@ -23,37 +26,105 @@ public class VistaUsuarioParqueo extends VistaBase {
 
     @Override
     public void inicializarComponentes() {
-        PanelPersonalizado panel = new PanelPersonalizado();
-        setContentPane(panel);
-        panel.setLayout(new GridLayout(4, 2, 10, 10));
+        setLayout(new BorderLayout());
+
+        tabbedPane = new JTabbedPane();
+        add(tabbedPane, BorderLayout.CENTER);
+
+        // Panel de Parqueo
+        PanelPersonalizado panelParqueo = new PanelPersonalizado();
+        panelParqueo.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         btnParquear = new BotonPersonalizado("Parquear");
         btnAgregarTiempo = new BotonPersonalizado("Agregar Tiempo");
         btnDesaparcar = new BotonPersonalizado("Desaparcar");
         btnVerEspaciosDisponibles = new BotonPersonalizado("Ver Espacios Disponibles");
-        btnVerHistorial = new BotonPersonalizado("Ver Historial");
-        btnVerMultas = new BotonPersonalizado("Ver Multas");
         lblTiempoGuardado = new JLabel("Tiempo guardado: 0 minutos");
 
-        panel.add(btnParquear);
-        panel.add(btnAgregarTiempo);
-        panel.add(btnDesaparcar);
-        panel.add(btnVerEspaciosDisponibles);
-        panel.add(btnVerHistorial);
-        panel.add(btnVerMultas);
-        panel.add(lblTiempoGuardado);
+        gbc.gridx = 0; gbc.gridy = 0; panelParqueo.add(btnParquear, gbc);
+        gbc.gridx = 1; gbc.gridy = 0; panelParqueo.add(btnAgregarTiempo, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panelParqueo.add(btnDesaparcar, gbc);
+        gbc.gridx = 1; gbc.gridy = 1; panelParqueo.add(btnVerEspaciosDisponibles, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; panelParqueo.add(lblTiempoGuardado, gbc);
+
+        tabbedPane.addTab("Parqueo", panelParqueo);
+
+        // Panel de Reservas Activas
+        PanelPersonalizado panelReservas = new PanelPersonalizado();
+        panelReservas.setLayout(new BorderLayout());
+        tblReservasActivas = new JTable(); // Aquí deberías configurar el modelo de la tabla
+        JScrollPane scrollReservas = new JScrollPane(tblReservasActivas);
+        panelReservas.add(scrollReservas, BorderLayout.CENTER);
+
+        tabbedPane.addTab("Reservas Activas", panelReservas);
+
+        // Panel de Historial
+        PanelPersonalizado panelHistorial = new PanelPersonalizado();
+        panelHistorial.setLayout(new BorderLayout());
+        btnVerHistorial = new BotonPersonalizado("Ver Historial");
+        panelHistorial.add(btnVerHistorial, BorderLayout.NORTH);
+
+        tabbedPane.addTab("Historial", panelHistorial);
+
+        // Panel de Multas
+        PanelPersonalizado panelMultas = new PanelPersonalizado();
+        panelMultas.setLayout(new BorderLayout());
+        tblMultas = new JTable(); // Aquí deberías configurar el modelo de la tabla
+        JScrollPane scrollMultas = new JScrollPane(tblMultas);
+        panelMultas.add(scrollMultas, BorderLayout.CENTER);
+        
+        JPanel panelBotonesMultas = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnVerMultas = new BotonPersonalizado("Actualizar Multas");
+        btnPagarMulta = new BotonPersonalizado("Pagar Multa Seleccionada");
+        panelBotonesMultas.add(btnVerMultas);
+        panelBotonesMultas.add(btnPagarMulta);
+        panelMultas.add(panelBotonesMultas, BorderLayout.SOUTH);
+
+        tabbedPane.addTab("Multas", panelMultas);
 
         pack();
         setLocationRelativeTo(null);
     }
 
     // Getters para los componentes
-    public BotonPersonalizado getBtnParquear() { return btnParquear; }
-    public BotonPersonalizado getBtnAgregarTiempo() { return btnAgregarTiempo; }
-    public BotonPersonalizado getBtnDesaparcar() { return btnDesaparcar; }
-    public BotonPersonalizado getBtnVerEspaciosDisponibles() { return btnVerEspaciosDisponibles; }
-    public BotonPersonalizado getBtnVerHistorial() { return btnVerHistorial; }
-    public BotonPersonalizado getBtnVerMultas() { return btnVerMultas; }
+    public BotonPersonalizado getBtnParquear() { 
+        return btnParquear; 
+    }
+
+    public BotonPersonalizado getBtnAgregarTiempo() {
+        return btnAgregarTiempo;  
+    }
+
+    public BotonPersonalizado getBtnDesaparcar() { 
+        return btnDesaparcar; 
+    }
+
+    public BotonPersonalizado getBtnVerEspaciosDisponibles() { 
+        return btnVerEspaciosDisponibles; 
+    }
+
+    public BotonPersonalizado getBtnVerHistorial() { 
+        return btnVerHistorial; 
+    }
+
+    public BotonPersonalizado getBtnVerMultas() { 
+        return btnVerMultas; 
+    }
+    
+    public BotonPersonalizado getBtnPagarMulta() { 
+        return btnPagarMulta; 
+    }
+    
+    public JTable getTblReservasActivas() { 
+        return tblReservasActivas; 
+    }
+    
+    public JTable getTblMultas() { 
+        return tblMultas; 
+    }
+    
     public void actualizarTiempoGuardado(int minutos) {
         lblTiempoGuardado.setText("Tiempo guardado: " + minutos + " minutos");
     }

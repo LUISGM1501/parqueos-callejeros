@@ -1,11 +1,13 @@
 package com.parqueos.modelo.usuario;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UsuarioParqueo extends Usuario {
     private String numeroTarjeta;
@@ -18,7 +20,7 @@ public class UsuarioParqueo extends Usuario {
     public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, String direccion, 
                           String idUsuario, String pin, String numeroTarjeta, String fechaVencimientoTarjeta, 
                           String codigoValidacionTarjeta) {
-        super(nombre, apellidos, telefono, email, direccion, idUsuario, pin);
+        super(nombre, apellidos, telefono, email, direccion, idUsuario, pin, TipoUsuario.USUARIO_PARQUEO);
         this.numeroTarjeta = numeroTarjeta;
         this.fechaVencimientoTarjeta = fechaVencimientoTarjeta;
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
@@ -27,43 +29,8 @@ public class UsuarioParqueo extends Usuario {
         this.reservasActivas = new ArrayList<>();
     }
 
-    public void agregarVehiculo(Vehiculo vehiculo) {
-        this.vehiculos.add(vehiculo);
-    }
-
-    public Reserva parquear(EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
-        if (!vehiculos.contains(vehiculo)) {
-            throw new IllegalArgumentException("El vehículo no está registrado para este usuario");
-        }
-        // Logica para guardar la reserva en el sistema
-        Reserva reserva = new Reserva(this, espacio, vehiculo, tiempoComprado);
-        // Aquí iria la logica para guardar la reserva en el sistema
-        reservasActivas.add(reserva);
-        return reserva;
-    }
-
-    public void agregarTiempo(Reserva reserva, int tiempoAdicional) {
-        if (!reservasActivas.contains(reserva)) {
-            throw new IllegalArgumentException("La reserva no está activa para este usuario");
-        }
-        reserva.extenderTiempo(tiempoAdicional);
-    }
-
-    public void desaparcar(Reserva reserva) {
-        if (!reservasActivas.contains(reserva)) {
-            throw new IllegalArgumentException("La reserva no esta activa para este usuario");
-        }
-        int tiempoNoUsado = reserva.finalizarReserva();
-        this.tiempoGuardado += tiempoNoUsado;
-        reservasActivas.remove(reserva);
-    }
-
-    public List<EspacioParqueo> buscarParqueosDisponibles() {
-        // Falta implementar la logica para buscar espacios de parqueo disponibles
-        return null; // Placeholder
-    }
-
     // Getters y setters
+
     public List<Vehiculo> getVehiculos() {
         return new ArrayList<>(vehiculos);
     }
@@ -74,6 +41,7 @@ public class UsuarioParqueo extends Usuario {
 
     public void setTiempoGuardado(int tiempoGuardado) {
         this.tiempoGuardado = tiempoGuardado;
+        this.actualizarEnArchivo();
     }
 
     public String getNumeroTarjeta() {
@@ -82,6 +50,7 @@ public class UsuarioParqueo extends Usuario {
 
     public void setNumeroTarjeta(String numeroTarjeta) {
         this.numeroTarjeta = numeroTarjeta;
+        this.actualizarEnArchivo();
     }   
 
     public String getFechaVencimientoTarjeta() {
@@ -90,6 +59,7 @@ public class UsuarioParqueo extends Usuario {
 
     public void setFechaVencimientoTarjeta(String fechaVencimientoTarjeta) {
         this.fechaVencimientoTarjeta = fechaVencimientoTarjeta;
+        this.actualizarEnArchivo();
     }   
 
     public String getCodigoValidacionTarjeta() {
@@ -98,9 +68,93 @@ public class UsuarioParqueo extends Usuario {
 
     public void setCodigoValidacionTarjeta(String codigoValidacionTarjeta) {
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
+        this.actualizarEnArchivo();
     }   
     
     public List<Reserva> getReservasActivas() {
         return new ArrayList<>(reservasActivas);
+    }
+
+    // Metodos
+
+    @Override
+    public void actualizarEnArchivo() {
+        super.actualizarEnArchivo();
+        // Actualizar vehículos y reservas si es necesario
+        for (Vehiculo vehiculo : vehiculos) {
+            vehiculo.actualizar();
+        }
+        for (Reserva reserva : reservasActivas) {
+            reserva.actualizar();
+        }
+    }
+
+    public static List<UsuarioParqueo> cargarTodosUserParqueo() {
+        return Usuario.cargarTodos().stream()
+                .filter(u -> u.getTipoUsuario() == TipoUsuario.USUARIO_PARQUEO)
+                .map(u -> (UsuarioParqueo) u)
+                .collect(Collectors.toList());
+    }
+
+    public void agregarVehiculo(Vehiculo vehiculo) {
+        this.vehiculos.add(vehiculo);
+        this.actualizarEnArchivo();
+    }
+
+    public Reserva parquear(EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
+        if (!vehiculos.contains(vehiculo)) {
+            throw new IllegalArgumentException("El vehículo no está registrado para este usuario");
+        }
+        if (!espacio.estaDisponible()) {
+            throw new IllegalStateException("El espacio de parqueo no está disponible");
+        }
+        ConfiguracionParqueo config = ConfiguracionParqueo.obtenerInstancia();
+        if (tiempoComprado < config.getTiempoMinimo()) {
+            throw new IllegalArgumentException("El tiempo mínimo de compra es " + config.getTiempoMinimo() + " minutos");
+        }
+        
+        double costo = (tiempoComprado / 60.0) * config.getPrecioHora();
+        
+        Reserva reserva = new Reserva(this, espacio, vehiculo, tiempoComprado);
+        reserva.guardar();
+        reservasActivas.add(reserva);
+        espacio.ocupar(vehiculo);
+        this.actualizarEnArchivo();
+        
+        return reserva;
+    }
+
+    public void agregarTiempo(Reserva reserva, int tiempoAdicional) {
+        if (!reservasActivas.contains(reserva)) {
+            throw new IllegalArgumentException("La reserva no está activa para este usuario");
+        }
+        ConfiguracionParqueo config = ConfiguracionParqueo.obtenerInstancia();
+        if (tiempoAdicional < config.getTiempoMinimo()) {
+            throw new IllegalArgumentException("El tiempo mínimo de compra es " + config.getTiempoMinimo() + " minutos");
+        }
+        
+        double costoAdicional = (tiempoAdicional / 60.0) * config.getPrecioHora();
+        
+        reserva.extenderTiempo(tiempoAdicional);
+        reserva.actualizar();
+        this.actualizarEnArchivo();
+    }
+
+    public void desaparcar(Reserva reserva) {
+        if (!reservasActivas.contains(reserva)) {
+            throw new IllegalArgumentException("La reserva no está activa para este usuario");
+        }
+        int tiempoNoUsado = reserva.finalizarReserva();
+        this.tiempoGuardado += tiempoNoUsado;
+        reservasActivas.remove(reserva);
+        reserva.getEspacio().liberar();
+        reserva.eliminar();
+        this.actualizarEnArchivo();
+    }
+
+    public List<EspacioParqueo> buscarParqueosDisponibles() {
+        return EspacioParqueo.cargarTodos().stream()
+                .filter(EspacioParqueo::estaDisponible)
+                .collect(Collectors.toList());
     }
 }

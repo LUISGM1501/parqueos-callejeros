@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.parqueos.util.GestorArchivos;
 
 public class ConfiguracionParqueo implements Serializable   {
     private static final long serialVersionUID = 1L;
+    private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
     
     private static ConfiguracionParqueo instancia;
     private LocalTime horarioInicio;
@@ -105,6 +107,10 @@ public class ConfiguracionParqueo implements Serializable   {
 
     public List<EspacioParqueo> getEspacios() {
         return new ArrayList<>(espacios);
+    }
+
+    public void guardar() {
+        GestorArchivos.guardarElemento(this, ARCHIVO_CONFIGURACION);
     }
 
     @Override

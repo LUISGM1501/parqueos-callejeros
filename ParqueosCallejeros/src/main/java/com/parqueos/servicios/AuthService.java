@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.parqueos.builders.AdministradorBuilder;
 import com.parqueos.builders.InspectorBuilder;
@@ -74,29 +76,23 @@ public class AuthService {
     }
 
     public void registrarUsuario(Usuario usuario) {
-        System.out.println("Registrando usuario: " + usuario.getIdUsuario());
-        usuarios.put(usuario.getIdUsuario(), usuario);
+        usuario.guardar();
     }
 
     public String iniciarSesion(String idUsuario, String pin) {
-        System.out.println("Intento de inicio de sesión para: " + idUsuario);
-        Usuario usuario = usuarios.get(idUsuario);
-        if (usuario != null) {
-            System.out.println("Usuario encontrado: " + usuario.getClass().getSimpleName());
-            System.out.println("PIN proporcionado: " + pin);
-            System.out.println("PIN almacenado: " + usuario.getPin());
-            if (usuario.validarPin(pin)) {
-                String token = UUID.randomUUID().toString();
-                sesiones.put(token, idUsuario);
-                System.out.println("Inicio de sesion exitoso");
-                return token;
-            } else {
-                System.out.println("PIN incorrecto");
-            }
+        List<Usuario> usuarios = Usuario.cargarTodos();
+        Usuario usuario = usuarios.stream()
+                .filter(u -> u.getIdUsuario().equals(idUsuario))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        if (usuario.validarPin(pin)) {
+            String token = UUID.randomUUID().toString();
+            sesiones.put(token, usuario.getId());
+            return token;
         } else {
-            System.out.println("Usuario no encontrado");
+            throw new IllegalArgumentException("Credenciales inválidas");
         }
-        throw new IllegalArgumentException("Credenciales invalidas");
     }
 
     public void cerrarSesion(String token) {
@@ -106,9 +102,9 @@ public class AuthService {
     public Usuario obtenerUsuarioAutenticado(String token) {
         String idUsuario = sesiones.get(token);
         if (idUsuario != null) {
-            return usuarios.get(idUsuario);
+            return Usuario.cargar(idUsuario);
         }
-        throw new IllegalStateException("Sesion no valida");
+        throw new IllegalStateException("Sesión no válida");
     }
 
     public boolean estaAutenticado(String token) {
@@ -121,20 +117,57 @@ public class AuthService {
     }
 
     public void solicitarRestablecimientoPin(String idUsuario) {
-        Usuario usuario = usuarios.get(idUsuario);
-        if (usuario != null) {
-            String pinTemporal = generarPinTemporal();
-            pinesTemporales.put(idUsuario, pinTemporal);
-            gestorNotificaciones.enviarCorreo(usuario.getEmail(), "Restablecimiento de PIN", 
-                "Su PIN temporal es: " + pinTemporal + ". Por favor, cambielo despues de iniciar sesion.");
-        } else {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
+        List<Usuario> usuarios = Usuario.cargarTodos();
+        Usuario usuario = usuarios.stream()
+                .filter(u -> u.getIdUsuario().equals(idUsuario))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        String pinTemporal = generarPinTemporal();
+        pinesTemporales.put(idUsuario, pinTemporal);
+        gestorNotificaciones.enviarCorreo(usuario.getEmail(), "Restablecimiento de PIN", 
+            "Su PIN temporal es: " + pinTemporal + ". Por favor, cámbielo después de iniciar sesión.");
     }
 
     private String generarPinTemporal() {
         Random random = new Random();
         return String.format("%04d", random.nextInt(10000));
+    }
+
+    public List<Administrador> obtenerTodosAdministradores() {
+        return Usuario.cargarTodos().stream()
+                .filter(u -> u instanceof Administrador)
+                .map(u -> (Administrador) u)
+                .collect(Collectors.toList());
+    }
+
+    public List<Inspector> obtenerTodosInspectores() {
+        return Usuario.cargarTodos().stream()
+                .filter(u -> u instanceof Inspector)
+                .map(u -> (Inspector) u)
+                .collect(Collectors.toList());
+    }
+
+    public List<UsuarioParqueo> obtenerTodosUsuariosParqueo() {
+        return Usuario.cargarTodos().stream()
+                .filter(u -> u instanceof UsuarioParqueo)
+                .map(u -> (UsuarioParqueo) u)
+                .collect(Collectors.toList());
+    }
+
+    public boolean esAdministrador(String token) {
+        Usuario usuario = obtenerUsuarioAutenticado(token);
+        return usuario instanceof Administrador;
+    }
+
+    public boolean esInspector(String token) {
+        Usuario usuario = obtenerUsuarioAutenticado(token);
+        return usuario instanceof Inspector;
+    }
+
+    public boolean esUsuarioParqueo(String token) {
+        Usuario usuario = obtenerUsuarioAutenticado(token);
+        return usuario instanceof UsuarioParqueo;
     }
 
     private boolean validarPinTemporal(String idUsuario, String pin) {

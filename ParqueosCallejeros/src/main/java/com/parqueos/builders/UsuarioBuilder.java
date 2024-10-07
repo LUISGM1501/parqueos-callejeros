@@ -10,7 +10,7 @@ public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
     protected String direccion;
     protected String idUsuario;
     protected String pin;
-
+    protected Usuario.TipoUsuario tipoUsuario;
     @SuppressWarnings("unchecked")
     public T conNombre(String nombre) {
         this.nombre = nombre;
@@ -53,7 +53,13 @@ public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public T conTipoUsuario(Usuario.TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+        return (T) this;
+    }
+
     public Usuario construir() {
-        return new Usuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin);
+        return new Usuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin, tipoUsuario);
     }
 }

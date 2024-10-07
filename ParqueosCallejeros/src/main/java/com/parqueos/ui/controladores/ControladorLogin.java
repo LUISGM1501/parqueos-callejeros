@@ -41,7 +41,7 @@ public class ControladorLogin extends ControladorBase {
 
         redireccionUsuarios.put(UsuarioParqueo.class, (usuario, token) -> {
             VistaUsuarioParqueo vistaUsuario = new VistaUsuarioParqueo();
-            new ControladorUsuarioParqueo(vistaUsuario, sistemaParqueo, (UsuarioParqueo) usuario);
+            new ControladorUsuarioParqueo(vistaUsuario, sistemaParqueo, (UsuarioParqueo) usuario, token);
             vistaUsuario.setVisible(true);
         });
 
@@ -75,12 +75,13 @@ public class ControladorLogin extends ControladorBase {
 
     private void redirigirUsuario(Usuario usuario, String token) {
         vista.setVisible(false);
-        BiConsumer<Usuario, String> redireccion = redireccionUsuarios.get(usuario.getClass());
-        if (redireccion != null) {
-            redireccion.accept(usuario, token);
+        if (usuario instanceof UsuarioParqueo) {
+            VistaUsuarioParqueo vistaUsuario = new VistaUsuarioParqueo();
+            new ControladorUsuarioParqueo(vistaUsuario, sistemaParqueo, (UsuarioParqueo) usuario, token);
+            vistaUsuario.setVisible(true);
         } else {
-            System.out.println("Tipo de usuario no reconocido");
-            vista.mostrarMensajeError("Tipo de usuario no reconocido");
+            // Manejar otros tipos de usuarios...
+            System.out.println("Tipo de usuario no manejado: " + usuario.getClass().getSimpleName());
             vista.setVisible(true);
         }
     }
