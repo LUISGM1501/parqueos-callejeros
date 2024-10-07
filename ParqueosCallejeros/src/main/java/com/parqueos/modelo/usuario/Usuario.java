@@ -83,6 +83,10 @@ public class Usuario implements Serializable {
         this.pin = pin;
     }
     
+    public LocalDate getFechaIngreso(){
+        return this.fechaIngreso;
+    }
+    
 
     public boolean validarPin(String pin) {
         return this.pin.equals(pin);

@@ -126,6 +126,16 @@ public class SistemaParqueo {
         authService.registrarUsuario(usuario);
         guardarDatos();
     }
+    
+    //consultar usuario
+    public Usuario consultarUsuario(String idUsuario) {
+        for (Usuario usuario : usuarios){
+            if (usuario.getIdUsuario() == idUsuario){
+                return usuario;
+            }
+        }
+        return null;
+    }
 
     public void actualizarUsuario(Usuario usuario) {
         int index = usuarios.indexOf(usuario);
@@ -139,7 +149,7 @@ public class SistemaParqueo {
         usuarios.removeIf(u -> u.getIdUsuario().equals(idUsuario));
         guardarDatos();
     }
-
+    
     public Reserva crearReserva(UsuarioParqueo usuario, EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
         if (!espacio.estaDisponible()) {
             throw new IllegalStateException("El espacio no esta disponible");

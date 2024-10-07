@@ -6,10 +6,12 @@ import java.awt.event.ActionListener;
 import com.parqueos.reportes.ReporteFactory;
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaAdministrador;
+import com.parqueos.ui.vistas.VistaGestionarUsuarios;
 
 public class ControladorAdministrador extends ControladorBase {
     private VistaAdministrador vista;
     private SistemaParqueo sistemaParqueo;
+    
 
     public ControladorAdministrador(VistaAdministrador vista, SistemaParqueo sistemaParqueo) {
         this.vista = vista;
@@ -86,6 +88,11 @@ public class ControladorAdministrador extends ControladorBase {
     private void gestionarUsuarios() {
         // Falta la logica para abrir la ventana de gestion de usuarios
         System.out.println("Abriendo gestion de usuarios");
+        vista.dispose();
+        VistaGestionarUsuarios vistaGestionUsuarios = new VistaGestionarUsuarios();
+        new ControladorGestionarUsuarios(vistaGestionUsuarios, sistemaParqueo);
+        vistaGestionUsuarios.setVisible(true);
+        
     }
 
     private void gestionarEspacios() {
