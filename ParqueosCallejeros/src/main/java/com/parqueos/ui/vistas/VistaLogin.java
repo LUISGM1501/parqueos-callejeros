@@ -1,5 +1,11 @@
 package com.parqueos.ui.vistas;
 
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -14,43 +20,64 @@ public class VistaLogin extends VistaBase {
     private BotonPersonalizado botonLogin;
 
     public VistaLogin() {
-        super("Login");
+        super("Inicio de Sesión");
         inicializarComponentes();
-    }
-
-    public void mostrarMensajeError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
     public void inicializarComponentes() {
         PanelPersonalizado panel = new PanelPersonalizado();
+        panel.setLayout(new GridBagLayout());
         setContentPane(panel);
 
-        JLabel labelUsuario = new JLabel("User:");
-        labelUsuario.setBounds(50, 50, 100, 30);
-        panel.add(labelUsuario);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        campoUsuario = new JTextField();
-        campoUsuario.setBounds(150, 50, 200, 30);
-        panel.add(campoUsuario);
+        JLabel labelTitulo = new JLabel("Sistema de Parqueos");
+        labelTitulo.setFont(new Font("Arial", Font.BOLD, 24));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(labelTitulo, gbc);
 
-        JLabel labelContrasena = new JLabel("Password:");
-        labelContrasena.setBounds(50, 100, 100, 30);
-        panel.add(labelContrasena);
+        JLabel labelUsuario = new JLabel("Usuario:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(labelUsuario, gbc);
 
-        campoContrasena = new JPasswordField();
-        campoContrasena.setBounds(150, 100, 200, 30);
-        panel.add(campoContrasena);
+        campoUsuario = new JTextField(15);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(campoUsuario, gbc);
 
-        botonLogin = new BotonPersonalizado("Login");
-        botonLogin.setBounds(150, 150, 200, 40);
-        panel.add(botonLogin);
+        JLabel labelContrasena = new JLabel("Contraseña:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(labelContrasena, gbc);
 
+        campoContrasena = new JPasswordField(15);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(campoContrasena, gbc);
+
+        botonLogin = new BotonPersonalizado("Iniciar Sesión");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(botonLogin, gbc);
+
+        setPreferredSize(new Dimension(400, 250));
         pack();
+        setLocationRelativeTo(null);
     }
 
-    // Getters para los componentes
     public JTextField getCampoUsuario() {
         return campoUsuario;
     }
@@ -61,5 +88,9 @@ public class VistaLogin extends VistaBase {
 
     public BotonPersonalizado getBotonLogin() {
         return botonLogin;
+    }
+
+    public void mostrarMensajeError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

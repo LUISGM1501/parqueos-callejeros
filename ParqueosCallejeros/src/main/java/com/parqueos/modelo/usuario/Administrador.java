@@ -1,5 +1,9 @@
 package com.parqueos.modelo.usuario;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
@@ -8,15 +12,15 @@ import com.parqueos.reportes.Reporte;
 import com.parqueos.reportes.ReporteFactory;
 import com.parqueos.reportes.ReporteFactory.TipoReporte;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 public class Administrador extends Usuario {
 
     public Administrador(String nombre, String apellidos, int telefono, String email, String direccion, String idUsuario, String pin) {
         super(nombre, apellidos, telefono, email, direccion, idUsuario, pin, TipoUsuario.ADMINISTRADOR);
+    }
+
+    // Constructor sin argumentos para Jackson
+    public Administrador() {
+        super("", "", 0, "", "", "", "", TipoUsuario.ADMINISTRADOR);
     }
 
     public static List<Administrador> cargarTodosAdminis() {

@@ -1,15 +1,15 @@
 package com.parqueos.modelo.usuario;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.reportes.Reporte;
 import com.parqueos.reportes.ReporteFactory;
 import com.parqueos.reportes.ReporteFactory.TipoReporte;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Inspector extends Usuario {
     private String terminalId;
@@ -18,6 +18,11 @@ public class Inspector extends Usuario {
                      String idUsuario, String pin, String terminalId) {
         super(nombre, apellidos, telefono, email, direccion, idUsuario, pin, TipoUsuario.INSPECTOR);
         this.terminalId = terminalId;
+    }
+
+    // Constructor sin argumentos para Jackson
+    public Inspector() {
+        super("", "", 0, "", "", "", "", TipoUsuario.INSPECTOR);
     }
 
     // Getters y setters
@@ -46,7 +51,7 @@ public class Inspector extends Usuario {
         return null;
     }
 
-    private Multa generarMulta(EspacioParqueo espacio, double monto) {
+    public Multa generarMulta(EspacioParqueo espacio, double monto) {
         Multa multa = new Multa(espacio.getVehiculoActual(), espacio, this, monto);
         multa.guardar();
         return multa;

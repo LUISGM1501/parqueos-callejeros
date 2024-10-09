@@ -1,10 +1,10 @@
 package com.parqueos.servicios;
 
-import com.parqueos.modelo.parqueo.EspacioParqueo;
-import com.parqueos.util.GestorArchivos;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.util.GestorArchivos;
 
 public class GestorEspacios {
     private static final String ARCHIVO_ESPACIOS = "espacios.json";

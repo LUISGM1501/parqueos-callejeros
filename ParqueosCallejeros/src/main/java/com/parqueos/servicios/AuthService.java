@@ -1,10 +1,11 @@
 package com.parqueos.servicios;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.parqueos.builders.AdministradorBuilder;
@@ -24,13 +25,12 @@ public class AuthService {
     public AuthService(GestorNotificaciones gestorNotificaciones) {
         this.usuarios = new HashMap<>();
         this.sesiones = new HashMap<>();
-        this.pinesTemporales = new HashMap<>();
+        this.pinesTemporales = new HashMap<>(); 
         this.gestorNotificaciones = gestorNotificaciones;
         agregarUsuariosPrueba();
     }
 
     private void agregarUsuariosPrueba() {
-        System.out.println("Agregando usuarios de prueba");
         Administrador admin = new AdministradorBuilder()
             .conNombre("Admin")
             .conApellidos("Admin")
@@ -69,26 +69,25 @@ public class AuthService {
         registrarUsuario(usuario);
         registrarUsuario(inspector);
 
-        System.out.println("Usuarios registrados:");
-        for (String id : usuarios.keySet()) {
-            System.out.println(id + ": " + usuarios.get(id).getClass().getSimpleName());
+        System.out.println("Usuarios de prueba agregados:");
+        for (Usuario u : usuarios.values()) {
+            System.out.println(u.getIdUsuario() + ": " + u.getClass().getSimpleName());
         }
     }
 
     public void registrarUsuario(Usuario usuario) {
-        usuario.guardar();
+        usuarios.put(usuario.getIdUsuario(), usuario);
     }
 
     public String iniciarSesion(String idUsuario, String pin) {
-        List<Usuario> usuarios = Usuario.cargarTodos();
-        Usuario usuario = usuarios.stream()
-                .filter(u -> u.getIdUsuario().equals(idUsuario))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        Usuario usuario = usuarios.get(idUsuario);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
 
         if (usuario.validarPin(pin)) {
             String token = UUID.randomUUID().toString();
-            sesiones.put(token, usuario.getId());
+            sesiones.put(token, usuario.getIdUsuario());
             return token;
         } else {
             throw new IllegalArgumentException("Credenciales inválidas");
@@ -102,7 +101,7 @@ public class AuthService {
     public Usuario obtenerUsuarioAutenticado(String token) {
         String idUsuario = sesiones.get(token);
         if (idUsuario != null) {
-            return Usuario.cargar(idUsuario);
+            return usuarios.get(idUsuario);
         }
         throw new IllegalStateException("Sesión no válida");
     }
@@ -117,11 +116,10 @@ public class AuthService {
     }
 
     public void solicitarRestablecimientoPin(String idUsuario) {
-        List<Usuario> usuarios = Usuario.cargarTodos();
-        Usuario usuario = usuarios.stream()
-                .filter(u -> u.getIdUsuario().equals(idUsuario))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        Usuario usuario = usuarios.get(idUsuario);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
 
         String pinTemporal = generarPinTemporal();
         pinesTemporales.put(idUsuario, pinTemporal);
@@ -134,22 +132,26 @@ public class AuthService {
         return String.format("%04d", random.nextInt(10000));
     }
 
+    public List<Usuario> obtenerTodosUsuarios() {
+        return new ArrayList<>(usuarios.values());
+    }
+
     public List<Administrador> obtenerTodosAdministradores() {
-        return Usuario.cargarTodos().stream()
+        return usuarios.values().stream()
                 .filter(u -> u instanceof Administrador)
                 .map(u -> (Administrador) u)
                 .collect(Collectors.toList());
     }
 
     public List<Inspector> obtenerTodosInspectores() {
-        return Usuario.cargarTodos().stream()
+        return usuarios.values().stream()
                 .filter(u -> u instanceof Inspector)
                 .map(u -> (Inspector) u)
                 .collect(Collectors.toList());
     }
 
     public List<UsuarioParqueo> obtenerTodosUsuariosParqueo() {
-        return Usuario.cargarTodos().stream()
+        return usuarios.values().stream()
                 .filter(u -> u instanceof UsuarioParqueo)
                 .map(u -> (UsuarioParqueo) u)
                 .collect(Collectors.toList());

@@ -1,11 +1,12 @@
 package com.parqueos.servicios;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.util.GestorArchivos;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class GestorMultas {
     private static final String ARCHIVO_MULTAS = "multas.json";
@@ -53,5 +54,12 @@ public class GestorMultas {
 
     public List<Multa> getMultas() {
         return multas;
+    }
+
+    public List<Multa> obtenerMultasEntreFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        return multas.stream()
+                     .filter(m -> m.getFechaHora().toLocalDate().isAfter(fechaInicio.minusDays(1)) && 
+                                    m.getFechaHora().toLocalDate().isBefore(fechaFin.plusDays(1)))
+                     .collect(Collectors.toList());
     }
 }

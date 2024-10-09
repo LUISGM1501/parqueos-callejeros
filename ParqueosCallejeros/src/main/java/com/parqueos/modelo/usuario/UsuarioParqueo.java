@@ -1,13 +1,13 @@
 package com.parqueos.modelo.usuario;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class UsuarioParqueo extends Usuario {
     private String numeroTarjeta;
@@ -24,6 +24,14 @@ public class UsuarioParqueo extends Usuario {
         this.numeroTarjeta = numeroTarjeta;
         this.fechaVencimientoTarjeta = fechaVencimientoTarjeta;
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
+        this.vehiculos = new ArrayList<>();
+        this.tiempoGuardado = 0;
+        this.reservasActivas = new ArrayList<>();
+    }
+
+    // Constructor sin argumentos para Jackson
+    public UsuarioParqueo() {
+        super("", "", 0, "", "", "", "", TipoUsuario.USUARIO_PARQUEO);
         this.vehiculos = new ArrayList<>();
         this.tiempoGuardado = 0;
         this.reservasActivas = new ArrayList<>();

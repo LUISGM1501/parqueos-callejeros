@@ -1,10 +1,23 @@
 package com.parqueos.ui.vistas;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class VistaUsuarioParqueo extends VistaBase {
     private JTabbedPane tabbedPane;
@@ -18,6 +31,9 @@ public class VistaUsuarioParqueo extends VistaBase {
     private JLabel lblTiempoGuardado;
     private JTable tblReservasActivas;
     private JTable tblMultas;
+    private JComboBox<String> cmbVehiculos;
+    private JTextField txtEspacio;
+    private JSpinner spnTiempo;
 
     public VistaUsuarioParqueo() {
         super("Panel de Usuario de Parqueo");
@@ -37,24 +53,33 @@ public class VistaUsuarioParqueo extends VistaBase {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
+        cmbVehiculos = new JComboBox<>();
+        txtEspacio = new JTextField(10);
+        spnTiempo = new JSpinner(new SpinnerNumberModel(30, 30, 1440, 30)); // 30 min a 24 horas, incrementos de 30 min
         btnParquear = new BotonPersonalizado("Parquear");
         btnAgregarTiempo = new BotonPersonalizado("Agregar Tiempo");
         btnDesaparcar = new BotonPersonalizado("Desaparcar");
         btnVerEspaciosDisponibles = new BotonPersonalizado("Ver Espacios Disponibles");
         lblTiempoGuardado = new JLabel("Tiempo guardado: 0 minutos");
 
-        gbc.gridx = 0; gbc.gridy = 0; panelParqueo.add(btnParquear, gbc);
-        gbc.gridx = 1; gbc.gridy = 0; panelParqueo.add(btnAgregarTiempo, gbc);
-        gbc.gridx = 0; gbc.gridy = 1; panelParqueo.add(btnDesaparcar, gbc);
-        gbc.gridx = 1; gbc.gridy = 1; panelParqueo.add(btnVerEspaciosDisponibles, gbc);
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; panelParqueo.add(lblTiempoGuardado, gbc);
+        gbc.gridx = 0; gbc.gridy = 0; panelParqueo.add(new JLabel("Vehículo:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 0; panelParqueo.add(cmbVehiculos, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panelParqueo.add(new JLabel("Espacio:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; panelParqueo.add(txtEspacio, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; panelParqueo.add(new JLabel("Tiempo (min):"), gbc);
+        gbc.gridx = 1; gbc.gridy = 2; panelParqueo.add(spnTiempo, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; panelParqueo.add(btnParquear, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2; panelParqueo.add(btnAgregarTiempo, gbc);
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2; panelParqueo.add(btnDesaparcar, gbc);
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2; panelParqueo.add(btnVerEspaciosDisponibles, gbc);
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2; panelParqueo.add(lblTiempoGuardado, gbc);
 
         tabbedPane.addTab("Parqueo", panelParqueo);
 
         // Panel de Reservas Activas
         PanelPersonalizado panelReservas = new PanelPersonalizado();
         panelReservas.setLayout(new BorderLayout());
-        tblReservasActivas = new JTable(); // Aquí deberías configurar el modelo de la tabla
+        tblReservasActivas = new JTable();
         JScrollPane scrollReservas = new JScrollPane(tblReservasActivas);
         panelReservas.add(scrollReservas, BorderLayout.CENTER);
 
@@ -71,7 +96,7 @@ public class VistaUsuarioParqueo extends VistaBase {
         // Panel de Multas
         PanelPersonalizado panelMultas = new PanelPersonalizado();
         panelMultas.setLayout(new BorderLayout());
-        tblMultas = new JTable(); // Aquí deberías configurar el modelo de la tabla
+        tblMultas = new JTable();
         JScrollPane scrollMultas = new JScrollPane(tblMultas);
         panelMultas.add(scrollMultas, BorderLayout.CENTER);
         
@@ -89,41 +114,18 @@ public class VistaUsuarioParqueo extends VistaBase {
     }
 
     // Getters para los componentes
-    public BotonPersonalizado getBtnParquear() { 
-        return btnParquear; 
-    }
-
-    public BotonPersonalizado getBtnAgregarTiempo() {
-        return btnAgregarTiempo;  
-    }
-
-    public BotonPersonalizado getBtnDesaparcar() { 
-        return btnDesaparcar; 
-    }
-
-    public BotonPersonalizado getBtnVerEspaciosDisponibles() { 
-        return btnVerEspaciosDisponibles; 
-    }
-
-    public BotonPersonalizado getBtnVerHistorial() { 
-        return btnVerHistorial; 
-    }
-
-    public BotonPersonalizado getBtnVerMultas() { 
-        return btnVerMultas; 
-    }
-    
-    public BotonPersonalizado getBtnPagarMulta() { 
-        return btnPagarMulta; 
-    }
-    
-    public JTable getTblReservasActivas() { 
-        return tblReservasActivas; 
-    }
-    
-    public JTable getTblMultas() { 
-        return tblMultas; 
-    }
+    public BotonPersonalizado getBtnParquear() { return btnParquear; }
+    public BotonPersonalizado getBtnAgregarTiempo() { return btnAgregarTiempo; }
+    public BotonPersonalizado getBtnDesaparcar() { return btnDesaparcar; }
+    public BotonPersonalizado getBtnVerEspaciosDisponibles() { return btnVerEspaciosDisponibles; }
+    public BotonPersonalizado getBtnVerHistorial() { return btnVerHistorial; }
+    public BotonPersonalizado getBtnVerMultas() { return btnVerMultas; }
+    public BotonPersonalizado getBtnPagarMulta() { return btnPagarMulta; }
+    public JTable getTblReservasActivas() { return tblReservasActivas; }
+    public JTable getTblMultas() { return tblMultas; }
+    public JComboBox<String> getCmbVehiculos() { return cmbVehiculos; }
+    public JTextField getTxtEspacio() { return txtEspacio; }
+    public JSpinner getSpnTiempo() { return spnTiempo; }
     
     public void actualizarTiempoGuardado(int minutos) {
         lblTiempoGuardado.setText("Tiempo guardado: " + minutos + " minutos");

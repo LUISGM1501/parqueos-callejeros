@@ -1,9 +1,9 @@
 package com.parqueos.servicios;
 
+import java.util.List;
+
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.util.GestorArchivos;
-
-import java.util.List;
 
 public class SistemaParqueo {
     private ConfiguracionParqueo configuracion;
@@ -13,6 +13,7 @@ public class SistemaParqueo {
     private GestorReservas gestorReservas;
     private GestorMultas gestorMultas;
     private GestorEspacios gestorEspacios;
+    private GestorReportes gestorReportes;
 
     private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
 
@@ -23,21 +24,55 @@ public class SistemaParqueo {
         this.gestorReservas = new GestorReservas();
         this.gestorMultas = new GestorMultas();
         this.gestorEspacios = new GestorEspacios();
+        this.gestorReportes = new GestorReportes();
         cargarDatos();
     }
 
     private void cargarDatos() {
-        List<ConfiguracionParqueo> configuraciones = GestorArchivos.cargarTodosLosElementos(ARCHIVO_CONFIGURACION, ConfiguracionParqueo.class);
-        if (!configuraciones.isEmpty()) {
-            configuracion = configuraciones.get(0);
-        } else {
+        try {
+            List<ConfiguracionParqueo> configuraciones = GestorArchivos.cargarTodosLosElementos(ARCHIVO_CONFIGURACION, ConfiguracionParqueo.class);
+            if (!configuraciones.isEmpty()) {
+                configuracion = configuraciones.get(0);
+            } else {
+                configuracion = ConfiguracionParqueo.obtenerInstancia();
+                configuracion.guardar();
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar la configuración. Se usará la configuración por defecto.");
+            e.printStackTrace();
             configuracion = ConfiguracionParqueo.obtenerInstancia();
-            configuracion.guardar();
         }
-        gestorUsuarios.cargarUsuarios();
-        gestorReservas.cargarReservas();
-        gestorMultas.cargarMultas();
-        gestorEspacios.cargarEspacios();
+    
+        try {
+            gestorUsuarios.cargarUsuarios();
+        } catch (Exception e) {
+            System.err.println("Error al cargar usuarios. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
+        try {
+            gestorReservas.cargarReservas();
+        } catch (Exception e) {
+            System.err.println("Error al cargar reservas. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
+        try {
+            gestorMultas.cargarMultas();
+        } catch (Exception e) {
+            System.err.println("Error al cargar multas. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
+        try {
+            gestorEspacios.cargarEspacios();
+        } catch (Exception e) {
+            System.err.println("Error al cargar espacios. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
+        try {
+            gestorReportes.cargarReportes();
+        } catch (Exception e) {
+            System.err.println("Error al cargar reportes. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
     }
 
     public String iniciarSesion(String idUsuario, String pin) {
@@ -96,5 +131,9 @@ public class SistemaParqueo {
 
     public GestorNotificaciones getGestorNotificaciones() {
         return gestorNotificaciones;
+    }
+    
+    public GestorReportes getGestorReportes() {
+        return gestorReportes;
     }
 }

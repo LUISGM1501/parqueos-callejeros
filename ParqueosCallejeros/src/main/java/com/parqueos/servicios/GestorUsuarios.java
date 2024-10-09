@@ -1,9 +1,9 @@
 package com.parqueos.servicios;
 
+import java.util.List;
+
 import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.util.GestorArchivos;
-
-import java.util.List;
 
 public class GestorUsuarios {
     private static final String ARCHIVO_USUARIOS = "usuarios.json";

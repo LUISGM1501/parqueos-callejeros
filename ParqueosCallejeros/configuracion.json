@@ -1,8 +1,8 @@
-[ {
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.ConfiguracionParqueo", {
   "horarioInicio" : null,
   "horarioFin" : null,
   "precioHora" : 0,
   "tiempoMinimo" : 0,
   "costoMulta" : 0,
-  "espacios" : [ ]
-} ]
+  "espacios" : [ "java.util.ArrayList", [ ] ]
+} ] ] ]

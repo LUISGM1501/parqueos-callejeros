@@ -1,16 +1,14 @@
 package com.parqueos.ui.vistas;
 
-import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
-import com.parqueos.util.GestorArchivos;
 
 public class VistaAdministrador extends VistaBase {
-
-    // Agregar el boton para crear un nuevo usuario parqueo
-    //private BotonCrearUsarioParqueo btnCrearUsuarioParqueo;
-
     private BotonPersonalizado btnConfigurarParqueo;
     private BotonPersonalizado btnGestionarUsuarios;
     private BotonPersonalizado btnGestionarEspacios;
@@ -29,7 +27,10 @@ public class VistaAdministrador extends VistaBase {
     public void inicializarComponentes() {
         PanelPersonalizado panel = new PanelPersonalizado();
         setContentPane(panel);
-        panel.setLayout(new GridLayout(4, 2, 10, 10));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         btnConfigurarParqueo = new BotonPersonalizado("Configurar Parqueo");
         btnGestionarUsuarios = new BotonPersonalizado("Gestionar Usuarios");
@@ -40,21 +41,35 @@ public class VistaAdministrador extends VistaBase {
         btnGenerarReporteHistorial = new BotonPersonalizado("Reporte de Historial");
         btnGenerarReporteEstadisticas = new BotonPersonalizado("Reporte de Estadísticas");
 
-        // Agregar el boton para crear un nuevo usuario parqueo
-        //btnCrearUsuarioParqueo = new BotonPersonalizado("Crear Usuario Parqueo");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(btnConfigurarParqueo, gbc);
 
-        panel.add(btnConfigurarParqueo);
-        panel.add(btnGestionarUsuarios);
-        panel.add(btnGestionarEspacios);
-        panel.add(btnGenerarReporteIngresos);
-        panel.add(btnGenerarReporteMultas);
-        panel.add(btnGenerarReporteEspacios);
-        panel.add(btnGenerarReporteHistorial);
-        panel.add(btnGenerarReporteEstadisticas);
+        gbc.gridx = 1;
+        panel.add(btnGestionarUsuarios, gbc);
 
-        // Agregar el boton para crear un nuevo usuario parqueo
-        //panel.add(btnCrearUsuarioParqueo);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(btnGestionarEspacios, gbc);
 
+        gbc.gridx = 1;
+        panel.add(btnGenerarReporteIngresos, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(btnGenerarReporteMultas, gbc);
+
+        gbc.gridx = 1;
+        panel.add(btnGenerarReporteEspacios, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(btnGenerarReporteHistorial, gbc);
+
+        gbc.gridx = 1;
+        panel.add(btnGenerarReporteEstadisticas, gbc);
+
+        setPreferredSize(new Dimension(600, 400));
         pack();
         setLocationRelativeTo(null);
     }

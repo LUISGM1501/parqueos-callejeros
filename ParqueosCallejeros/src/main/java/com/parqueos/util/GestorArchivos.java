@@ -65,14 +65,14 @@ public class GestorArchivos {
 
     public static <T> List<T> cargarTodosLosElementos(String nombreArchivo, Class<T> tipoClase) {
         File file = new File(nombreArchivo);
-        if (file.exists()) {
+        if (file.exists() && file.length() > 0) {
             try {
                 return objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, tipoClase));
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Error al cargar los elementos desde " + nombreArchivo, e);
             }
         } else {
-            LOGGER.info("El archivo " + nombreArchivo + " no existe. Se creará uno nuevo.");
+            LOGGER.info("El archivo " + nombreArchivo + " está vacío o no existe. Se iniciará con una lista vacía.");
         }
         return new ArrayList<>();
     }

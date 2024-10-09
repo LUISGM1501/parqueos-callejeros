@@ -1,11 +1,12 @@
 package com.parqueos.servicios;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.util.GestorArchivos;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class GestorReservas {
     private static final String ARCHIVO_RESERVAS = "reservas.json";
@@ -47,5 +48,12 @@ public class GestorReservas {
 
     public List<Reserva> getReservas() {
         return reservas;
+    }
+
+    public List<Reserva> obtenerReservasEntreFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        return reservas.stream()
+                       .filter(r -> r.getHoraInicio().toLocalDate().isAfter(fechaInicio.minusDays(1)) && 
+                                    r.getHoraInicio().toLocalDate().isBefore(fechaFin.plusDays(1)))
+                       .collect(Collectors.toList());
     }
 }

@@ -1,18 +1,21 @@
 package com.parqueos.ui.controladores;
 
-import com.parqueos.ui.vistas.VistaUsuarioParqueo;
-import com.parqueos.servicios.SistemaParqueo;
-import com.parqueos.modelo.usuario.UsuarioParqueo;
-import com.parqueos.modelo.parqueo.Reserva;
-import com.parqueos.modelo.multa.Multa;
-import com.parqueos.modelo.parqueo.EspacioParqueo;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import com.parqueos.modelo.multa.Multa;
+import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.modelo.parqueo.Reserva;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
+import com.parqueos.modelo.vehiculo.Vehiculo;
+import com.parqueos.servicios.SistemaParqueo;
+import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 
 public class ControladorUsuarioParqueo extends ControladorBase {
     private VistaUsuarioParqueo vista;
@@ -30,95 +33,60 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     @Override
     protected void inicializar() {
-        vista.getBtnParquear().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parquear();
-            }
-        });
-
-        vista.getBtnAgregarTiempo().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                agregarTiempo();
-            }
-        });
-
-        vista.getBtnDesaparcar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                desaparcar();
-            }
-        });
-
-        vista.getBtnVerEspaciosDisponibles().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                verEspaciosDisponibles();
-            }
-        });
-
-        vista.getBtnVerHistorial().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                verHistorial();
-            }
-        });
-
-        vista.getBtnVerMultas().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                verMultas();
-            }
-        });
-
-        vista.getBtnVerMultas().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                verMultas();
-            }
-        });
-
-        vista.getBtnPagarMulta().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pagarMulta();
-            }
-        });
-
+        cargarVehiculos();
+        actualizarTiempoGuardado();
         actualizarTablaReservasActivas();
         actualizarTablaMultas();
-        actualizarTiempoGuardado();
+
+        vista.getBtnParquear().addActionListener(e -> parquear());
+        vista.getBtnAgregarTiempo().addActionListener(e -> agregarTiempo());
+        vista.getBtnDesaparcar().addActionListener(e -> desaparcar());
+        vista.getBtnVerEspaciosDisponibles().addActionListener(e -> verEspaciosDisponibles());
+        vista.getBtnVerHistorial().addActionListener(e -> verHistorial());
+        vista.getBtnVerMultas().addActionListener(e -> actualizarTablaMultas());
+        vista.getBtnPagarMulta().addActionListener(e -> pagarMulta());
+    }
+
+    private void cargarVehiculos() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        for (Vehiculo vehiculo : usuario.getVehiculos()) {
+            model.addElement(vehiculo.getPlaca());
+        }
+        vista.getCmbVehiculos().setModel(model);
     }
 
     private void parquear() {
-        String numeroEspacio = JOptionPane.showInputDialog(vista, "Ingrese el número de espacio:");
-        String placaVehiculo = JOptionPane.showInputDialog(vista, "Ingrese la placa del vehículo:");
-        String tiempoCompradoStr = JOptionPane.showInputDialog(vista, "Ingrese el tiempo a comprar en minutos:");
-        
+        String placa = (String) vista.getCmbVehiculos().getSelectedItem();
+        String numeroEspacio = vista.getTxtEspacio().getText();
+        int tiempoComprado = (Integer) vista.getSpnTiempo().getValue();
+
         try {
-            int tiempoComprado = Integer.parseInt(tiempoCompradoStr);
-            Reserva reserva = sistemaParqueo.parquear(token, numeroEspacio, placaVehiculo, tiempoComprado);
+            Reserva reserva = sistemaParqueo.getGestorReservas().crearReserva(new Reserva(usuario, 
+                sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio),
+                usuario.getVehiculos().stream().filter(v -> v.getPlaca().equals(placa)).findFirst().orElseThrow(),
+                tiempoComprado));
             JOptionPane.showMessageDialog(vista, "Parqueo exitoso. ID de reserva: " + reserva.getIdReserva());
+            actualizarTablaReservasActivas();
             actualizarTiempoGuardado();
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(vista, "Tiempo inválido. Por favor ingrese un número.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException | IllegalStateException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void agregarTiempo() {
         String idReserva = JOptionPane.showInputDialog(vista, "Ingrese el ID de la reserva:");
-        String tiempoAdicionalStr = JOptionPane.showInputDialog(vista, "Ingrese el tiempo adicional en minutos:");
+        int tiempoAdicional = (Integer) vista.getSpnTiempo().getValue();
         
         try {
-            int tiempoAdicional = Integer.parseInt(tiempoAdicionalStr);
-            sistemaParqueo.agregarTiempo(token, idReserva, tiempoAdicional);
-            JOptionPane.showMessageDialog(vista, "Tiempo agregado exitosamente.");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(vista, "Tiempo inválido. Por favor ingrese un número.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException | IllegalStateException e) {
+            Reserva reserva = sistemaParqueo.getGestorReservas().buscarReserva(idReserva);
+            if (reserva != null && reserva.getUsuario().equals(usuario)) {
+                reserva.extenderTiempo(tiempoAdicional);
+                JOptionPane.showMessageDialog(vista, "Tiempo agregado exitosamente.");
+                actualizarTablaReservasActivas();
+            } else {
+                JOptionPane.showMessageDialog(vista, "Reserva no encontrada o no pertenece al usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -127,50 +95,50 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         String idReserva = JOptionPane.showInputDialog(vista, "Ingrese el ID de la reserva a finalizar:");
         
         try {
-            sistemaParqueo.desaparcar(token, idReserva);
-            JOptionPane.showMessageDialog(vista, "Vehículo desaparcado exitosamente.");
-            actualizarTiempoGuardado();
-        } catch (IllegalArgumentException | IllegalStateException e) {
+            Reserva reserva = sistemaParqueo.getGestorReservas().buscarReserva(idReserva);
+            if (reserva != null && reserva.getUsuario().equals(usuario)) {
+                int tiempoNoUsado = reserva.finalizarReserva();
+                usuario.setTiempoGuardado(usuario.getTiempoGuardado() + tiempoNoUsado);
+                JOptionPane.showMessageDialog(vista, "Vehículo desaparcado exitosamente. Tiempo guardado: " + tiempoNoUsado + " minutos.");
+                actualizarTablaReservasActivas();
+                actualizarTiempoGuardado();
+            } else {
+                JOptionPane.showMessageDialog(vista, "Reserva no encontrada o no pertenece al usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void verEspaciosDisponibles() {
-        try {
-            List<EspacioParqueo> espaciosDisponibles = sistemaParqueo.obtenerEspaciosDisponibles(token);
-            StringBuilder mensaje = new StringBuilder("Espacios disponibles:\n");
-            for (EspacioParqueo espacio : espaciosDisponibles) {
-                mensaje.append("Espacio ").append(espacio.getNumero()).append("\n");
-            }
-            JOptionPane.showMessageDialog(vista, mensaje.toString());
-        } catch (IllegalStateException e) {
-            JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        List<EspacioParqueo> espaciosDisponibles = sistemaParqueo.getGestorEspacios().obtenerEspaciosDisponibles();
+        StringBuilder mensaje = new StringBuilder("Espacios disponibles:\n");
+        for (EspacioParqueo espacio : espaciosDisponibles) {
+            mensaje.append("Espacio ").append(espacio.getNumero()).append("\n");
         }
+        JOptionPane.showMessageDialog(vista, mensaje.toString());
     }
 
     private void verHistorial() {
-        List<Reserva> historial = sistemaParqueo.obtenerHistorialReservas(token);
+        List<Reserva> historial = sistemaParqueo.getGestorReservas().obtenerHistorialReservas(usuario);
         if (historial.isEmpty()) {
             JOptionPane.showMessageDialog(vista, "No tiene reservas en su historial.");
         } else {
-            // Crear y mostrar una nueva ventana con el historial
-            JFrame frameHistorial = new JFrame("Historial de Reservas");
-            JTable tablaHistorial = new JTable();
-            DefaultTableModel modeloHistorial = new DefaultTableModel();
-            modeloHistorial.setColumnIdentifiers(new Object[]{"ID", "Espacio", "Vehículo", "Inicio", "Fin"});
+            DefaultTableModel modelo = new DefaultTableModel();
+            modelo.setColumnIdentifiers(new Object[]{"ID", "Espacio", "Vehículo", "Inicio", "Fin"});
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
             for (Reserva reserva : historial) {
-                modeloHistorial.addRow(new Object[]{
+                modelo.addRow(new Object[]{
                     reserva.getIdReserva(),
                     reserva.getEspacio().getNumero(),
                     reserva.getVehiculo().getPlaca(),
-                    reserva.getHoraInicio(),
-                    reserva.getHoraFin()
+                    reserva.getHoraInicio().format(formatter),
+                    reserva.getHoraFin().format(formatter)
                 });
             }
-            tablaHistorial.setModel(modeloHistorial);
-            frameHistorial.add(new JScrollPane(tablaHistorial));
-            frameHistorial.pack();
-            frameHistorial.setVisible(true);
+            JTable tablaHistorial = new JTable(modelo);
+            JScrollPane scrollPane = new JScrollPane(tablaHistorial);
+            JOptionPane.showMessageDialog(vista, scrollPane, "Historial de Reservas", JOptionPane.PLAIN_MESSAGE);
         }
     }
 
@@ -178,60 +146,35 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         List<Reserva> reservasActivas = usuario.getReservasActivas();
         DefaultTableModel modelo = new DefaultTableModel();
         modelo.setColumnIdentifiers(new Object[]{"ID", "Espacio", "Vehículo", "Inicio", "Fin"});
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         for (Reserva reserva : reservasActivas) {
             modelo.addRow(new Object[]{
                 reserva.getIdReserva(),
                 reserva.getEspacio().getNumero(),
                 reserva.getVehiculo().getPlaca(),
-                reserva.getHoraInicio(),
-                reserva.getHoraFin()
+                reserva.getHoraInicio().format(formatter),
+                reserva.getHoraFin().format(formatter)
             });
         }
         vista.getTblReservasActivas().setModel(modelo);
     }
 
     private void actualizarTablaMultas() {
-        try {
-            List<Multa> multas = sistemaParqueo.obtenerMultasUsuario(token);
-            DefaultTableModel modelo = new DefaultTableModel();
-            modelo.setColumnIdentifiers(new Object[]{"ID", "Vehículo", "Espacio", "Fecha", "Monto", "Pagada"});
-            for (Multa multa : multas) {
-                modelo.addRow(new Object[]{
-                    multa.getIdMulta(),
-                    multa.getVehiculo().getPlaca(),
-                    multa.getEspacio().getNumero(),
-                    multa.getFechaHora(),
-                    multa.getMonto(),
-                    multa.getPagada() ? "Sí" : "No"
-                });
-            }
-            vista.getTblMultas().setModel(modelo);
-        } catch (IllegalStateException e) {
-            JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        List<Multa> multas = sistemaParqueo.getGestorMultas().obtenerMultasUsuario(usuario);
+        DefaultTableModel modelo = new DefaultTableModel();
+        modelo.setColumnIdentifiers(new Object[]{"ID", "Vehículo", "Espacio", "Fecha", "Monto", "Pagada"});
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        for (Multa multa : multas) {
+            modelo.addRow(new Object[]{
+                multa.getIdMulta(),
+                multa.getVehiculo().getPlaca(),
+                multa.getEspacio().getNumero(),
+                multa.getFechaHora().format(formatter),
+                multa.getMonto(),
+                multa.getPagada() ? "Sí" : "No"
+            });
         }
-    }
-
-    private void verMultas() {
-        try {
-            List<Multa> multas = sistemaParqueo.obtenerMultasUsuario(token);
-            if (multas.isEmpty()) {
-                JOptionPane.showMessageDialog(vista, "No tiene multas registradas.");
-            } else {
-                StringBuilder mensaje = new StringBuilder("Multas:\n\n");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                for (Multa multa : multas) {
-                    mensaje.append("ID: ").append(multa.getIdMulta())
-                           .append("\nVehículo: ").append(multa.getVehiculo().getPlaca())
-                           .append("\nEspacio: ").append(multa.getEspacio().getNumero())
-                           .append("\nFecha y hora: ").append(multa.getFechaHora().format(formatter))
-                           .append("\nMonto: $").append(String.format("%.2f", multa.getMonto()))
-                           .append("\n\n");
-                }
-                JOptionPane.showMessageDialog(vista, mensaje.toString(), "Multas", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (IllegalStateException e) {
-            JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        vista.getTblMultas().setModel(modelo);
     }
 
     private void pagarMulta() {
@@ -239,10 +182,15 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         if (filaSeleccionada != -1) {
             String idMulta = (String) vista.getTblMultas().getValueAt(filaSeleccionada, 0);
             try {
-                sistemaParqueo.pagarMulta(token, idMulta);
-                JOptionPane.showMessageDialog(vista, "Multa pagada exitosamente.");
-                actualizarTablaMultas();
-            } catch (IllegalStateException | IllegalArgumentException e) {
+                Multa multa = sistemaParqueo.getGestorMultas().buscarMulta(idMulta);
+                if (multa != null && !multa.getPagada()) {
+                    multa.pagar();
+                    JOptionPane.showMessageDialog(vista, "Multa pagada exitosamente.");
+                    actualizarTablaMultas();
+                } else {
+                    JOptionPane.showMessageDialog(vista, "La multa no existe o ya ha sido pagada.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
