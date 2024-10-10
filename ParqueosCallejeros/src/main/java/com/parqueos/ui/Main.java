@@ -19,7 +19,7 @@ public class Main {
                     GestorNotificaciones gestorNotificaciones = new GestorNotificaciones();
                     AuthService authService = new AuthService(gestorNotificaciones);
                     SistemaParqueo sistemaParqueo = new SistemaParqueo();
-                    VistaLogin vistaLogin = new VistaLogin();
+                    VistaLogin vistaLogin = new VistaLogin(sistemaParqueo);
                     ControladorLogin controladorLogin = new ControladorLogin(vistaLogin, authService, sistemaParqueo);
                     vistaLogin.setVisible(true);
 

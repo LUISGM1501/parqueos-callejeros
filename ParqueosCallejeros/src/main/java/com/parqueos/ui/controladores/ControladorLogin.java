@@ -11,9 +11,6 @@ import com.parqueos.modelo.usuario.Administrador;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.usuario.Inspector;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 public class ControladorLogin extends ControladorBase {
     private final VistaLogin vista;
     private final AuthService authService;
@@ -23,20 +20,15 @@ public class ControladorLogin extends ControladorBase {
         this.vista = vista;
         this.authService = authService;
         this.sistemaParqueo = sistemaParqueo;
+        this.vista.setControlador(this);
         inicializar();
     }
 
     @Override
     protected void inicializar() {
-        vista.getBotonLogin().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                iniciarSesion();
-            }
-        });
     }
 
-    private void iniciarSesion() {
+    public void iniciarSesion() {
         String idUsuario = vista.getCampoUsuario().getText();
         String pin = new String(vista.getCampoContrasena().getPassword());
 
@@ -52,15 +44,15 @@ public class ControladorLogin extends ControladorBase {
     private void redirigirUsuario(Usuario usuario, String token) {
         vista.setVisible(false);
         if (usuario instanceof Administrador) {
-            VistaAdministrador vistaAdmin = new VistaAdministrador();
+            VistaAdministrador vistaAdmin = new VistaAdministrador(sistemaParqueo, token);
             new ControladorAdministrador(vistaAdmin, sistemaParqueo, token);
             vistaAdmin.setVisible(true);
         } else if (usuario instanceof UsuarioParqueo) {
-            VistaUsuarioParqueo vistaUsuario = new VistaUsuarioParqueo();
+            VistaUsuarioParqueo vistaUsuario = new VistaUsuarioParqueo(sistemaParqueo, token);
             new ControladorUsuarioParqueo(vistaUsuario, sistemaParqueo, (UsuarioParqueo) usuario, token);
             vistaUsuario.setVisible(true);
         } else if (usuario instanceof Inspector) {
-            VistaInspector vistaInspector = new VistaInspector();
+            VistaInspector vistaInspector = new VistaInspector(sistemaParqueo, token);
             new ControladorInspector(vistaInspector, sistemaParqueo, (Inspector) usuario, token);
             vistaInspector.setVisible(true);
         } else {

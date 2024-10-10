@@ -1,12 +1,10 @@
 package com.parqueos.ui.vistas;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 
+import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.componentes.BotonPersonalizado;
-import com.parqueos.ui.componentes.PanelPersonalizado;
 
 public class VistaAdministrador extends VistaBase {
     private BotonPersonalizado btnConfigurarParqueo;
@@ -18,60 +16,104 @@ public class VistaAdministrador extends VistaBase {
     private BotonPersonalizado btnGenerarReporteHistorial;
     private BotonPersonalizado btnGenerarReporteEstadisticas;
 
-    public VistaAdministrador() {
-        super("Panel de Administrador");
+    public VistaAdministrador(SistemaParqueo sistemaParqueo, String token) {
+        super("Panel de Administrador", sistemaParqueo, token);
         inicializarComponentes();
     }
 
     @Override
     public void inicializarComponentes() {
-        PanelPersonalizado panel = new PanelPersonalizado();
-        setContentPane(panel);
-        panel.setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
+
+        // Panel superior con título
+        JPanel panelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelTitulo.setBackground(new Color(41, 128, 185));
+        JLabel lblTitulo = new JLabel("Panel de Administrador");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE);
+        panelTitulo.add(lblTitulo);
+        add(panelTitulo, BorderLayout.NORTH);
+
+        // Panel principal
+        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal.setBackground(Color.WHITE);
+        add(panelPrincipal, BorderLayout.CENTER);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
 
-        btnConfigurarParqueo = new BotonPersonalizado("Configurar Parqueo");
-        btnGestionarUsuarios = new BotonPersonalizado("Gestionar Usuarios");
-        btnGestionarEspacios = new BotonPersonalizado("Gestionar Espacios");
-        btnGenerarReporteIngresos = new BotonPersonalizado("Reporte de Ingresos");
-        btnGenerarReporteMultas = new BotonPersonalizado("Reporte de Multas");
-        btnGenerarReporteEspacios = new BotonPersonalizado("Reporte de Espacios");
-        btnGenerarReporteHistorial = new BotonPersonalizado("Reporte de Historial");
-        btnGenerarReporteEstadisticas = new BotonPersonalizado("Reporte de Estadísticas");
+        // Agregar el botón de cerrar sesión
+        JPanel panelCerrarSesion = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        agregarBotonCerrarSesion(panelCerrarSesion);
+        add(panelCerrarSesion, BorderLayout.SOUTH);
 
+        // Panel de Configuración y Gestión
+        JPanel panelConfigGestion = crearPanelSeccion("Configuración y Gestión");
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(btnConfigurarParqueo, gbc);
+        gbc.gridheight = 2;
+        panelPrincipal.add(panelConfigGestion, gbc);
 
+        // Panel de Reportes
+        JPanel panelReportes = crearPanelSeccion("Reportes");
         gbc.gridx = 1;
-        panel.add(btnGestionarUsuarios, gbc);
+        gbc.gridy = 0;
+        gbc.gridheight = 2;
+        panelPrincipal.add(panelReportes, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(btnGestionarEspacios, gbc);
-
-        gbc.gridx = 1;
-        panel.add(btnGenerarReporteIngresos, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        panel.add(btnGenerarReporteMultas, gbc);
-
-        gbc.gridx = 1;
-        panel.add(btnGenerarReporteEspacios, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        panel.add(btnGenerarReporteHistorial, gbc);
-
-        gbc.gridx = 1;
-        panel.add(btnGenerarReporteEstadisticas, gbc);
-
-        setPreferredSize(new Dimension(600, 400));
+        setPreferredSize(new Dimension(800, 600));
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private JPanel crearPanelSeccion(String titulo) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2), titulo));
+        panel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1.0;
+
+        if (titulo.equals("Configuración y Gestión")) {
+            btnConfigurarParqueo = crearBoton("Configurar Parqueo");
+            btnGestionarUsuarios = crearBoton("Gestionar Usuarios");
+            btnGestionarEspacios = crearBoton("Gestionar Espacios");
+
+            panel.add(btnConfigurarParqueo, gbc);
+            panel.add(btnGestionarUsuarios, gbc);
+            panel.add(btnGestionarEspacios, gbc);
+        } else {
+            btnGenerarReporteIngresos = crearBoton("Reporte de Ingresos");
+            btnGenerarReporteMultas = crearBoton("Reporte de Multas");
+            btnGenerarReporteEspacios = crearBoton("Reporte de Espacios");
+            btnGenerarReporteHistorial = crearBoton("Reporte de Historial");
+            btnGenerarReporteEstadisticas = crearBoton("Reporte de Estadísticas");
+
+            panel.add(btnGenerarReporteIngresos, gbc);
+            panel.add(btnGenerarReporteMultas, gbc);
+            panel.add(btnGenerarReporteEspacios, gbc);
+            panel.add(btnGenerarReporteHistorial, gbc);
+            panel.add(btnGenerarReporteEstadisticas, gbc);
+        }
+
+        // Añadir un componente de relleno para empujar los botones hacia arriba
+        gbc.weighty = 1.0;
+        panel.add(Box.createVerticalGlue(), gbc);
+
+        return panel;
+    }
+
+    private BotonPersonalizado crearBoton(String texto) {
+        BotonPersonalizado boton = new BotonPersonalizado(texto);
+        boton.setFont(new Font("Arial", Font.PLAIN, 14));
+        boton.setPreferredSize(new Dimension(200, 40));
+        return boton;
     }
 
     // Getters para los botones

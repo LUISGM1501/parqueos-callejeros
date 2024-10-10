@@ -1,17 +1,9 @@
 package com.parqueos.ui.vistas;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
+import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
 
@@ -25,8 +17,8 @@ public class VistaInspector extends VistaBase {
     private JTextArea txtResultadoRevision;
     private JTable tblMultasGeneradas;
 
-    public VistaInspector() {
-        super("Panel de Inspector");
+    public VistaInspector(SistemaParqueo sistemaParqueo, String token) {
+        super("Panel de Inspector", sistemaParqueo, token);
         inicializarComponentes();
     }
 
@@ -34,59 +26,103 @@ public class VistaInspector extends VistaBase {
     public void inicializarComponentes() {
         setLayout(new BorderLayout());
 
+        // Panel superior con título
+        JPanel panelTitulo = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelTitulo.setBackground(new Color(41, 128, 185));
+        JLabel lblTitulo = new JLabel("Panel de Inspector");
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE);
+        panelTitulo.add(lblTitulo);
+        add(panelTitulo, BorderLayout.NORTH);
+
+        // Panel principal
         PanelPersonalizado panelPrincipal = new PanelPersonalizado();
         panelPrincipal.setLayout(new GridBagLayout());
+        add(panelPrincipal, BorderLayout.CENTER);
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        txtEspacio = new JTextField(10);
-        txtPlaca = new JTextField(10);
-        btnRevisarParqueo = new BotonPersonalizado("Revisar Parqueo");
-        btnGenerarMulta = new BotonPersonalizado("Generar Multa");
-        btnVerReporteEspacios = new BotonPersonalizado("Ver Reporte de Espacios");
-        btnVerReporteMultas = new BotonPersonalizado("Ver Reporte de Multas");
-        txtResultadoRevision = new JTextArea(5, 30);
-        txtResultadoRevision.setEditable(false);
-        JScrollPane scrollResultado = new JScrollPane(txtResultadoRevision);
+        // Agregar el botón de cerrar sesión
+        JPanel panelCerrarSesion = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        agregarBotonCerrarSesion(panelCerrarSesion);
+        add(panelCerrarSesion, BorderLayout.SOUTH);
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
-        panelPrincipal.add(new JLabel("Número de Espacio:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 2;
-        panelPrincipal.add(txtEspacio, gbc);
+        // Panel de Revisión de Parqueo
+        JPanel panelRevision = crearPanelSeccion("Revisión de Parqueo");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        panelPrincipal.add(panelRevision, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
-        panelPrincipal.add(new JLabel("Placa del Vehículo:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 1; gbc.gridwidth = 2;
-        panelPrincipal.add(txtPlaca, gbc);
+        // Panel de Resultados y Multas
+        JPanel panelResultados = crearPanelSeccion("Resultados y Multas");
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        panelPrincipal.add(panelResultados, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 3;
-        panelPrincipal.add(btnRevisarParqueo, gbc);
+        // Panel de Reportes
+        JPanel panelReportes = crearPanelSeccion("Reportes");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.weighty = 1.0;
+        panelPrincipal.add(panelReportes, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 3;
-        panelPrincipal.add(btnGenerarMulta, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 3;
-        panelPrincipal.add(new JLabel("Resultado de la revisión:"), gbc);
-
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 3;
-        panelPrincipal.add(scrollResultado, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 3;
-        panelPrincipal.add(btnVerReporteEspacios, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 3;
-        panelPrincipal.add(btnVerReporteMultas, gbc);
-
-        add(panelPrincipal, BorderLayout.NORTH);
-
-        tblMultasGeneradas = new JTable();
-        JScrollPane scrollTabla = new JScrollPane(tblMultasGeneradas);
-        add(scrollTabla, BorderLayout.CENTER);
-
-        setPreferredSize(new Dimension(600, 500));
+        setPreferredSize(new Dimension(800, 600));
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private JPanel crearPanelSeccion(String titulo) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2), titulo));
+        panel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1.0;
+
+        if (titulo.equals("Revisión de Parqueo")) {
+            txtEspacio = new JTextField(15);
+            txtPlaca = new JTextField(15);
+            btnRevisarParqueo = new BotonPersonalizado("Revisar Parqueo");
+            btnGenerarMulta = new BotonPersonalizado("Generar Multa");
+
+            panel.add(new JLabel("Número de Espacio:"), gbc);
+            panel.add(txtEspacio, gbc);
+            panel.add(new JLabel("Placa del Vehículo:"), gbc);
+            panel.add(txtPlaca, gbc);
+            panel.add(btnRevisarParqueo, gbc);
+            panel.add(btnGenerarMulta, gbc);
+        } else if (titulo.equals("Resultados y Multas")) {
+            txtResultadoRevision = new JTextArea(5, 20);
+            txtResultadoRevision.setEditable(false);
+            JScrollPane scrollResultado = new JScrollPane(txtResultadoRevision);
+            tblMultasGeneradas = new JTable();
+            JScrollPane scrollTabla = new JScrollPane(tblMultasGeneradas);
+
+            gbc.weighty = 1.0;
+            panel.add(new JLabel("Resultado de la revisión:"), gbc);
+            panel.add(scrollResultado, gbc);
+            panel.add(new JLabel("Multas Generadas:"), gbc);
+            panel.add(scrollTabla, gbc);
+        } else if (titulo.equals("Reportes")) {
+            btnVerReporteEspacios = new BotonPersonalizado("Ver Reporte de Espacios");
+            btnVerReporteMultas = new BotonPersonalizado("Ver Reporte de Multas");
+
+            panel.add(btnVerReporteEspacios, gbc);
+            panel.add(btnVerReporteMultas, gbc);
+        }
+
+        return panel;
     }
 
     // Getters
