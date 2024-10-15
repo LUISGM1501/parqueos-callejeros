@@ -18,10 +18,10 @@ import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 
 public class ControladorUsuarioParqueo extends ControladorBase {
-    private VistaUsuarioParqueo vista;
-    private SistemaParqueo sistemaParqueo;
-    private UsuarioParqueo usuario;
-    private String token;
+    private final VistaUsuarioParqueo vista;
+    private final SistemaParqueo sistemaParqueo;
+    private final UsuarioParqueo usuario;
+    private final String token;
 
     public ControladorUsuarioParqueo(VistaUsuarioParqueo vista, SistemaParqueo sistemaParqueo, UsuarioParqueo usuario, String token) {
         this.vista = vista;

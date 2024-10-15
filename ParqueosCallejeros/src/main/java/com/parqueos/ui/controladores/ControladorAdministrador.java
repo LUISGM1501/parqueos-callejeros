@@ -9,11 +9,12 @@ import com.parqueos.reportes.Reporte;
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaAdministrador;
 import com.parqueos.ui.vistas.VistaConfiguracionParqueo;
+import com.parqueos.ui.vistas.VistaGestionUsuarios;
 
 public class ControladorAdministrador extends ControladorBase {
-    private VistaAdministrador vista;
-    private SistemaParqueo sistemaParqueo;
-    private String token;
+    private final VistaAdministrador vista;
+    private final SistemaParqueo sistemaParqueo;
+    private final String token;
 
     public ControladorAdministrador(VistaAdministrador vista, SistemaParqueo sistemaParqueo, String token) {
         this.vista = vista;
@@ -51,8 +52,9 @@ public class ControladorAdministrador extends ControladorBase {
     }
 
     private void gestionarUsuarios() {
-        // Aquí deberías abrir una nueva vista para gestionar usuarios
-        JOptionPane.showMessageDialog(vista, "Funcionalidad de gestión de usuarios no implementada aún.");
+        VistaGestionUsuarios vistaGestionUsuarios = new VistaGestionUsuarios(vista);
+        ControladorGestionUsuarios controladorGestionUsuarios = new ControladorGestionUsuarios(vistaGestionUsuarios, sistemaParqueo, token);
+        vistaGestionUsuarios.setVisible(true);
     }
 
     private void gestionarEspacios() {

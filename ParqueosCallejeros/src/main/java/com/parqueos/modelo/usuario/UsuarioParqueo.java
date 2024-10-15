@@ -13,9 +13,9 @@ public class UsuarioParqueo extends Usuario {
     private String numeroTarjeta;
     private String fechaVencimientoTarjeta;
     private String codigoValidacionTarjeta;
-    private List<Vehiculo> vehiculos;
+    private final List<Vehiculo> vehiculos;
     private int tiempoGuardado; // en minutos
-    private List<Reserva> reservasActivas;
+    private final List<Reserva> reservasActivas;
 
     public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, String direccion, 
                           String idUsuario, String pin, String numeroTarjeta, String fechaVencimientoTarjeta, 

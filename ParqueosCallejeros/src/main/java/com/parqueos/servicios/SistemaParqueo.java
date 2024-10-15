@@ -7,13 +7,13 @@ import com.parqueos.util.GestorArchivos;
 
 public class SistemaParqueo {
     private ConfiguracionParqueo configuracion;
-    private AuthService authService;
-    private GestorNotificaciones gestorNotificaciones;
-    private GestorUsuarios gestorUsuarios;
-    private GestorReservas gestorReservas;
-    private GestorMultas gestorMultas;
-    private GestorEspacios gestorEspacios;
-    private GestorReportes gestorReportes;
+    private final AuthService authService;
+    private final GestorNotificaciones gestorNotificaciones;
+    private final GestorUsuarios gestorUsuarios;
+    private final GestorReservas gestorReservas;
+    private final GestorMultas gestorMultas;
+    private final GestorEspacios gestorEspacios;
+    private final GestorReportes gestorReportes;
 
     private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
 

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.parqueos.util.GestorArchivos;
 
 public class ConfiguracionParqueo implements Serializable   {
@@ -16,7 +17,7 @@ public class ConfiguracionParqueo implements Serializable   {
     private int precioHora;
     private int tiempoMinimo;
     private int costoMulta;
-    private List<EspacioParqueo> espacios;
+    private final List<EspacioParqueo> espacios;
 
     private ConfiguracionParqueo() {
         // Constructor privado para evitar instanciacion directa

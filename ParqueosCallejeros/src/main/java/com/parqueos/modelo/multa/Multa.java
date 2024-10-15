@@ -1,24 +1,24 @@
 package com.parqueos.modelo.multa;
 
-import com.parqueos.modelo.parqueo.EspacioParqueo;
-import com.parqueos.modelo.usuario.Inspector;
-import com.parqueos.modelo.vehiculo.Vehiculo;
-import com.parqueos.util.GestorArchivos;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.vehiculo.Vehiculo;
+import com.parqueos.util.GestorArchivos;
 
 public class Multa implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_MULTAS = "multas.json";
     
     private final String idMulta;
-    private Vehiculo vehiculo;
-    private EspacioParqueo espacio;
-    private Inspector inspector;
-    private LocalDateTime fechaHora;
+    private final Vehiculo vehiculo;
+    private final EspacioParqueo espacio;
+    private final Inspector inspector;
+    private final LocalDateTime fechaHora;
     private double monto;
     private boolean pagada;
 

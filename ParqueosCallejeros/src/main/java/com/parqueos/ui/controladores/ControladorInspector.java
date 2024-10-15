@@ -17,10 +17,10 @@ import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaInspector;
 
 public class ControladorInspector extends ControladorBase {
-    private VistaInspector vista;
-    private SistemaParqueo sistemaParqueo;
-    private Inspector inspector;
-    private String token;
+    private final VistaInspector vista;
+    private final SistemaParqueo sistemaParqueo;
+    private final Inspector inspector;
+    private final String token;
 
     public ControladorInspector(VistaInspector vista, SistemaParqueo sistemaParqueo, Inspector inspector, String token) {
         this.vista = vista;

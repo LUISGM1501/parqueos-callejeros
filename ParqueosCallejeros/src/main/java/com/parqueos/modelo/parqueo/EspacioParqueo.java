@@ -1,18 +1,18 @@
 package com.parqueos.modelo.parqueo;
 
-import com.parqueos.modelo.vehiculo.Vehiculo;
-import com.parqueos.util.GestorArchivos;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+
+import com.parqueos.modelo.vehiculo.Vehiculo;
+import com.parqueos.util.GestorArchivos;
 
 public class EspacioParqueo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_ESPACIOS = "espacios.json";
 
-    private String id;
-    private String numero;
+    private final String id;
+    private final String numero;
     private boolean ocupado;
     private boolean pagado;
     private Vehiculo vehiculoActual;

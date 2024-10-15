@@ -1,15 +1,15 @@
 package com.parqueos.ui.controladores;
 
+import com.parqueos.modelo.usuario.Administrador;
+import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.usuario.Usuario;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.servicios.AuthService;
 import com.parqueos.servicios.SistemaParqueo;
-import com.parqueos.ui.vistas.VistaLogin;
 import com.parqueos.ui.vistas.VistaAdministrador;
-import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 import com.parqueos.ui.vistas.VistaInspector;
-import com.parqueos.modelo.usuario.Usuario;
-import com.parqueos.modelo.usuario.Administrador;
-import com.parqueos.modelo.usuario.UsuarioParqueo;
-import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.ui.vistas.VistaLogin;
+import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 
 public class ControladorLogin extends ControladorBase {
     private final VistaLogin vista;
