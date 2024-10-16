@@ -90,10 +90,11 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 3;
         panel.add(new JLabel("Tiempo mínimo (minutos):"), gbc);
-        int tiempoMinimo = Math.max(1, Math.min(configuracionActual.getTiempoMinimo(), 120));
-        spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(tiempoMinimo > 0 ? tiempoMinimo : 15, 1, 120, 1)); // Valor predeterminado: 15
+        int tiempoMinimo = Math.max(30, Math.min(configuracionActual.getTiempoMinimo(), 120)); // Mínimo 30
+       spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(tiempoMinimo > 0 ? tiempoMinimo : 30, 30, Double.POSITIVE_INFINITY, 30));
         gbc.gridx = 1;
         panel.add(spnTiempoMinimo, gbc);
+
 
         // Costo de multa
         gbc.gridx = 0;
