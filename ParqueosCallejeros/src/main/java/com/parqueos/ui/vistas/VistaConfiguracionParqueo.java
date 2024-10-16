@@ -5,6 +5,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.LocalTime;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -31,6 +33,16 @@ public class VistaConfiguracionParqueo extends JDialog {
         super(parent, "Configuración del Parqueo", true);
         inicializarComponentes(configuracionActual);
     }
+    
+    //Conversión de LocalTime a Date
+    private Date localTimeToDate(LocalTime localTime) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
+        calendar.set(Calendar.MINUTE, localTime.getMinute());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
 
     private void inicializarComponentes(ConfiguracionParqueo configuracionActual) {
         PanelPersonalizado panel = new PanelPersonalizado();
@@ -46,7 +58,9 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioInicio = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deInicio = new JSpinner.DateEditor(spnHorarioInicio, "HH:mm");
         spnHorarioInicio.setEditor(deInicio);
-        spnHorarioInicio.setValue(configuracionActual.getHorarioInicio());
+        spnHorarioInicio.setValue(configuracionActual.getHorarioInicio() != null ? 
+            localTimeToDate(configuracionActual.getHorarioInicio()) : 
+            localTimeToDate(LocalTime.of(8, 0)));  // Valor predeterminado: 08:00 AM
         gbc.gridx = 1;
         panel.add(spnHorarioInicio, gbc);
 
@@ -57,7 +71,9 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioFin = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deFin = new JSpinner.DateEditor(spnHorarioFin, "HH:mm");
         spnHorarioFin.setEditor(deFin);
-        spnHorarioFin.setValue(configuracionActual.getHorarioFin());
+        spnHorarioFin.setValue(configuracionActual.getHorarioFin() != null ? 
+            localTimeToDate(configuracionActual.getHorarioFin()) : 
+            localTimeToDate(LocalTime.of(18, 0)));  // Valor predeterminado: 06:00 PM
         gbc.gridx = 1;
         panel.add(spnHorarioFin, gbc);
 
@@ -65,7 +81,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 2;
         panel.add(new JLabel("Precio por hora:"), gbc);
-        spnPrecioHora = new JSpinner(new SpinnerNumberModel(configuracionActual.getPrecioHora(), 0, 10000, 100));
+        int precioHora = Math.max(0, Math.min(configuracionActual.getPrecioHora(), 10000));
+        spnPrecioHora = new JSpinner(new SpinnerNumberModel(precioHora > 0 ? precioHora : 100, 0, 10000, 100)); // Valor predeterminado: 100
         gbc.gridx = 1;
         panel.add(spnPrecioHora, gbc);
 
@@ -73,7 +90,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 3;
         panel.add(new JLabel("Tiempo mínimo (minutos):"), gbc);
-        spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(configuracionActual.getTiempoMinimo(), 1, 120, 1));
+        int tiempoMinimo = Math.max(1, Math.min(configuracionActual.getTiempoMinimo(), 120));
+        spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(tiempoMinimo > 0 ? tiempoMinimo : 15, 1, 120, 1)); // Valor predeterminado: 15
         gbc.gridx = 1;
         panel.add(spnTiempoMinimo, gbc);
 
@@ -81,7 +99,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 4;
         panel.add(new JLabel("Costo de multa:"), gbc);
-        spnCostoMulta = new JSpinner(new SpinnerNumberModel(configuracionActual.getCostoMulta(), 0, 50000, 500));
+        int costoMulta = Math.max(0, Math.min(configuracionActual.getCostoMulta(), 50000));
+        spnCostoMulta = new JSpinner(new SpinnerNumberModel(costoMulta > 0 ? costoMulta : 500, 0, 50000, 500)); // Valor predeterminado: 500
         gbc.gridx = 1;
         panel.add(spnCostoMulta, gbc);
 
@@ -102,6 +121,7 @@ public class VistaConfiguracionParqueo extends JDialog {
         pack();
         setLocationRelativeTo(null);
     }
+
 
     public ConfiguracionParqueo getConfiguracion() {
         LocalTime horarioInicio = LocalTime.parse(((JSpinner.DateEditor) spnHorarioInicio.getEditor()).getFormat().format(spnHorarioInicio.getValue()));
