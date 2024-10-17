@@ -13,7 +13,7 @@ public class UsuarioParqueo extends Usuario {
     private String numeroTarjeta;
     private String fechaVencimientoTarjeta;
     private String codigoValidacionTarjeta;
-    private final List<Vehiculo> vehiculos;
+    private List<Vehiculo> vehiculos;
     private int tiempoGuardado; // en minutos
     private final List<Reserva> reservasActivas;
 
@@ -41,6 +41,11 @@ public class UsuarioParqueo extends Usuario {
 
     public List<Vehiculo> getVehiculos() {
         return new ArrayList<>(vehiculos);
+    }
+
+    public void setVehiculos(List<Vehiculo> vehiculos) {
+        this.vehiculos = vehiculos;
+        this.actualizarEnArchivo();
     }
 
     public int getTiempoGuardado() {

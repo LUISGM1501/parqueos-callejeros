@@ -31,7 +31,11 @@ public class Administrador extends Usuario {
     }
 
     public void configurarParqueo(ConfiguracionParqueo configuracion) {
-        ConfiguracionParqueo.setInstancia(configuracion);
+        ConfiguracionParqueo.obtenerInstancia().setHorarioInicio(configuracion.getHorarioInicio());
+        ConfiguracionParqueo.obtenerInstancia().setHorarioFin(configuracion.getHorarioFin());
+        ConfiguracionParqueo.obtenerInstancia().setPrecioHora(configuracion.getPrecioHora());
+        ConfiguracionParqueo.obtenerInstancia().setTiempoMinimo(configuracion.getTiempoMinimo());
+        ConfiguracionParqueo.obtenerInstancia().setCostoMulta(configuracion.getCostoMulta());
         configuracion.guardar();
     }
 

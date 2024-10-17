@@ -1,31 +1,51 @@
 package com.parqueos.servicios;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.parqueos.builders.AdministradorBuilder;
-import com.parqueos.builders.InspectorBuilder;
-import com.parqueos.builders.UsuarioBuilder;
-import com.parqueos.builders.UsuarioParqueoBuilder;
 import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
+import com.parqueos.modelo.usuario.Administrador;
+import com.parqueos.modelo.usuario.Inspector;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
+import com.parqueos.builders.UsuarioBuilder;
+import com.parqueos.builders.UsuarioParqueoBuilder;
+import com.parqueos.builders.AdministradorBuilder;
+import com.parqueos.builders.InspectorBuilder;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class GestorUsuarios {
     private static final String ARCHIVO_USUARIOS = "usuarios.json";
+    private static final Logger LOGGER = Logger.getLogger(GestorUsuarios.class.getName());
+    
     private List<Usuario> usuarios;
     private final AuthService authService;
+    private final GestorVehiculos gestorVehiculos;
 
-    public GestorUsuarios(AuthService authService) {
+    public GestorUsuarios(AuthService authService, GestorVehiculos gestorVehiculos) {
         this.authService = authService;
+        this.gestorVehiculos = gestorVehiculos;
+        this.usuarios = new ArrayList<>();
         cargarUsuarios();
     }
 
     public void cargarUsuarios() {
-        usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
-        for (Usuario usuario : usuarios) {
-            authService.registrarUsuario(usuario);
+        try {
+            usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
+            for (Usuario usuario : usuarios) {
+                if (usuario instanceof UsuarioParqueo) {
+                    UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuario;
+                    List<Vehiculo> vehiculos = gestorVehiculos.obtenerVehiculosPorUsuario(usuarioParqueo.getId());
+                    usuarioParqueo.setVehiculos(vehiculos);
+                }
+                authService.registrarUsuario(usuario);
+            }
+            LOGGER.info("Usuarios cargados exitosamente. Total: " + usuarios.size());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al cargar usuarios", e);
+            usuarios = new ArrayList<>();
         }
     }
 
@@ -65,8 +85,10 @@ public class GestorUsuarios {
             
             UsuarioParqueo usuarioParqueo = (UsuarioParqueo) builder.construir();
             for (Vehiculo vehiculo : vehiculos) {
-                usuarioParqueo.agregarVehiculo(vehiculo);
+                vehiculo.setPropietario(usuarioParqueo);
+                gestorVehiculos.agregarVehiculo(vehiculo);
             }
+            usuarioParqueo.setVehiculos(vehiculos);
             nuevoUsuario = usuarioParqueo;
         } else if (builder instanceof InspectorBuilder) {
             ((InspectorBuilder) builder).conTerminalId(terminalId);
@@ -75,14 +97,11 @@ public class GestorUsuarios {
             nuevoUsuario = builder.construir();
         }
 
-        registrarUsuario(nuevoUsuario);
-        return nuevoUsuario;
-    }
-
-    public void registrarUsuario(Usuario usuario) {
-        usuarios.add(usuario);
-        authService.registrarUsuario(usuario);
+        usuarios.add(nuevoUsuario);
+        authService.registrarUsuario(nuevoUsuario);
         guardarUsuarios();
+        LOGGER.info("Usuario creado: " + nuevoUsuario.getId());
+        return nuevoUsuario;
     }
 
     public Usuario actualizarUsuario(String id, String nombre, String apellidos, int telefono, String email,
@@ -94,31 +113,50 @@ public class GestorUsuarios {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
+        int index = usuarios.indexOf(usuarioExistente);
         Usuario usuarioActualizado = crearUsuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin,
                                                   tipoUsuario, numeroTarjeta, fechaVencimiento, codigoValidacion,
                                                   terminalId, vehiculos);
         
-        int index = usuarios.indexOf(usuarioExistente);
         usuarios.set(index, usuarioActualizado);
         guardarUsuarios();
+        LOGGER.info("Usuario actualizado: " + id);
         return usuarioActualizado;
     }
 
     public void eliminarUsuario(String id) {
+        Usuario usuario = buscarUsuario(id);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+
+        if (usuario instanceof UsuarioParqueo) {
+            UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuario;
+            for (Vehiculo vehiculo : usuarioParqueo.getVehiculos()) {
+                gestorVehiculos.eliminarVehiculo(vehiculo.getId());
+            }
+        }
+        
         boolean removido = usuarios.removeIf(u -> u.getId().equals(id));
         if (removido) {
             guardarUsuarios();
+            LOGGER.info("Usuario eliminado: " + id);
         } else {
-            throw new IllegalArgumentException("Usuario no encontrado");
+            LOGGER.warning("No se pudo eliminar el usuario: " + id);
         }
     }
 
     private void guardarUsuarios() {
-        GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
+        try {
+            GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
+            LOGGER.info("Usuarios guardados exitosamente");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error al guardar usuarios", e);
+        }
     }
 
     public List<Usuario> getUsuarios() {
-        return usuarios;
+        return new ArrayList<>(usuarios);
     }
 
     public Usuario buscarUsuario(String id) {
@@ -131,6 +169,11 @@ public class GestorUsuarios {
     public List<Usuario> buscarUsuariosPorTipo(Usuario.TipoUsuario tipo) {
         return usuarios.stream()
             .filter(u -> u.getTipoUsuario() == tipo)
-            .collect(Collectors.toList());
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    public void inicializarListaVacia() {
+        this.usuarios = new ArrayList<>();
+        LOGGER.info("Lista de usuarios inicializada vacía");
     }
 }

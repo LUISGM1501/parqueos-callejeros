@@ -14,17 +14,19 @@ public class SistemaParqueo {
     private final GestorMultas gestorMultas;
     private final GestorEspacios gestorEspacios;
     private final GestorReportes gestorReportes;
+    private final GestorVehiculos gestorVehiculos;
 
     private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
 
     public SistemaParqueo() {
         this.gestorNotificaciones = new GestorNotificaciones();
         this.authService = new AuthService(gestorNotificaciones);
-        this.gestorUsuarios = new GestorUsuarios(authService);
         this.gestorReservas = new GestorReservas();
         this.gestorMultas = new GestorMultas();
         this.gestorEspacios = new GestorEspacios();
         this.gestorReportes = new GestorReportes();
+        this.gestorVehiculos = new GestorVehiculos();
+        this.gestorUsuarios = new GestorUsuarios(authService, gestorVehiculos);
         cargarDatos();
     }
 
@@ -71,6 +73,12 @@ public class SistemaParqueo {
             gestorReportes.cargarReportes();
         } catch (Exception e) {
             System.err.println("Error al cargar reportes. Se iniciará con una lista vacía.");
+            e.printStackTrace();
+        }
+        try {
+            gestorVehiculos.cargarVehiculos();
+        } catch (Exception e) {
+            System.err.println("Error al cargar vehículos. Se iniciará con una lista vacía.");
             e.printStackTrace();
         }
     }

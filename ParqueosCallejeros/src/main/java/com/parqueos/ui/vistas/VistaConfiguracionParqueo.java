@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.LocalTime;
+import java.util.Calendar;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -46,7 +47,7 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioInicio = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deInicio = new JSpinner.DateEditor(spnHorarioInicio, "HH:mm");
         spnHorarioInicio.setEditor(deInicio);
-        spnHorarioInicio.setValue(configuracionActual.getHorarioInicio());
+        spnHorarioInicio.setValue(calendarFromLocalTime(configuracionActual.getHorarioInicio()).getTime());
         gbc.gridx = 1;
         panel.add(spnHorarioInicio, gbc);
 
@@ -57,7 +58,7 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioFin = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deFin = new JSpinner.DateEditor(spnHorarioFin, "HH:mm");
         spnHorarioFin.setEditor(deFin);
-        spnHorarioFin.setValue(configuracionActual.getHorarioFin());
+        spnHorarioFin.setValue(calendarFromLocalTime(configuracionActual.getHorarioFin()).getTime());
         gbc.gridx = 1;
         panel.add(spnHorarioFin, gbc);
 
@@ -65,7 +66,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 2;
         panel.add(new JLabel("Precio por hora:"), gbc);
-        spnPrecioHora = new JSpinner(new SpinnerNumberModel(configuracionActual.getPrecioHora(), 0, 10000, 100));
+        int precioHoraInicial = validarValor(configuracionActual.getPrecioHora(), 0, 10000);
+        spnPrecioHora = new JSpinner(new SpinnerNumberModel(precioHoraInicial, 0, 10000, 100));
         gbc.gridx = 1;
         panel.add(spnPrecioHora, gbc);
 
@@ -73,7 +75,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 3;
         panel.add(new JLabel("Tiempo mínimo (minutos):"), gbc);
-        spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(configuracionActual.getTiempoMinimo(), 1, 120, 1));
+        int tiempoMinimoInicial = validarValor(configuracionActual.getTiempoMinimo(), 1, 120);
+        spnTiempoMinimo = new JSpinner(new SpinnerNumberModel(tiempoMinimoInicial, 1, 120, 1));
         gbc.gridx = 1;
         panel.add(spnTiempoMinimo, gbc);
 
@@ -81,7 +84,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 4;
         panel.add(new JLabel("Costo de multa:"), gbc);
-        spnCostoMulta = new JSpinner(new SpinnerNumberModel(configuracionActual.getCostoMulta(), 0, 50000, 500));
+        int costoMultaInicial = validarValor(configuracionActual.getCostoMulta(), 0, 50000);
+        spnCostoMulta = new JSpinner(new SpinnerNumberModel(costoMultaInicial, 0, 50000, 500));
         gbc.gridx = 1;
         panel.add(spnCostoMulta, gbc);
 
@@ -103,14 +107,44 @@ public class VistaConfiguracionParqueo extends JDialog {
         setLocationRelativeTo(null);
     }
 
+    private int validarValor(int valor, int min, int max) {
+        return Math.max(min, Math.min(valor, max));
+    }
+
     public ConfiguracionParqueo getConfiguracion() {
-        LocalTime horarioInicio = LocalTime.parse(((JSpinner.DateEditor) spnHorarioInicio.getEditor()).getFormat().format(spnHorarioInicio.getValue()));
-        LocalTime horarioFin = LocalTime.parse(((JSpinner.DateEditor) spnHorarioFin.getEditor()).getFormat().format(spnHorarioFin.getValue()));
+        LocalTime horarioInicio = localTimeFromCalendar((Calendar) spnHorarioInicio.getValue());
+        LocalTime horarioFin = localTimeFromCalendar((Calendar) spnHorarioFin.getValue());
         int precioHora = (Integer) spnPrecioHora.getValue();
         int tiempoMinimo = (Integer) spnTiempoMinimo.getValue();
         int costoMulta = (Integer) spnCostoMulta.getValue();
 
-        return new ConfiguracionParqueo(horarioInicio, horarioFin, precioHora, tiempoMinimo, costoMulta);
+        ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
+        configuracion.setHorarioInicio(horarioInicio);
+        configuracion.setHorarioFin(horarioFin);
+        configuracion.setPrecioHora(precioHora);
+        configuracion.setTiempoMinimo(tiempoMinimo);
+        configuracion.setCostoMulta(costoMulta);
+
+        return configuracion;
+    }
+
+    private Calendar calendarFromLocalTime(LocalTime time) {
+        Calendar cal = Calendar.getInstance();
+        if (time == null) {
+            // Valor predeterminado: 8:00 AM
+            cal.set(Calendar.HOUR_OF_DAY, 8);
+            cal.set(Calendar.MINUTE, 0);
+        } else {
+            cal.set(Calendar.HOUR_OF_DAY, time.getHour());
+            cal.set(Calendar.MINUTE, time.getMinute());
+        }
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
+    }
+
+    private LocalTime localTimeFromCalendar(Calendar cal) {
+        return LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
     }
 
     public BotonPersonalizado getBtnGuardar() {

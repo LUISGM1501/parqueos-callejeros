@@ -39,3 +39,12 @@ build/
 
 ### Correo ###
 .env
+
+### Archivos Json ###
+configuracion.json
+espacios.json
+multas.json
+reportes.json
+reservas.json
+usuarios.json
+vehiculos.json

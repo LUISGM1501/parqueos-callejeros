@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.parqueos.util.GestorArchivos;
 
-public class ConfiguracionParqueo implements Serializable   {
+public class ConfiguracionParqueo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
     
@@ -20,29 +20,37 @@ public class ConfiguracionParqueo implements Serializable   {
     private final List<EspacioParqueo> espacios;
 
     private ConfiguracionParqueo() {
-        // Constructor privado para evitar instanciacion directa
+        // Valores por defecto
+        this.horarioInicio = LocalTime.of(8, 0);
+        this.horarioFin = LocalTime.of(18, 0);
+        this.precioHora = 1000;
+        this.tiempoMinimo = 30;
+        this.costoMulta = 5000;
         this.espacios = new ArrayList<>();
     }
 
-    public static ConfiguracionParqueo obtenerInstancia() {
+    public static synchronized ConfiguracionParqueo obtenerInstancia() {
         if (instancia == null) {
-            instancia = new ConfiguracionParqueo();
+            instancia = cargarConfiguracion();
+            if (instancia == null) {
+                instancia = new ConfiguracionParqueo();
+            }
         }
         return instancia;
     }
 
-    public static ConfiguracionParqueo setInstancia(ConfiguracionParqueo configuracion) {
-        instancia = configuracion;
-        return instancia;
+    private static ConfiguracionParqueo cargarConfiguracion() {
+        List<ConfiguracionParqueo> configuraciones = GestorArchivos.cargarTodosLosElementos(ARCHIVO_CONFIGURACION, ConfiguracionParqueo.class);
+        return configuraciones.isEmpty() ? null : configuraciones.get(0);
     }
 
-    public ConfiguracionParqueo(LocalTime horarioInicio, LocalTime horarioFin, int precioHora, int tiempoMinimo, int costoMulta) {
+    public void actualizarConfiguracion(LocalTime horarioInicio, LocalTime horarioFin, int precioHora, int tiempoMinimo, int costoMulta) {
         this.horarioInicio = horarioInicio;
         this.horarioFin = horarioFin;
         this.precioHora = precioHora;
         this.tiempoMinimo = tiempoMinimo;
         this.costoMulta = costoMulta;
-        this.espacios = new ArrayList<>();
+        guardar();
     }
 
     public void agregarEspacios(int inicio, int fin) {
@@ -52,6 +60,7 @@ public class ConfiguracionParqueo implements Serializable   {
                 espacios.add(new EspacioParqueo(numero));
             }
         }
+        guardar();
     }
 
     public void eliminarEspacios(int inicio, int fin) {
@@ -59,59 +68,32 @@ public class ConfiguracionParqueo implements Serializable   {
             int numero = Integer.parseInt(espacio.getNumero());
             return numero >= inicio && numero <= fin;
         });
+        guardar();
     }
 
     private boolean existeEspacio(String numero) {
         return espacios.stream().anyMatch(espacio -> espacio.getNumero().equals(numero));
     }
 
-    // Getters y setters
-    public LocalTime getHorarioInicio() {
-        return horarioInicio;
-    }
+    // Getters
+    public LocalTime getHorarioInicio() { return horarioInicio; }
+    public LocalTime getHorarioFin() { return horarioFin; }
+    public int getPrecioHora() { return precioHora; }
+    public int getTiempoMinimo() { return tiempoMinimo; }
+    public int getCostoMulta() { return costoMulta; }
+    public List<EspacioParqueo> getEspacios() { return new ArrayList<>(espacios); }
 
-    public void setHorarioInicio(LocalTime horarioInicio) {
-        this.horarioInicio = horarioInicio;
-    }
-
-    public LocalTime getHorarioFin() {
-        return horarioFin;
-    }
-
-    public void setHorarioFin(LocalTime horarioFin) {
-        this.horarioFin = horarioFin;
-    }
-
-    public int getPrecioHora() {
-        return precioHora;
-    }
-
-    public void setPrecioHora(int precioHora) {
-        this.precioHora = precioHora;
-    }
-
-    public int getTiempoMinimo() {
-        return tiempoMinimo;
-    }
-
-    public void setTiempoMinimo(int tiempoMinimo) {
-        this.tiempoMinimo = tiempoMinimo;
-    }
-
-    public int getCostoMulta() {
-        return costoMulta;
-    }
-
-    public void setCostoMulta(int costoMulta) {
-        this.costoMulta = costoMulta;
-    }
-
-    public List<EspacioParqueo> getEspacios() {
-        return new ArrayList<>(espacios);
-    }
+    // Setters
+    public void setHorarioInicio(LocalTime horarioInicio) { this.horarioInicio = horarioInicio; }
+    public void setHorarioFin(LocalTime horarioFin) { this.horarioFin = horarioFin; }
+    public void setPrecioHora(int precioHora) { this.precioHora = precioHora; }
+    public void setTiempoMinimo(int tiempoMinimo) { this.tiempoMinimo = tiempoMinimo; }
+    public void setCostoMulta(int costoMulta) { this.costoMulta = costoMulta; }
 
     public void guardar() {
-        GestorArchivos.guardarElemento(this, ARCHIVO_CONFIGURACION);
+        List<ConfiguracionParqueo> configuraciones = new ArrayList<>();
+        configuraciones.add(this);
+        GestorArchivos.guardarTodo(configuraciones, ARCHIVO_CONFIGURACION);
     }
 
     @Override

@@ -29,4 +29,37 @@ public class Validador {
     public static boolean validarApellidos(String apellidos) {
         return apellidos != null && apellidos.length() >= 1 && apellidos.length() <= 40;
     }
+
+    public static boolean validarDireccion(String direccion) {
+        return direccion != null && direccion.length() >= 5 && direccion.length() <= 60;
+    }
+
+    public static boolean validarIdUsuario(String idUsuario) {
+        return idUsuario != null && idUsuario.length() >= 2 && idUsuario.length() <= 25;
+    }
+
+    public static boolean validarTipoUsuario(String tipoUsuario) {
+        return tipoUsuario != null && tipoUsuario.length() >= 2 && tipoUsuario.length() <= 25;
+    }
+
+    public static boolean validarNumeroTarjeta(String numeroTarjeta) {
+        return numeroTarjeta != null && numeroTarjeta.length() == 16 && numeroTarjeta.matches("\\d+");
+    }
+    
+    public static boolean validarCodigoValidacion(String codigoValidacion) {
+        return codigoValidacion != null && codigoValidacion.length() == 3 && codigoValidacion.matches("\\d+");
+    }
+
+    public static boolean validarTerminalId(String terminalId) {
+        return terminalId != null && terminalId.length() == 6 && terminalId.matches("\\d+");
+    }
+
+    public static boolean validarTiempoGuardado(int tiempoGuardado) {
+        return tiempoGuardado >= 0;
+    }
+
+    public static boolean validarFechaVencimiento(String fechaVencimiento) {
+        return fechaVencimiento != null && fechaVencimiento.length() == 4 && fechaVencimiento.matches("\\d+");
+    }
+
 }
