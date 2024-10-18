@@ -16,6 +16,7 @@ import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Usuario;
 
+
 // Clase para gestionar las notificaciones
 public class GestorNotificaciones {
     // Variables de entorno para el remitente
