@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -58,9 +59,8 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioInicio = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deInicio = new JSpinner.DateEditor(spnHorarioInicio, "HH:mm");
         spnHorarioInicio.setEditor(deInicio);
-        spnHorarioInicio.setValue(configuracionActual.getHorarioInicio() != null ? 
-            localTimeToDate(configuracionActual.getHorarioInicio()) : 
-            localTimeToDate(LocalTime.of(8, 0)));  // Valor predeterminado: 08:00 AM
+        spnHorarioInicio.setValue(calendarFromLocalTime(configuracionActual.getHorarioInicio()).getTime());
+
         gbc.gridx = 1;
         panel.add(spnHorarioInicio, gbc);
 
@@ -71,9 +71,7 @@ public class VistaConfiguracionParqueo extends JDialog {
         spnHorarioFin = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor deFin = new JSpinner.DateEditor(spnHorarioFin, "HH:mm");
         spnHorarioFin.setEditor(deFin);
-        spnHorarioFin.setValue(configuracionActual.getHorarioFin() != null ? 
-            localTimeToDate(configuracionActual.getHorarioFin()) : 
-            localTimeToDate(LocalTime.of(18, 0)));  // Valor predeterminado: 06:00 PM
+        spnHorarioFin.setValue(calendarFromLocalTime(configuracionActual.getHorarioFin()).getTime());
         gbc.gridx = 1;
         panel.add(spnHorarioFin, gbc);
 
@@ -124,14 +122,45 @@ public class VistaConfiguracionParqueo extends JDialog {
     }
 
 
+    private int validarValor(int valor, int min, int max) {
+        return Math.max(min, Math.min(valor, max));
+    }
+
+
     public ConfiguracionParqueo getConfiguracion() {
-        LocalTime horarioInicio = LocalTime.parse(((JSpinner.DateEditor) spnHorarioInicio.getEditor()).getFormat().format(spnHorarioInicio.getValue()));
-        LocalTime horarioFin = LocalTime.parse(((JSpinner.DateEditor) spnHorarioFin.getEditor()).getFormat().format(spnHorarioFin.getValue()));
+        LocalTime horarioInicio = localTimeFromCalendar((Calendar) spnHorarioInicio.getValue());
+        LocalTime horarioFin = localTimeFromCalendar((Calendar) spnHorarioFin.getValue());
         int precioHora = (Integer) spnPrecioHora.getValue();
         int tiempoMinimo = (Integer) spnTiempoMinimo.getValue();
         int costoMulta = (Integer) spnCostoMulta.getValue();
 
-        return new ConfiguracionParqueo(horarioInicio, horarioFin, precioHora, tiempoMinimo, costoMulta);
+        ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
+        configuracion.setHorarioInicio(horarioInicio);
+        configuracion.setHorarioFin(horarioFin);
+        configuracion.setPrecioHora(precioHora);
+        configuracion.setTiempoMinimo(tiempoMinimo);
+        configuracion.setCostoMulta(costoMulta);
+
+        return configuracion;
+    }
+
+    private Calendar calendarFromLocalTime(LocalTime time) {
+        Calendar cal = Calendar.getInstance();
+        if (time == null) {
+            // Valor predeterminado: 8:00 AM
+            cal.set(Calendar.HOUR_OF_DAY, 8);
+            cal.set(Calendar.MINUTE, 0);
+        } else {
+            cal.set(Calendar.HOUR_OF_DAY, time.getHour());
+            cal.set(Calendar.MINUTE, time.getMinute());
+        }
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
+    }
+
+    private LocalTime localTimeFromCalendar(Calendar cal) {
+        return LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
     }
 
     public BotonPersonalizado getBtnGuardar() {

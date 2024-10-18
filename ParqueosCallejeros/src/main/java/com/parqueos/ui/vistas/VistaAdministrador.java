@@ -1,7 +1,18 @@
 package com.parqueos.ui.vistas;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.componentes.BotonPersonalizado;
@@ -16,6 +27,7 @@ public class VistaAdministrador extends VistaBase {
     private BotonPersonalizado btnGenerarReporteHistorial;
     private BotonPersonalizado btnGenerarReporteEstadisticas;
 
+    // Constructor para inicializar la vista
     public VistaAdministrador(SistemaParqueo sistemaParqueo, String token) {
         super("Panel de Administrador", sistemaParqueo, token);
         inicializarComponentes();

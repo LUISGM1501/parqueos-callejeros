@@ -3,6 +3,8 @@ package com.parqueos.builders;
 import com.parqueos.modelo.usuario.Usuario;
 
 public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
+    // Builder principal el cual se hereda para crear los distintos tipos de usuarios
+
     protected String nombre;
     protected String apellidos;
     protected int telefono;
@@ -11,7 +13,9 @@ public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
     protected String idUsuario;
     protected String pin;
     protected Usuario.TipoUsuario tipoUsuario;
-    @SuppressWarnings("unchecked")
+
+    // Setters para los atributos del usuario
+    @SuppressWarnings("unchecked") // Para quitar las advertencias deunchecked para los generics
     public T conNombre(String nombre) {
         this.nombre = nombre;
         return (T) this;
@@ -59,6 +63,7 @@ public class UsuarioBuilder <T extends UsuarioBuilder<T>> {
         return (T) this;
     }
 
+    // Metodo para construir el usuario
     public Usuario construir() {
         return new Usuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin, tipoUsuario);
     }
