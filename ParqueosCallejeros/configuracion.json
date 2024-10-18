@@ -5,4 +5,25 @@
   "tiempoMinimo" : 0,
   "costoMulta" : 0,
   "espacios" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.modelo.parqueo.ConfiguracionParqueo", {
+  "horarioInicio" : [ 8, 0 ],
+  "horarioFin" : [ 18, 0 ],
+  "precioHora" : 100,
+  "tiempoMinimo" : 30,
+  "costoMulta" : 500,
+  "espacios" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.modelo.parqueo.ConfiguracionParqueo", {
+  "horarioInicio" : [ 8, 0 ],
+  "horarioFin" : [ 9, 0 ],
+  "precioHora" : 100,
+  "tiempoMinimo" : 30,
+  "costoMulta" : 500,
+  "espacios" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.modelo.parqueo.ConfiguracionParqueo", {
+  "horarioInicio" : [ 8, 0 ],
+  "horarioFin" : [ 18, 0 ],
+  "precioHora" : 100,
+  "tiempoMinimo" : 30,
+  "costoMulta" : 500,
+  "espacios" : [ "java.util.ArrayList", [ ] ]
 } ] ] ]

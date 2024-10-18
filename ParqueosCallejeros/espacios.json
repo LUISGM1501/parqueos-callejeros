@@ -1,1 +1,13 @@
-["java.util.ArrayList", [ ] ]
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "5dc1c333-fd2c-4656-bf16-2c64379eb2cf",
+  "numero" : "019",
+  "vehiculoActual" : null
+} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "d041dbe3-f322-4e29-8bbc-8b36f4be8f91",
+  "numero" : "020",
+  "vehiculoActual" : null
+} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "fdb1ca38-e203-411a-b37f-42c4d9cd44e8",
+  "numero" : "021",
+  "vehiculoActual" : null
+} ] ] ]

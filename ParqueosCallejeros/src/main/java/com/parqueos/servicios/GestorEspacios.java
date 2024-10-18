@@ -37,6 +37,19 @@ public class GestorEspacios {
                        .findFirst()
                        .orElse(null);
     }
+    
+    public void eliminarEspacio(String numeroEspacio) {
+    EspacioParqueo espacio = buscarEspacio(numeroEspacio);
+    
+    if (espacio != null) {
+        espacios.remove(espacio);
+        guardarEspacios(); // Guardar los cambios en el archivo
+        System.out.println("El espacio " + numeroEspacio + " fue eliminado con éxito.");
+    } else {
+        System.out.println("El espacio " + numeroEspacio + " no existe.");
+    }
+}
+
 
     private void guardarEspacios() {
         GestorArchivos.guardarTodo(espacios, ARCHIVO_ESPACIOS);

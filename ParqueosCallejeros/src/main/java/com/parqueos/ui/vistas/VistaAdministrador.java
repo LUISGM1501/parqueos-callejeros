@@ -84,7 +84,7 @@ public class VistaAdministrador extends VistaBase {
             btnConfigurarParqueo = crearBoton("Configurar Parqueo");
             btnGestionarUsuarios = crearBoton("Gestionar Usuarios");
             btnGestionarEspacios = crearBoton("Gestionar Espacios");
-
+            
             panel.add(btnConfigurarParqueo, gbc);
             panel.add(btnGestionarUsuarios, gbc);
             panel.add(btnGestionarEspacios, gbc);
