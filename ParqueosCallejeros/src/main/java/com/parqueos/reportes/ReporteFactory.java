@@ -8,6 +8,8 @@ import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 
 public class ReporteFactory {
+
+    // Metodo Factory para crear un reporte 
     public static Reporte crearReporte(TipoReporte tipo, LocalDate fechaInicio, LocalDate fechaFin, 
                                        List<EspacioParqueo> espacios, List<Reserva> reservas, 
                                        List<Double> ingresos, List<Multa> multas) {
@@ -21,6 +23,7 @@ public class ReporteFactory {
         };
     }
 
+    // Enum para los tipos de reportes
     public enum TipoReporte {
         INGRESOS, MULTAS, ESPACIOS, HISTORIAL, ESTADISTICAS
     }

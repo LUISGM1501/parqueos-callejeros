@@ -16,12 +16,18 @@ import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Usuario;
 
+// Clase para gestionar las notificaciones
 public class GestorNotificaciones {
+    // Variables de entorno para el remitente
     private static final String REMITENTE_EMAIL = System.getenv("REMITENTE_EMAIL");
     private static final String REMITENTE_PASSWORD = System.getenv("REMITENTE_PASSWORD");
 
+    // Metodo para notificar una reserva creada
     public void notificarReservaCreada(Reserva reserva) {
+        // Obtener el usuario de la reserva
         Usuario usuario = reserva.getUsuario();
+
+        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Su reserva ha sido creada exitosamente:\n" +
@@ -38,11 +44,16 @@ public class GestorNotificaciones {
             reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
         );
         
+        // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Reserva Creada", mensaje);
     }
     
+    // Metodo para notificar el tiempo agregado a una reserva
     public void notificarTiempoAgregado(Reserva reserva) {
+        // Obtener el usuario de la reserva
         Usuario usuario = reserva.getUsuario();
+
+        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha agregado tiempo a su reserva:\n" +
@@ -57,11 +68,16 @@ public class GestorNotificaciones {
             reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
         );
         
+        // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Tiempo Agregado a Reserva", mensaje);
     }
     
+    // Metodo para notificar el desaparcado de un vehiculo
     public void notificarDesaparcado(Reserva reserva, int tiempoNoUsado) {
+        // Obtener el usuario de la reserva
         Usuario usuario = reserva.getUsuario();
+
+        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Su vehículo ha sido desaparcado:\n" +
@@ -77,11 +93,16 @@ public class GestorNotificaciones {
             tiempoNoUsado
         );
         
+        // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Vehículo Desaparcado", mensaje);
     }
     
+    // Metodo para notificar una multa generada
     public void notificarMultaGenerada(Multa multa) {
+        // Obtener el usuario del vehiculo
         Usuario usuario = multa.getVehiculo().getPropietario();
+
+        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha generado una multa para su vehículo:\n" +
@@ -98,11 +119,16 @@ public class GestorNotificaciones {
             multa.getMonto()
         );
         
+        // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Multa Generada", mensaje);
     }
 
+    // Metodo para notificar el pago de una multa
     public void notificarMultaPagada(Multa multa) {
+        // Obtener el usuario del vehiculo
         Usuario usuario = multa.getVehiculo().getPropietario();
+
+        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha registrado el pago de la siguiente multa:\n" +
@@ -119,33 +145,45 @@ public class GestorNotificaciones {
             multa.getMonto()
         );
         
+        // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Confirmación de Pago de Multa", mensaje);
     }
     
+    // Metodo para enviar un correo
     public void enviarCorreo(String destinatario, String asunto, String mensaje) {
+        // Configurar las propiedades del servidor de correo
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
+        // Crear una sesion de correo
         Session session = Session.getInstance(props, new Authenticator() {
+            
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(REMITENTE_EMAIL, REMITENTE_PASSWORD);
             }
         });
 
+        // Crear un mensaje mime
         try {
+            // Un mensaje mime es un mensaje que puede contener texto, html, adjuntos, etc.
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(REMITENTE_EMAIL));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
             message.setSubject(asunto);
             message.setText(mensaje);
 
+            // Enviar el mensaje
             Transport.send(message);
 
+            // Mensaje de confirmacion
             System.out.println("Correo enviado exitosamente a " + destinatario);
         } catch (MessagingException e) {
+            // Mensaje de error
+            System.out.println("Error al enviar el correo: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
