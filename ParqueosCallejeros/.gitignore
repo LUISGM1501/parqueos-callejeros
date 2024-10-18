@@ -41,10 +41,13 @@ build/
 .env
 
 ### Archivos Json ###
-configuracion.json
-espacios.json
-multas.json
-reportes.json
-reservas.json
-usuarios.json
-vehiculos.json
+### configuracion.json
+### espacios.json
+### multas.json
+### reportes.json
+### reservas.json
+### usuarios.json
+### vehiculos.json
+
+### Archivos pdf ###
+*.pdf
