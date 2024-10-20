@@ -12,9 +12,13 @@ import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaAdministrador;
 import com.parqueos.ui.vistas.VistaConfiguracionParqueo;
 import com.parqueos.ui.vistas.VistaGestionarEspacios;
+import com.parqueos.ui.vistas.VistaGestionUsuarios;
+
+
 import java.util.ArrayList;
 import java.util.List;
-import com.parqueos.ui.vistas.VistaGestionUsuarios;
+
+
 import com.parqueos.util.GeneradorPDF;
 
 // Controlador para el administrador
@@ -97,115 +101,11 @@ public class ControladorAdministrador extends ControladorBase {
 
     // Metodo para gestionar espacios
     private void gestionarEspacios() {
+        //Crear la vista de gestionar espacios
         VistaGestionarEspacios vistaGestEspacios = new VistaGestionarEspacios(vista);
-        
-        //Funcionalidad boton agregar
-        vistaGestEspacios.getBtnAgregar().addActionListener(e->{
-            int e1, e2;
-            String txtEspacio1, txtEspacio2;
-            EspacioParqueo espacio;
-            List<Integer> listaNums = new ArrayList<>();
-            if (vistaGestEspacios.getRdbUnEspacio().isSelected()){
-                txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
-                //Validacion de existencia del espacio
-                if (sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1) == null){
-                    espacio = new EspacioParqueo(txtEspacio1);
-                    sistemaParqueo.getGestorEspacios().agregarEspacio(espacio);
-                    JOptionPane.showMessageDialog(vista, "Espacio agregado con éxito.");
-                }else{
-                    JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " ya existe.");
-                }
-                
-            } else if(vistaGestEspacios.getRdbVariosEspacios().isSelected()){
-                txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
-                txtEspacio2 = vistaGestEspacios.getTxtLimiteEspacios().getText();
-                
-                //longitud de los caracters de espacio
-                int longitud = txtEspacio1.length();
-                String formato = "%0" + Integer.toString(longitud) + "d";
-                
-                //Transformar strings a números
-                e1 = Integer.valueOf(txtEspacio1);
-                e2 = Integer.valueOf(txtEspacio2);
-                
-                //agregar espacios del rango convertidos en números
-                for(int i = e1; i <= e2; i++){
-                    listaNums.add(i);
-                }
-                //tranformar devuelta a espacios
-                for (int num : listaNums){
-                    txtEspacio1 = String.format(formato, num);
-                    if (sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1) == null){
-                        espacio = new EspacioParqueo(txtEspacio1);
-                        sistemaParqueo.getGestorEspacios().agregarEspacio(espacio);                        
-                    }else{
-                        JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " ya existe.");
-                    }                    
-                } 
-                JOptionPane.showMessageDialog(vista, "Espacios agregados con éxito.");
-            }
-        });
-        
-        //Funcionalidad boton eliminar
-        vistaGestEspacios.getBtnEliminar().addActionListener(e ->{
-            int e1, e2;
-            String txtEspacio1, txtEspacio2;
-            EspacioParqueo espacio;
-            List<Integer> listaNums = new ArrayList<>();
-            if (vistaGestEspacios.getRdbUnEspacio().isSelected()){
-                txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();  
-                espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1);
-                //Validacion de existencia del espacio
-                if (espacio != null){
-                    if(!espacio.estaOcupado()){
-                            sistemaParqueo.getGestorEspacios().eliminarEspacio(txtEspacio1);
-                            JOptionPane.showMessageDialog(vista, "El espacio fue eliminado con éxito.");
-                        }else{
-                            JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " está ocupado.");
-                        }                     
-                }else{
-                    JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " no existe.");
-                }
-                
-            } else if(vistaGestEspacios.getRdbVariosEspacios().isSelected()){
-                txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
-                txtEspacio2 = vistaGestEspacios.getTxtLimiteEspacios().getText();
-                
-                //longitud de los caracters de espacio
-                int longitud = txtEspacio1.length();
-                String formato = "%0" + Integer.toString(longitud) + "d";
-                
-                //Transformar strings a números
-                e1 = Integer.valueOf(txtEspacio1);
-                e2 = Integer.valueOf(txtEspacio2);
-                
-                //agregar espacios del rango convertidos en números
-                for(int i = e1; i <= e2; i++){
-                    listaNums.add(i);
-                }
-                //tranformar devuelta a espacios
-                for (int num : listaNums){
-                    txtEspacio1 = String.format(formato, num);
-                    espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1);
-                    if (espacio != null){
-                        if(!espacio.estaOcupado()){
-                            sistemaParqueo.getGestorEspacios().eliminarEspacio(txtEspacio1); 
-                        }else{
-                            JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " está ocupado.");
-                        }                                                                    
-                    }else{
-                        JOptionPane.showMessageDialog(vista, "El espacio " + txtEspacio1 + " no existe.");
-                    }                    
-                } 
-                JOptionPane.showMessageDialog(vista, "Espacios eliminados con éxito.");
-            } else{
-                JOptionPane.showMessageDialog(vista, "Seleccione una opción antes de iniciar.");
-            }
-        });
-        
-        //boton cancelar5 para salir
-        vistaGestEspacios.getBtnCancelar().addActionListener(e -> vistaGestEspacios.dispose());
-        
+        //Crear el controlador de getion de espacios
+        ControladorGestionarEspacios controladorGestionarEspacios = new ControladorGestionarEspacios(vistaGestEspacios, sistemaParqueo, token);
+        //Mostrar la vista       
         vistaGestEspacios.setVisible(true);
     }
 

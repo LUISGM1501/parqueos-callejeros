@@ -20,6 +20,7 @@ import javax.swing.SpinnerNumberModel;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
+import java.time.ZoneId;
 
 public class VistaConfiguracionParqueo extends JDialog {
     private JSpinner spnHorarioInicio;
@@ -125,24 +126,27 @@ public class VistaConfiguracionParqueo extends JDialog {
     private int validarValor(int valor, int min, int max) {
         return Math.max(min, Math.min(valor, max));
     }
-
-
+    
     public ConfiguracionParqueo getConfiguracion() {
-        LocalTime horarioInicio = localTimeFromCalendar((Calendar) spnHorarioInicio.getValue());
-        LocalTime horarioFin = localTimeFromCalendar((Calendar) spnHorarioFin.getValue());
-        int precioHora = (Integer) spnPrecioHora.getValue();
-        int tiempoMinimo = (Integer) spnTiempoMinimo.getValue();
-        int costoMulta = (Integer) spnCostoMulta.getValue();
+    Date inicioDate = (Date) spnHorarioInicio.getValue();
+    Date finDate = (Date) spnHorarioFin.getValue();
+    LocalTime horarioInicio = localTimeFromCalendar(calendarFromLocalTime(inicioDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
+    LocalTime horarioFin = localTimeFromCalendar(calendarFromLocalTime(finDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
 
-        ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
-        configuracion.setHorarioInicio(horarioInicio);
-        configuracion.setHorarioFin(horarioFin);
-        configuracion.setPrecioHora(precioHora);
-        configuracion.setTiempoMinimo(tiempoMinimo);
-        configuracion.setCostoMulta(costoMulta);
+    int precioHora = validarValor((Integer) spnPrecioHora.getValue(), 0, 10000);
+    int tiempoMinimo = validarValor((Integer) spnTiempoMinimo.getValue(), 30, 300);
+    int costoMulta = validarValor((Integer) spnCostoMulta.getValue(), 0, 50000);
 
-        return configuracion;
-    }
+    ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
+    configuracion.setHorarioInicio(horarioInicio);
+    configuracion.setHorarioFin(horarioFin);
+    configuracion.setPrecioHora(precioHora);
+    configuracion.setTiempoMinimo(tiempoMinimo);
+    configuracion.setCostoMulta(costoMulta);
+
+    return configuracion;
+}
+
 
     private Calendar calendarFromLocalTime(LocalTime time) {
         Calendar cal = Calendar.getInstance();
