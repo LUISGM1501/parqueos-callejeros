@@ -1,28 +1,22 @@
 package com.parqueos.ui.controladores;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import javax.swing.JOptionPane;
 
+import java.time.LocalDate;
+
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
-import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.reportes.Reporte;
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.VistaAdministrador;
 import com.parqueos.ui.vistas.VistaConfiguracionParqueo;
-import com.parqueos.ui.vistas.VistaGestionarEspacios;
 import com.parqueos.ui.vistas.VistaGestionUsuarios;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-
+import com.parqueos.ui.vistas.VistaGestionarEspacios;
+import com.parqueos.ui.vistas.DialogoFecha;
 import com.parqueos.util.GeneradorPDF;
 
 // Controlador para el administrador
 public class ControladorAdministrador extends ControladorBase {
+
     private final VistaAdministrador vista;
     private final SistemaParqueo sistemaParqueo;
     private final String token;
@@ -62,7 +56,7 @@ public class ControladorAdministrador extends ControladorBase {
         ConfiguracionParqueo configuracionActual = ConfiguracionParqueo.obtenerInstancia();
         // Crear la vista de configuracion
         VistaConfiguracionParqueo vistaConfig = new VistaConfiguracionParqueo(vista, configuracionActual);
-        
+
         // Setear el boton de guardar
         vistaConfig.getBtnGuardar().addActionListener(e -> {
             // Obtener la nueva configuracion
@@ -80,7 +74,6 @@ public class ControladorAdministrador extends ControladorBase {
                 JOptionPane.showMessageDialog(vista, "Error de autorización: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-
 
         // Setear el boton de cancelar
         vistaConfig.getBtnCancelar().addActionListener(e -> vistaConfig.dispose());
@@ -109,26 +102,42 @@ public class ControladorAdministrador extends ControladorBase {
         vistaGestEspacios.setVisible(true);
     }
 
-    // Metodo para generar reporte de ingresos
+    //Me´todo para generar reporte de ingresos
     private void generarReporteIngresos() {
-        // Obtener la fecha de inicio y fin
-        LocalDate fechaInicio = LocalDate.now().minusDays(30); // Último mes
-        LocalDate fechaFin = LocalDate.now();
-        // Generar el reporte
-        Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteIngresos(fechaInicio, fechaFin, sistemaParqueo.getGestorReservas().getReservas());
-        // Mostrar el reporte
-        mostrarReporte(reporte, "Reporte de Ingresos");
+        // Crear el diálogo para seleccionar las fechas
+        DialogoFecha dialogoFecha = new DialogoFecha();
+        LocalDate[] fechas = dialogoFecha.mostrarDialogo();
+
+        // Verificar que se hayan seleccionado las fechas
+        if (fechas != null) {
+            LocalDate fechaInicio = fechas[0];
+            LocalDate fechaFin = fechas[1];
+
+            // Generar el reporte
+            Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteIngresos(fechaInicio, fechaFin, sistemaParqueo.getGestorReservas().getReservas());
+
+            // Mostrar el reporte
+            mostrarReporte(reporte, "Reporte de Ingresos");
+        }
     }
+
 
     // Metodo para generar reporte de multas
     private void generarReporteMultas() {
-        // Obtener la fecha de inicio y fin
-        LocalDate fechaInicio = LocalDate.now().minusDays(30); // Último mes
-        LocalDate fechaFin = LocalDate.now();
-        // Generar el reporte
-        Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteMultas(fechaInicio, fechaFin, sistemaParqueo.getGestorMultas().getMultas());
-        // Mostrar el reporte
-        mostrarReporte(reporte, "Reporte de Multas");
+        // Crear el diálogo para seleccionar las fechas
+        DialogoFecha dialogoFecha = new DialogoFecha();
+        LocalDate[] fechas = dialogoFecha.mostrarDialogo();
+
+        if (fechas != null) {
+            LocalDate fechaInicio = fechas[0];
+            LocalDate fechaFin = fechas[1];
+
+            // Generar el reporte
+            Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteMultas(fechaInicio, fechaFin, sistemaParqueo.getGestorMultas().getMultas());
+
+            // Mostrar el reporte
+            mostrarReporte(reporte, "Reporte de Multas");
+        }
     }
 
     // Metodo para generar reporte de espacios
@@ -141,26 +150,41 @@ public class ControladorAdministrador extends ControladorBase {
 
     // Metodo para generar reporte de historial
     private void generarReporteHistorial() {
-        // Obtener la fecha de inicio y fin
-        LocalDate fechaInicio = LocalDate.now().minusDays(30); // Último mes
-        LocalDate fechaFin = LocalDate.now();
-        // Generar el reporte
-        Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteHistorial(fechaInicio, fechaFin, sistemaParqueo.getGestorReservas().getReservas());
-        // Mostrar el reporte
-        mostrarReporte(reporte, "Reporte de Historial");
+        // Crear el diálogo para seleccionar las fechas
+        DialogoFecha dialogoFecha = new DialogoFecha();
+        LocalDate[] fechas = dialogoFecha.mostrarDialogo();
+
+        // Verificar que se hayan seleccionado las fechas
+        if (fechas != null) {
+            LocalDate fechaInicio = fechas[0];
+            LocalDate fechaFin = fechas[1];
+
+            // Generar el reporte
+            Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteHistorial(fechaInicio, fechaFin, sistemaParqueo.getGestorReservas().getReservas());
+
+            // Mostrar el reporte
+            mostrarReporte(reporte, "Reporte de Historial");
+        }
     }
 
     // Metodo para generar reporte de estadisticas
     private void generarReporteEstadisticas() {
-        // Obtener la fecha de inicio y fin
-        LocalDate fechaInicio = LocalDate.now().minusDays(30); // Último mes
-        LocalDate fechaFin = LocalDate.now();
-        // Generar el reporte
-        Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteEstadisticas(fechaInicio, fechaFin, 
-            sistemaParqueo.getGestorEspacios().getEspacios(), 
-            sistemaParqueo.getGestorReservas().getReservas());
-        // Mostrar el reporte
-        mostrarReporte(reporte, "Reporte de Estadísticas");
+        // Crear el diálogo para seleccionar las fechas
+        DialogoFecha dialogoFecha = new DialogoFecha();
+        LocalDate[] fechas = dialogoFecha.mostrarDialogo();
+
+        if (fechas != null) {
+            LocalDate fechaInicio = fechas[0];
+            LocalDate fechaFin = fechas[1];
+
+            // Generar el reporte
+            Reporte reporte = sistemaParqueo.getGestorReportes().generarReporteEstadisticas(fechaInicio, fechaFin,
+                    sistemaParqueo.getGestorEspacios().getEspacios(),
+                    sistemaParqueo.getGestorReservas().getReservas());
+
+            // Mostrar el reporte
+            mostrarReporte(reporte, "Reporte de Estadísticas");
+        }
     }
 
     // Metodo para mostrar el reporte
@@ -170,23 +194,23 @@ public class ControladorAdministrador extends ControladorBase {
         LocalDate fechaFin = LocalDate.now();
         // Generar el contenido del reporte
         String contenidoReporte = reporte.generarReporte(fechaInicio, fechaFin);
-        
+
         try {
             // Generar el nombre del archivo
             String nombreArchivo = titulo.toLowerCase().replace(" ", "_") + ".pdf";
             // Generar el PDF
             GeneradorPDF.generarPDF(nombreArchivo, contenidoReporte);
             // Mostrar el mensaje de confirmacion
-            JOptionPane.showMessageDialog(vista, 
-                "Reporte generado con éxito.\nArchivo: " + nombreArchivo, 
-                "Reporte Generado", 
-                JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(vista,
+                    "Reporte generado con éxito.\nArchivo: " + nombreArchivo,
+                    "Reporte Generado",
+                    JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             // Mostrar el mensaje de error
-            JOptionPane.showMessageDialog(vista, 
-                "Error al generar el PDF: " + e.getMessage(), 
-                "Error", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(vista,
+                    "Error al generar el PDF: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             // Si falla la generacion del PDF, mostramos el reporte en un diálogo
             JOptionPane.showMessageDialog(vista, contenidoReporte, titulo, JOptionPane.PLAIN_MESSAGE);
         }
