@@ -2,24 +2,41 @@ package com.parqueos.modelo.usuario;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.util.GestorArchivos;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_USUARIOS = "usuarios.json";
-    
+        
+    @JsonProperty("id")
     private String id; 
+    @JsonProperty("nombre")
     protected String nombre;
+    @JsonProperty("apellidos")
     protected String apellidos;
+    @JsonProperty("telefono")
     protected int telefono;
+    @JsonProperty("email")
     protected String email;
+    @JsonProperty("direccion")
     protected String direccion;
+    @JsonProperty("idUsuario")
     protected String idUsuario;
+    @JsonProperty("pin")
     private String pin;
+    @JsonProperty("fechaIngreso")
     protected LocalDate fechaIngreso;
+    @JsonProperty("tipoUsuario")
     private final TipoUsuario tipoUsuario;
 
     // Enum para los tipos de usuarios
@@ -29,8 +46,14 @@ public class Usuario implements Serializable {
         USUARIO_PARQUEO
     }
 
+    @JsonCreator
+    public Usuario() {
+        this("", "", 0, "", "", "", "", TipoUsuario.USUARIO_PARQUEO);
+    }
+
     // Constructor de usuario
-    public Usuario(String nombre, String apellidos, int telefono, String email, String direccion, String idUsuario, String pin, TipoUsuario tipoUsuario) {
+    public Usuario(String nombre, String apellidos, int telefono, String email, 
+                  String direccion, String idUsuario, String pin, TipoUsuario tipoUsuario) {
         this.id = UUID.randomUUID().toString();
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -150,20 +173,33 @@ public class Usuario implements Serializable {
 
     // Metodo para actualizar un usuario en el archivo
     public void actualizarEnArchivo() {
-        // Cargar todos los usuarios
-        List<Usuario> usuarios = cargarTodos();
-
-        for (int i = 0; i < usuarios.size(); i++) {
-            // Buscar el usuario actual
-            if (usuarios.get(i).getId().equals(this.id)) {
-                // Actualizar el usuario
-                usuarios.set(i, this);
-                break;
+        try {
+            // Cargar todos los usuarios existentes
+            List<Usuario> usuarios = cargarTodos();
+            boolean encontrado = false;
+            
+            // Buscar y actualizar el usuario existente
+            for (int i = 0; i < usuarios.size(); i++) {
+                if (usuarios.get(i).getId().equals(this.id)) {
+                    // Actualizar el usuario
+                    usuarios.set(i, this);
+                    encontrado = true;
+                    break;
+                }
             }
+            
+            // Si no se encontró, agregarlo a la lista
+            if (!encontrado) {
+                usuarios.add(this);
+            }
+            
+            // Guardar la lista completa
+            GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
+            
+        } catch (Exception e) {
+            // Si da error, lanzar una excepcion
+            throw new RuntimeException("Error al actualizar el usuario en el archivo", e);
         }
-
-        // Guardar todos los usuarios
-        guardarTodos(usuarios);
     }
 
     // Metodo para cargar un usuario por id
@@ -181,7 +217,9 @@ public class Usuario implements Serializable {
     // Metodo para cargar todos los usuarios
     public static List<Usuario> cargarTodos() {
         // Cargar todos los usuarios del archivo json
-        return GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
+        List<Usuario> usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
+        // Retornar la lista de usuarios
+        return usuarios != null ? usuarios : new ArrayList<>();
     }
 
     // Metodo para guardar todos los usuarios

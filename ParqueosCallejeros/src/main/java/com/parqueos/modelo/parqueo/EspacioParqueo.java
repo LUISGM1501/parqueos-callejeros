@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
 
@@ -26,31 +28,48 @@ public class EspacioParqueo implements Serializable {
         this.vehiculoActual = null;
     }
 
+    // Constructor sin argumentos para el JSON
+    @JsonCreator
+    public EspacioParqueo() {
+        this.id = UUID.randomUUID().toString();
+        this.numero = "";
+        this.ocupado = false;
+        this.pagado = false;
+        this.vehiculoActual = null;
+    }
+
     // Getters y setters
+    @JsonProperty("id")
     public String getId() {
         return id;
     }
 
+    @JsonProperty("ocupado")
     public boolean estaOcupado() {
         return ocupado;
     }
 
+    @JsonProperty("pagado")
     public boolean estaPagado() {
         return pagado;
     }
 
+    @JsonProperty("pagado")
     public void setPagado(boolean pagado) {
         this.pagado = pagado;
     }
 
+    @JsonProperty("numero")
     public String getNumero() {
         return numero;
     }
 
+    @JsonProperty("vehiculoActual")
     public Vehiculo getVehiculoActual() {
         return vehiculoActual;
     }
 
+    @JsonProperty("estaDisponible")
     public boolean estaDisponible() {
         return !ocupado;
     }

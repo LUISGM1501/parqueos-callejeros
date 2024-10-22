@@ -37,6 +37,10 @@ public class GestorUsuarios {
         try {
             // Cargar los usuarios del archivo json
             usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
+            
+            if (usuarios == null) {
+                usuarios = new ArrayList<>();
+            }
 
             // Recorrer la lista de usuarios
             for (Usuario usuario : usuarios) {
@@ -50,14 +54,15 @@ public class GestorUsuarios {
                 }
                 // Registrar el usuario en el servicio de autenticacion
                 authService.registrarUsuario(usuario);
+                LOGGER.info("Usuario cargado: " + usuario.getIdUsuario());
             }
             // Mensaje de confirmacion
-            LOGGER.info("Usuarios cargados exitosamente. Total: " + usuarios.size());
+            LOGGER.info("Total de usuarios cargados: " + usuarios.size());
         } catch (Exception e) {
             // Mensaje de error
             LOGGER.log(Level.SEVERE, "Error al cargar usuarios", e);
             // Inicializar la lista de usuarios
-            inicializarListaVacia();
+            usuarios = new ArrayList<>();
         }
     }
 

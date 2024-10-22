@@ -4,87 +4,108 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuarioParqueo extends Usuario {
+    @JsonProperty("numeroTarjeta")
     private String numeroTarjeta;
+    @JsonProperty("fechaVencimientoTarjeta")
     private String fechaVencimientoTarjeta;
+    @JsonProperty("codigoValidacionTarjeta")
     private String codigoValidacionTarjeta;
+    @JsonManagedReference
+    @JsonProperty("vehiculos")
     private List<Vehiculo> vehiculos;
+    @JsonProperty("tiempoGuardado")
     private int tiempoGuardado; // en minutos
+    @JsonIgnore
     private final List<Reserva> reservasActivas;
 
     // Constructor de usuario parqueo
-    public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, String direccion, 
-                          String idUsuario, String pin, String numeroTarjeta, String fechaVencimientoTarjeta, 
-                          String codigoValidacionTarjeta) {
+    public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, 
+                         String direccion, String idUsuario, String pin,
+                         String numeroTarjeta, String fechaVencimientoTarjeta, 
+                         String codigoValidacionTarjeta) {
         super(nombre, apellidos, telefono, email, direccion, idUsuario, pin, TipoUsuario.USUARIO_PARQUEO);
         this.numeroTarjeta = numeroTarjeta;
         this.fechaVencimientoTarjeta = fechaVencimientoTarjeta;
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
         this.vehiculos = new ArrayList<>();
-        this.tiempoGuardado = 0;
         this.reservasActivas = new ArrayList<>();
     }
 
     // Constructor sin argumentos para el JSON 
+    @JsonCreator
     public UsuarioParqueo() {
         super("", "", 0, "", "", "", "", TipoUsuario.USUARIO_PARQUEO);
         this.vehiculos = new ArrayList<>();
-        this.tiempoGuardado = 0;
         this.reservasActivas = new ArrayList<>();
     }
 
     // Getters y setters
 
+    @JsonProperty("vehiculos")
     public List<Vehiculo> getVehiculos() {
         return new ArrayList<>(vehiculos);
     }
 
+    @JsonProperty("vehiculos")
     public void setVehiculos(List<Vehiculo> vehiculos) {
         this.vehiculos = vehiculos;
-        this.actualizarEnArchivo();
     }
 
+    @JsonProperty("tiempoGuardado")
     public int getTiempoGuardado() {
         return tiempoGuardado;
     }
 
+    @JsonProperty("tiempoGuardado")
     public void setTiempoGuardado(int tiempoGuardado) {
         this.tiempoGuardado = tiempoGuardado;
-        this.actualizarEnArchivo();
     }
 
+    @JsonProperty("numeroTarjeta")
     public String getNumeroTarjeta() {
         return numeroTarjeta;
     }
 
+    @JsonProperty("numeroTarjeta")
     public void setNumeroTarjeta(String numeroTarjeta) {
         this.numeroTarjeta = numeroTarjeta;
-        this.actualizarEnArchivo();
     }   
 
+    @JsonProperty("fechaVencimientoTarjeta")
     public String getFechaVencimientoTarjeta() {
         return fechaVencimientoTarjeta;
     }
 
+    @JsonProperty("fechaVencimientoTarjeta")
     public void setFechaVencimientoTarjeta(String fechaVencimientoTarjeta) {
         this.fechaVencimientoTarjeta = fechaVencimientoTarjeta;
-        this.actualizarEnArchivo();
     }   
 
+    @JsonProperty("codigoValidacionTarjeta")
     public String getCodigoValidacionTarjeta() {
         return codigoValidacionTarjeta;
     }
 
+    @JsonProperty("codigoValidacionTarjeta")
     public void setCodigoValidacionTarjeta(String codigoValidacionTarjeta) {
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
-        this.actualizarEnArchivo();
     }   
     
+    @JsonProperty("reservasActivas")
     public List<Reserva> getReservasActivas() {
         return new ArrayList<>(reservasActivas);
     }

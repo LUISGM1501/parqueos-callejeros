@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
@@ -22,6 +23,7 @@ public class Inspector extends Usuario {
     }
 
     // Constructor sin argumentos para el JSON
+    @JsonCreator
     public Inspector() {
         super("", "", 0, "", "", "", "", TipoUsuario.INSPECTOR);
     }

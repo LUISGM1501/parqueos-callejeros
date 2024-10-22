@@ -29,7 +29,17 @@ public class UsuarioParqueoBuilder extends UsuarioBuilder<UsuarioParqueoBuilder>
     @Override
     public UsuarioParqueo construir() {
         // Constructor del usuario parqueo
-        return new UsuarioParqueo(nombre, apellidos, telefono, email, direccion, idUsuario, pin,
-                                  numeroTarjeta, fechaVencimientoTarjeta, codigoValidacionTarjeta);
+        return new UsuarioParqueo(
+            nombre,
+            apellidos,
+            telefono,
+            email,
+            direccion,
+            idUsuario,
+            pin,
+            numeroTarjeta,
+            fechaVencimientoTarjeta,
+            codigoValidacionTarjeta
+        );
     }
 }

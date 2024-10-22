@@ -1,17 +1,26 @@
 package com.parqueos.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.parqueos.modelo.usuario.Administrador;
+import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.usuario.Usuario;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
 
 public class GestorArchivos {
     private static final Logger LOGGER = Logger.getLogger(GestorArchivos.class.getName());
@@ -20,12 +29,21 @@ public class GestorArchivos {
     private static ObjectMapper configurarObjectMapper() {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfBaseType(Object.class)
+                .allowIfSubType(Object.class)
+                .allowIfSubType(Usuario.class)
+                .allowIfSubType(Administrador.class)
+                .allowIfSubType(UsuarioParqueo.class)
+                .allowIfSubType(Inspector.class)
                 .build();
-        
-        return new ObjectMapper()
-                .enable(SerializationFeature.INDENT_OUTPUT)
-                .registerModule(new JavaTimeModule())
-                .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+            .registerModule(new JavaTimeModule())
+            .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
+
+        return mapper;
     }
 
     public static <T> void guardarElemento(T elemento, String nombreArchivo) {
@@ -64,25 +82,77 @@ public class GestorArchivos {
     }
 
     public static <T> List<T> cargarTodosLosElementos(String nombreArchivo, Class<T> tipoClase) {
-        File file = new File(nombreArchivo);
-        if (file.exists() && file.length() > 0) {
-            try {
-                return objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, tipoClase));
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error al cargar los elementos desde " + nombreArchivo, e);
-            }
-        } else {
-            LOGGER.info("El archivo " + nombreArchivo + " está vacío o no existe. Se iniciará con una lista vacía.");
+        File archivo = new File(nombreArchivo);
+        if (!archivo.exists() || archivo.length() == 0) {
+            LOGGER.info("El archivo " + nombreArchivo + " no existe o está vacío. Se creará uno nuevo.");
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
+        
+        try {
+            String contenido = new String(Files.readAllBytes(archivo.toPath()), StandardCharsets.UTF_8);
+            JavaType tipo = objectMapper.getTypeFactory().constructCollectionType(List.class, tipoClase);
+            
+            // Intenta deserializar directamente
+            try {
+                return objectMapper.readValue(contenido, tipo);
+            } catch (Exception e) {
+                LOGGER.warning("Error en la deserialización directa, intentando con un enfoque alternativo: " + e.getMessage());
+                // Si falla, intenta deserializar como un array simple
+                JsonNode root = objectMapper.readTree(contenido);
+                List<T> resultado = new ArrayList<>();
+                if (root.isArray()) {
+                    for (JsonNode node : root) {
+                        try {
+                            T elemento = objectMapper.treeToValue(node, tipoClase);
+                            resultado.add(elemento);
+                        } catch (Exception ex) {
+                            LOGGER.warning("Error al deserializar elemento individual: " + ex.getMessage());
+                        }
+                    }
+                }
+                return resultado;
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Error al cargar elementos desde " + nombreArchivo + ": " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
-    public static <T> void guardarTodo(List<T> elementos, String nombreArchivo) {
+    public static synchronized <T> void guardarTodo(List<T> elementos, String nombreArchivo) {
         try {
+            // Crear una copia de seguridad antes de guardar
+            File archivo = new File(nombreArchivo);
+            if (archivo.exists()) {
+                // Crear un backup del archivo
+                File backup = new File(nombreArchivo + ".bak");
+                if (backup.exists()) {
+                    // Si el backup existe, eliminarlo
+                    backup.delete();
+                }
+                // Renombrar el archivo original al backup
+                archivo.renameTo(backup);
+            }
+            
+            // Guardar los nuevos datos
             objectMapper.writeValue(new File(nombreArchivo), elementos);
-            LOGGER.info("Elementos guardados correctamente en " + nombreArchivo);
+            
+            // Si el guardado fue exitoso, eliminar el backup
+            File backup = new File(nombreArchivo + ".bak");
+            if (backup.exists()) {
+                // Si el backup existe, eliminarlo
+                backup.delete();
+            }
+            
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error al guardar los elementos en " + nombreArchivo, e);
+            LOGGER.severe("Error al guardar elementos en " + nombreArchivo + ": " + e.getMessage());
+            
+            // Si hubo error, restaurar desde el backup
+            File backup = new File(nombreArchivo + ".bak");
+            if (backup.exists()) {
+                // Si el backup existe, restaurarlo
+                backup.renameTo(new File(nombreArchivo));
+            }
         }
     }
 
@@ -92,6 +162,21 @@ public class GestorArchivos {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al obtener el ID del elemento", e);
             throw new RuntimeException("El elemento no tiene un método getId válido", e);
+        }
+    }
+
+    private static void debugArchivo(String nombreArchivo) {
+        try {
+            File archivo = new File(nombreArchivo);
+            if (archivo.exists()) {
+                LOGGER.info("Archivo existe: " + archivo.getAbsolutePath());
+                LOGGER.info("Tamaño: " + archivo.length() + " bytes");
+                LOGGER.info("Contenido: " + new String(Files.readAllBytes(archivo.toPath())));
+            } else {
+                LOGGER.warning("Archivo no existe: " + archivo.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Error al debuggear archivo: " + e.getMessage());
         }
     }
 }

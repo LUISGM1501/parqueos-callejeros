@@ -4,9 +4,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.util.GestorArchivos;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Vehiculo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_VEHICULOS = "vehiculos.json";
@@ -15,8 +19,9 @@ public class Vehiculo implements Serializable {
     private String placa;
     private String marca;
     private String modelo;
+    @JsonBackReference
     private UsuarioParqueo propietario;
-
+    private String propietarioId;
     // Constructor de vehiculo
     public Vehiculo(String placa, String marca, String modelo, UsuarioParqueo propietario) {
         this.id = UUID.randomUUID().toString();
@@ -63,8 +68,22 @@ public class Vehiculo implements Serializable {
         this.propietario = propietario;
     }
 
+    public String getPropietarioId() {
+        return propietarioId;
+    }
+
+    public void setPropietarioId(String propietarioId) {
+        this.propietarioId = propietarioId;
+    }
+
     // Metodos
     public void guardar() {
+        // Guardar el id del propietario
+        if (propietario != null) {
+            // Si el propietario no es nulo, guardar el id del propietario
+            this.propietarioId = propietario.getId();
+        }
+
         // Cargar todos los vehiculos
         List<Vehiculo> vehiculos = cargarTodos();
 
@@ -72,7 +91,7 @@ public class Vehiculo implements Serializable {
         vehiculos.add(this);
 
         // Guardar todos los vehiculos en el archivo json
-        guardarTodos(vehiculos);
+        GestorArchivos.guardarTodo(vehiculos, ARCHIVO_VEHICULOS);
     }
 
     // Metodo para actualizar un vehiculo
@@ -127,6 +146,12 @@ public class Vehiculo implements Serializable {
     public static void guardarTodos(List<Vehiculo> vehiculos) {
         // Guardar todos los vehiculos en el archivo json
         GestorArchivos.guardarTodo(vehiculos, ARCHIVO_VEHICULOS);
+    }
+
+    // Metodo para cargar el propietario del vehiculo
+    public void cargarPropietario() {
+        // Cargar el propietario del vehiculo
+        this.propietario = (UsuarioParqueo) Usuario.cargar(this.propietario.getId());
     }
 
     // Metodo para convertir a string
