@@ -15,6 +15,7 @@ import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.servicios.SistemaParqueo;
+import com.parqueos.servicios.GestorNotificaciones;
 import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 
 // Controlador para el usuario parqueo

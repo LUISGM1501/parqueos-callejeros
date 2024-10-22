@@ -15,6 +15,7 @@ import javax.mail.internet.MimeMessage;
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Usuario;
+import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 
 
 // Clase para gestionar las notificaciones
@@ -125,10 +126,46 @@ public class GestorNotificaciones {
     }
 
     // Metodo para notificar el pago de una multa
+    // Método para notificar sobre cambios en la configuración
+    public void notificarCambioConfiguracion(SistemaParqueo sistema, ConfiguracionParqueo config, String token) {
+        // Obtener el usuario del vehículo
+        Usuario usuario = sistema.getAuthService().obtenerUsuarioAutenticado(token);
+
+        // Verificar que el usuario no sea nulo
+        if (usuario == null) {
+            System.out.println("Error: Usuario no autenticado o token inválido.");
+            return; // O lanzar una excepción, según el caso
+        }
+
+        // Crear el mensaje de la notificación
+        String mensaje = String.format(
+            "Estimado/a %s %s,\n\n" +
+            "Se han realizado cambios en la configuración del parqueo. A continuación, los detalles:\n" +
+            "Horario de Apertura: %s\n" +
+            "Horario de Cierre: %s\n" +
+            "Precio por Hora: $%.2f\n" +
+            "Tiempo Mínimo de Estancia: %d minutos\n\n" +
+            "Por favor, tome en cuenta estos cambios para su próxima visita.\n" +
+            "Gracias por usar nuestro servicio de parqueo.",
+            usuario.getNombre(),
+            usuario.getApellidos(),
+            config.getHorarioInicio().format(DateTimeFormatter.ofPattern("HH:mm")),
+            config.getHorarioFin().format(DateTimeFormatter.ofPattern("HH:mm")),
+            (float) config.getPrecioHora(), // Asegúrate que este sea un float o double
+            config.getTiempoMinimo() // Este debe ser un int
+        );
+
+        // Enviar el correo
+        enviarCorreo(usuario.getEmail(), "Cambio en la Configuración del Parqueo", mensaje);
+    }
+
+
+    
+    //método para notificar sobre cambio en configuración
     public void notificarMultaPagada(Multa multa) {
         // Obtener el usuario del vehiculo
         Usuario usuario = multa.getVehiculo().getPropietario();
-
+        
         // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +

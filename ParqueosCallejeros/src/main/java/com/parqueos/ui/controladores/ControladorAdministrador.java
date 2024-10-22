@@ -64,6 +64,8 @@ public class ControladorAdministrador extends ControladorBase {
             try {
                 // Setear la nueva configuracion
                 sistemaParqueo.setConfiguracion(token, nuevaConfiguracion);
+                //enviar correo
+                
                 JOptionPane.showMessageDialog(vista, "Configuración actualizada con éxito.");
                 vistaConfig.dispose();
             } catch (IllegalArgumentException ex) {
@@ -73,6 +75,8 @@ public class ControladorAdministrador extends ControladorBase {
                 // Error de autorizacion
                 JOptionPane.showMessageDialog(vista, "Error de autorización: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+            sistemaParqueo.getGestorNotificaciones().notificarCambioConfiguracion(sistemaParqueo, nuevaConfiguracion, token);
+            
         });
 
         // Setear el boton de cancelar
