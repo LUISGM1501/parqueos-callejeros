@@ -59,7 +59,7 @@ public class Validador {
     }
 
     public static boolean validarFechaVencimiento(String fechaVencimiento) {
-        return fechaVencimiento != null && fechaVencimiento.length() == 4 && fechaVencimiento.matches("\\d+");
+        return fechaVencimiento != null && fechaVencimiento.length() == 5 && fechaVencimiento.matches("\\d+");
     }
 
 }

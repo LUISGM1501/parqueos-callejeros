@@ -88,7 +88,7 @@ public class GestorVehiculos {
         // Retornar una lista de vehiculos filtrados por el id del usuario
         return vehiculos.stream()
                 // Filtrar el vehiculo por el id del usuario
-                .filter(v -> v.getPropietario() != null && v.getPropietario().getId().equals(idUsuario))
+                .filter(v -> v.getPropietario() != null && v.getPropietario().equals(idUsuario))
                 .collect(Collectors.toList());
     }
 

@@ -15,10 +15,10 @@ public class Vehiculo implements Serializable {
     private String placa;
     private String marca;
     private String modelo;
-    private UsuarioParqueo propietario;
+    private String propietario;
 
     // Constructor de vehiculo
-    public Vehiculo(String placa, String marca, String modelo, UsuarioParqueo propietario) {
+    public Vehiculo(String placa, String marca, String modelo, String propietario) {
         this.id = UUID.randomUUID().toString();
         this.placa = placa;
         this.marca = marca;
@@ -55,11 +55,11 @@ public class Vehiculo implements Serializable {
         this.modelo = modelo;
     }
 
-    public UsuarioParqueo getPropietario() {
+    public String getPropietario() {
         return propietario;
     }
 
-    public void setPropietario(UsuarioParqueo  propietario) {
+    public void setPropietario(String  propietario) {
         this.propietario = propietario;
     }
 

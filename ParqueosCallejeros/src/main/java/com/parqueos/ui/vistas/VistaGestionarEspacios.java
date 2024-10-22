@@ -43,7 +43,7 @@ public class VistaGestionarEspacios extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Tabla para mostrar los espacios - se coloca en la parte superior
-        tblEspacios = new JTable(new DefaultTableModel(new Object[]{"Número de Espacio", "Estado"}, 0));
+        tblEspacios = new JTable();
         JScrollPane scrollPane = new JScrollPane(tblEspacios);
         
         gbc.gridx = 0;

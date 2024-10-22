@@ -1,11 +1,1 @@
-[ "java.util.ArrayList", [ [ "com.parqueos.modelo.usuario.Administrador", {
-  "id" : "b3d34301-429b-4767-b4dc-f6bbb5100770",
-  "nombre" : "es",
-  "apellidos" : "es",
-  "telefono" : 12121212,
-  "email" : "ee@gmail.com",
-  "direccion" : "wefgvwfwfew",
-  "idUsuario" : "123",
-  "pin" : "1234",
-  "tipoUsuario" : "ADMINISTRADOR"
-} ] ] ]
+[ "java.util.ArrayList", [ ] ]

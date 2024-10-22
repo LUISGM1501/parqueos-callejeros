@@ -46,14 +46,19 @@ public class ControladorGestionUsuarios {
     private void cargarUsuarios() {
         // Obtener los usuarios del sistema
         List<Usuario> usuarios = sistemaParqueo.getGestorUsuarios().getUsuarios();
-        // Crear el modelo de la tabla
-        DefaultTableModel modelo = new DefaultTableModel();
-        // Agregar las columnas
-        modelo.addColumn("ID");
-        modelo.addColumn("Nombre");
-        modelo.addColumn("Apellidos");
-        modelo.addColumn("Email");
-        modelo.addColumn("Tipo");
+
+        // Obtener el modelo de la tabla y limpiar cualquier fila existente
+        DefaultTableModel modelo = (DefaultTableModel) vista.getTblUsuarios().getModel();
+        modelo.setRowCount(0);  // Esta línea limpia el modelo de la tabla
+
+        // Agregar las columnas si no están definidas aún
+        if (modelo.getColumnCount() == 0) {
+            modelo.addColumn("ID");
+            modelo.addColumn("Nombre");
+            modelo.addColumn("Apellidos");
+            modelo.addColumn("Email");
+            modelo.addColumn("Tipo");
+        }
 
         // Agregar los usuarios al modelo
         for (Usuario usuario : usuarios) {
@@ -66,11 +71,10 @@ public class ControladorGestionUsuarios {
             });
         }
 
-        // Setear el modelo de la tabla
-        vista.getTblUsuarios().setModel(modelo);
         // Log de la cantidad de usuarios cargados
         LOGGER.info("Usuarios cargados en la tabla: " + usuarios.size());
     }
+
 
     // Metodo para agregar un usuario
     private void agregarUsuario() {
@@ -127,32 +131,21 @@ public class ControladorGestionUsuarios {
     private void editarUsuario() {
         // Obtener la fila seleccionada
         int filaSeleccionada = vista.getTblUsuarios().getSelectedRow();
-        // Si la fila seleccionada es mayor o igual a 0
         if (filaSeleccionada >= 0) {
-            // Obtener el id del usuario
             String id = (String) vista.getTblUsuarios().getValueAt(filaSeleccionada, 0);
-            // Buscar el usuario
             Usuario usuario = sistemaParqueo.getGestorUsuarios().buscarUsuario(id);
-            // Si el usuario no es null
             if (usuario != null) {
-                // Obtener la ventana padre
                 Window window = SwingUtilities.getWindowAncestor(vista);
-                // Obtener el frame
                 Frame frame = window instanceof Frame ? (Frame) window : null;
-                // Crear el dialogo
                 DialogoUsuario dialogo = new DialogoUsuario(frame, usuario);
-                // Mostrar el dialogo
                 dialogo.setVisible(true);
-                
-                // Si el id del usuario no es null
+
                 if (dialogo.getIdUsuario() != null) {
                     try {
-                        // Validar los datos del usuario
                         if (!validarDatosUsuario(dialogo)) {
                             return;
                         }
-                        
-                        // Actualizar el usuario
+
                         Usuario usuarioActualizado = sistemaParqueo.getGestorUsuarios().actualizarUsuario(
                             id,
                             dialogo.getNombre(),
@@ -169,26 +162,27 @@ public class ControladorGestionUsuarios {
                             dialogo.getTerminalId(),
                             dialogo.getVehiculos()
                         );
-                        
-                        // Cargar los usuarios
-                        cargarUsuarios();
-                        // Mostrar el mensaje de confirmacion
+
+                        // Actualizar directamente la fila editada
+                        DefaultTableModel modelo = (DefaultTableModel) vista.getTblUsuarios().getModel();
+                        modelo.setValueAt(usuarioActualizado.getNombre(), filaSeleccionada, 1);
+                        modelo.setValueAt(usuarioActualizado.getApellidos(), filaSeleccionada, 2);
+                        modelo.setValueAt(usuarioActualizado.getEmail(), filaSeleccionada, 3);
+                        modelo.setValueAt(usuarioActualizado.getTipoUsuario(), filaSeleccionada, 4);
+
                         JOptionPane.showMessageDialog(vista, "Usuario actualizado con éxito.");
-                        // Log del usuario actualizado
                         LOGGER.info("Usuario actualizado: " + usuarioActualizado.getId());
                     } catch (Exception e) {
-                        // Log del error
                         LOGGER.log(Level.SEVERE, "Error al actualizar usuario", e);
-                        // Mostrar el mensaje de error
                         JOptionPane.showMessageDialog(vista, "Error al actualizar usuario: " + e.getMessage());
                     }
                 }
             }
         } else {
-            // Mostrar el mensaje de error
             JOptionPane.showMessageDialog(vista, "Por favor, seleccione un usuario para editar.");
         }
     }
+
 
     // Metodo para eliminar un usuario
     private void eliminarUsuario() {

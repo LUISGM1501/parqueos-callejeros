@@ -9,6 +9,7 @@ import com.parqueos.builders.AdministradorBuilder;
 import com.parqueos.builders.InspectorBuilder;
 import com.parqueos.builders.UsuarioBuilder;
 import com.parqueos.builders.UsuarioParqueoBuilder;
+import com.parqueos.modelo.usuario.Inspector;
 import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
@@ -106,7 +107,7 @@ public class GestorUsuarios {
             // Recorrer la lista de vehiculos
             for (Vehiculo vehiculo : vehiculos) {
                 // Asignar el propietario del vehiculo
-                vehiculo.setPropietario(usuarioParqueo);
+                vehiculo.setPropietario(usuarioParqueo.getId());
                 // Agregar el vehiculo al gestor de vehiculos
                 gestorVehiculos.agregarVehiculo(vehiculo);
             }
@@ -138,33 +139,55 @@ public class GestorUsuarios {
     }
 
     // Metodo para actualizar un usuario
+    // Metodo para actualizar un usuario
     public Usuario actualizarUsuario(String id, String nombre, String apellidos, int telefono, String email,
                                      String direccion, String idUsuario, String pin, Usuario.TipoUsuario tipoUsuario,
                                      String numeroTarjeta, String fechaVencimiento, String codigoValidacion,
                                      String terminalId, List<Vehiculo> vehiculos) {
         // Buscar el usuario existente
         Usuario usuarioExistente = buscarUsuario(id);
+
         // Si el usuario no existe, lanzar una excepcion
         if (usuarioExistente == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        // Obtener el indice del usuario existente
-        int index = usuarios.indexOf(usuarioExistente);
-        // Crear el nuevo usuario
-        Usuario usuarioActualizado = crearUsuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin,
-                                                  tipoUsuario, numeroTarjeta, fechaVencimiento, codigoValidacion,
-                                                  terminalId, vehiculos);
-        
-        // Actualizar el usuario en la lista
-        usuarios.set(index, usuarioActualizado);
-        // Guardar los usuarios
+        // Actualizar los datos del usuario existente
+        usuarioExistente.setNombre(nombre);
+        usuarioExistente.setApellidos(apellidos);
+        usuarioExistente.setTelefono(telefono);
+        usuarioExistente.setEmail(email);
+        usuarioExistente.setDireccion(direccion);
+        usuarioExistente.setIdUsuario(idUsuario);
+        usuarioExistente.setPin(pin);
+
+        // Si es un usuario parqueo, actualizamos los detalles adicionales
+        if (usuarioExistente instanceof UsuarioParqueo) {
+            UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuarioExistente;
+            usuarioParqueo.setNumeroTarjeta(numeroTarjeta);
+            usuarioParqueo.setFechaVencimientoTarjeta(fechaVencimiento);
+            usuarioParqueo.setCodigoValidacionTarjeta(codigoValidacion);
+
+            // Actualizar los vehiculos
+            usuarioParqueo.setVehiculos(vehiculos);
+        }
+
+        // Si es un inspector, actualizamos el terminal ID
+        if (usuarioExistente instanceof Inspector) {
+            Inspector usuarioParqueo = (Inspector) usuarioExistente;
+            usuarioParqueo.setTerminalId(terminalId);
+        }
+
+        // Guardar los usuarios en el archivo
         guardarUsuarios();
+
         // Mensaje de confirmacion
         LOGGER.info("Usuario actualizado: " + id);
+
         // Retornar el usuario actualizado
-        return usuarioActualizado;
+        return usuarioExistente;
     }
+
     
     // Metodo para eliminar un usuario
     public void eliminarUsuario(String id) {

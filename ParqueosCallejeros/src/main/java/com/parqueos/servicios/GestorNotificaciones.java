@@ -21,8 +21,8 @@ import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 // Clase para gestionar las notificaciones
 public class GestorNotificaciones {
     // Variables de entorno para el remitente
-    private static final String REMITENTE_EMAIL = System.getenv("REMITENTE_EMAIL");
-    private static final String REMITENTE_PASSWORD = System.getenv("REMITENTE_PASSWORD");
+    private static final String REMITENTE_EMAIL = "eazofp2106@gmail.com";
+    private static final String REMITENTE_PASSWORD = "zjpf lihk iypt inoa";
 
     // Metodo para notificar una reserva creada
     public void notificarReservaCreada(Reserva reserva) {
@@ -100,9 +100,10 @@ public class GestorNotificaciones {
     }
     
     // Metodo para notificar una multa generada
-    public void notificarMultaGenerada(Multa multa) {
+    public void notificarMultaGenerada(Multa multa, SistemaParqueo sistema) {
         // Obtener el usuario del vehiculo
-        Usuario usuario = multa.getVehiculo().getPropietario();
+        String id = multa.getVehiculo().getPropietario();
+        Usuario usuario = sistema.getGestorUsuarios().buscarUsuario(id);
 
         // Crear el mensaje de la notificacion
         String mensaje = String.format(
@@ -162,9 +163,10 @@ public class GestorNotificaciones {
 
     
     //método para notificar sobre cambio en configuración
-    public void notificarMultaPagada(Multa multa) {
+    public void notificarMultaPagada(Multa multa, SistemaParqueo sistema) {
         // Obtener el usuario del vehiculo
-        Usuario usuario = multa.getVehiculo().getPropietario();
+        String id = multa.getVehiculo().getPropietario();
+        Usuario usuario = sistema.getGestorUsuarios().buscarUsuario(id);
         
         // Crear el mensaje de la notificacion
         String mensaje = String.format(
