@@ -81,41 +81,44 @@ public class ControladorUsuarioParqueo extends ControladorBase {
     private void parquear() {
         try {
             // Validar que se haya seleccionado un vehículo
-            if (vista.getCmbVehiculos().getSelectedItem() == null) {
+            String placa = (String) vista.getCmbVehiculos().getSelectedItem();
+            if (placa == null || placa.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(vista, "Debe seleccionar un vehículo");
                 return;
             }
 
             // Validar que se haya ingresado un espacio
-            String numeroEspacio = vista.getTxtEspacio().getText().trim();
-            if (numeroEspacio.isEmpty()) {
+            String numeroEspacio = vista.getTxtEspacio().getText();
+            if (numeroEspacio == null || numeroEspacio.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(vista, "Debe ingresar un número de espacio");
                 return;
             }
 
             // Obtener el vehículo seleccionado
-            String placa = (String) vista.getCmbVehiculos().getSelectedItem();
             Vehiculo vehiculo = usuario.getVehiculos().stream()
-                .filter(v -> v.getPlaca().equals(placa))
+                .filter(v -> placa.equals(v.getPlaca()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Vehículo no encontrado"));
+                .orElse(null);
+
+            if (vehiculo == null) {
+                JOptionPane.showMessageDialog(vista, "Error: Vehículo no encontrado");
+                return;
+            }
 
             // Verificar si el vehículo ya está parqueado
-            List<Reserva> reservasActivas = sistemaParqueo.getGestorReservas().getReservas().stream()
-                .filter(r -> r.estaActiva() && r.getVehiculo().getPlaca().equals(placa))
-                .collect(Collectors.toList());
+            boolean vehiculoYaParqueado = sistemaParqueo.getGestorReservas().getReservas().stream()
+                .filter(Reserva::estaActiva)
+                .anyMatch(r -> r.getVehiculo() != null && 
+                             r.getVehiculo().getPlaca() != null && 
+                             r.getVehiculo().getPlaca().equals(placa));
 
-            if (!reservasActivas.isEmpty()) {
-                JOptionPane.showMessageDialog(vista, 
-                    "El vehículo ya se encuentra parqueado en el espacio " + 
-                    reservasActivas.get(0).getEspacio().getNumero(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            if (vehiculoYaParqueado) {
+                JOptionPane.showMessageDialog(vista, "Este vehículo ya se encuentra parqueado");
                 return;
             }
 
             // Buscar el espacio
-            EspacioParqueo espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio);
+            EspacioParqueo espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio.trim());
             if (espacio == null) {
                 JOptionPane.showMessageDialog(vista, "El espacio no existe");
                 return;
@@ -150,6 +153,7 @@ public class ControladorUsuarioParqueo extends ControladorBase {
             vista.getSpnTiempo().setValue(30);
 
         } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(vista, 
                 "Error al parquear: " + e.getMessage(), 
                 "Error", 
@@ -195,37 +199,42 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                 return;
             }
 
-            String idReserva = (String) vista.getTblReservasActivas().getValueAt(filaSeleccionada, 0);
-            if (idReserva == null || idReserva.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(vista, 
-                    "Error: ID de reserva inválido",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            Object idReservaObj = vista.getTblReservasActivas().getValueAt(filaSeleccionada, 0);
+            if (idReservaObj == null) {
+                JOptionPane.showMessageDialog(vista, "Error: No se pudo obtener el ID de la reserva");
+                return;
+            }
+
+            String idReserva = idReservaObj.toString().trim();
+            if (idReserva.isEmpty()) {
+                JOptionPane.showMessageDialog(vista, "Error: ID de reserva inválido");
                 return;
             }
 
             Reserva reserva = sistemaParqueo.getGestorReservas().buscarReserva(idReserva);
-            if (reserva == null || !reserva.estaActiva()) {
-                JOptionPane.showMessageDialog(vista, 
-                    "La reserva no está activa o ya no existe",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            if (reserva == null) {
+                JOptionPane.showMessageDialog(vista, "No se encontró la reserva");
+                return;
+            }
+
+            if (!reserva.estaActiva()) {
+                JOptionPane.showMessageDialog(vista, "La reserva ya no está activa");
                 actualizarTablaReservasActivas();
                 return;
             }
 
-            // Confirmar la acción
+            // Confirmar desaparcar
             int confirmacion = JOptionPane.showConfirmDialog(vista,
-                "¿Está seguro que desea desaparcar el vehículo " + reserva.getVehiculo().getPlaca() + 
-                " del espacio " + reserva.getEspacio().getNumero() + "?",
-                "Confirmar Desaparcado",
+                "¿Está seguro que desea desaparcar el vehículo?" +
+                "\nEspacio: " + reserva.getEspacio().getNumero() +
+                "\nVehículo: " + reserva.getVehiculo().getPlaca(),
+                "Confirmar Desaparcar",
                 JOptionPane.YES_NO_OPTION);
 
             if (confirmacion == JOptionPane.YES_OPTION) {
                 int tiempoNoUsado = reserva.finalizarReserva();
                 usuario.setTiempoGuardado(usuario.getTiempoGuardado() + tiempoNoUsado);
                 
-                // Enviar notificación
                 sistemaParqueo.getGestorNotificaciones().notificarDesaparcado(reserva, tiempoNoUsado);
 
                 JOptionPane.showMessageDialog(vista, 
@@ -237,11 +246,11 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                 actualizarTiempoGuardado();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(vista, 
                 "Error al desaparcar: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 

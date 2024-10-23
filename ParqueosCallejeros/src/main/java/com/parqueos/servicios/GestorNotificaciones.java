@@ -2,6 +2,8 @@ package com.parqueos.servicios;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -13,23 +15,36 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.parqueos.modelo.multa.Multa;
+import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Usuario;
-import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
-
 
 // Clase para gestionar las notificaciones
 public class GestorNotificaciones {
-    // Variables de entorno para el remitente
+    private static final Logger LOGGER = Logger.getLogger(GestorNotificaciones.class.getName());
+    
+    // Variables de configuración de correo
+    private static final String SMTP_HOST = "smtp.gmail.com";
+    private static final String SMTP_PORT = "587";
     private static final String REMITENTE_EMAIL = System.getenv("REMITENTE_EMAIL");
     private static final String REMITENTE_PASSWORD = System.getenv("REMITENTE_PASSWORD");
+    private static boolean emailConfigured = false;
+
+    public GestorNotificaciones() {
+        // Verificar si la configuración de correo está disponible
+        emailConfigured = verificarConfiguracionEmail();
+        if (!emailConfigured) {
+            LOGGER.warning("Configuración de correo no disponible. Las notificaciones serán mostradas en consola.");
+        }
+    }
+
+    private boolean verificarConfiguracionEmail() {
+        return REMITENTE_EMAIL != null && !REMITENTE_EMAIL.isEmpty() 
+            && REMITENTE_PASSWORD != null && !REMITENTE_PASSWORD.isEmpty();
+    }
 
     // Metodo para notificar una reserva creada
     public void notificarReservaCreada(Reserva reserva) {
-        // Obtener el usuario de la reserva
-        Usuario usuario = reserva.getUsuario();
-
-        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Su reserva ha sido creada exitosamente:\n" +
@@ -38,24 +53,19 @@ public class GestorNotificaciones {
             "Inicio: %s\n" +
             "Fin: %s\n\n" +
             "Gracias por usar nuestro servicio de parqueo.",
-            usuario.getNombre(),
-            usuario.getApellidos(),
+            reserva.getUsuario().getNombre(),
+            reserva.getUsuario().getApellidos(),
             reserva.getEspacio().getNumero(),
             reserva.getVehiculo().getPlaca(),
             reserva.getHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
             reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
         );
         
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Reserva Creada", mensaje);
+        enviarNotificacion(reserva.getUsuario().getEmail(), "Reserva Creada", mensaje);
     }
     
     // Metodo para notificar el tiempo agregado a una reserva
     public void notificarTiempoAgregado(Reserva reserva) {
-        // Obtener el usuario de la reserva
-        Usuario usuario = reserva.getUsuario();
-
-        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha agregado tiempo a su reserva:\n" +
@@ -63,23 +73,18 @@ public class GestorNotificaciones {
             "Vehículo: %s\n" +
             "Nueva hora de fin: %s\n\n" +
             "Gracias por usar nuestro servicio de parqueo.",
-            usuario.getNombre(),
-            usuario.getApellidos(),
+            reserva.getUsuario().getNombre(),
+            reserva.getUsuario().getApellidos(),
             reserva.getEspacio().getNumero(),
             reserva.getVehiculo().getPlaca(),
             reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
         );
         
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Tiempo Agregado a Reserva", mensaje);
+        enviarNotificacion(reserva.getUsuario().getEmail(), "Tiempo Agregado a Reserva", mensaje);
     }
     
     // Metodo para notificar el desaparcado de un vehiculo
     public void notificarDesaparcado(Reserva reserva, int tiempoNoUsado) {
-        // Obtener el usuario de la reserva
-        Usuario usuario = reserva.getUsuario();
-
-        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Su vehículo ha sido desaparcado:\n" +
@@ -88,23 +93,18 @@ public class GestorNotificaciones {
             "Tiempo no usado: %d minutos\n\n" +
             "Este tiempo ha sido agregado a su tiempo guardado.\n" +
             "Gracias por usar nuestro servicio de parqueo.",
-            usuario.getNombre(),
-            usuario.getApellidos(),
+            reserva.getUsuario().getNombre(),
+            reserva.getUsuario().getApellidos(),
             reserva.getEspacio().getNumero(),
             reserva.getVehiculo().getPlaca(),
             tiempoNoUsado
         );
         
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Vehículo Desaparcado", mensaje);
+        enviarNotificacion(reserva.getUsuario().getEmail(), "Vehículo Desaparcado", mensaje);
     }
     
     // Metodo para notificar una multa generada
     public void notificarMultaGenerada(Multa multa) {
-        // Obtener el usuario del vehiculo
-        Usuario usuario = multa.getVehiculo().getPropietario();
-
-        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha generado una multa para su vehículo:\n" +
@@ -113,31 +113,26 @@ public class GestorNotificaciones {
             "Fecha y hora: %s\n" +
             "Monto: $%.2f\n\n" +
             "Por favor, realice el pago lo antes posible para evitar cargos adicionales.",
-            usuario.getNombre(),
-            usuario.getApellidos(),
+            multa.getVehiculo().getPropietario().getNombre(),
+            multa.getVehiculo().getPropietario().getApellidos(),
             multa.getVehiculo().getPlaca(),
             multa.getEspacio().getNumero(),
             multa.getFechaHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
             multa.getMonto()
         );
         
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Multa Generada", mensaje);
+        enviarNotificacion(multa.getVehiculo().getPropietario().getEmail(), "Multa Generada", mensaje);
     }
 
-    // Metodo para notificar el pago de una multa
     // Método para notificar sobre cambios en la configuración
     public void notificarCambioConfiguracion(SistemaParqueo sistema, ConfiguracionParqueo config, String token) {
-        // Obtener el usuario del vehículo
         Usuario usuario = sistema.getAuthService().obtenerUsuarioAutenticado(token);
 
-        // Verificar que el usuario no sea nulo
         if (usuario == null) {
-            System.out.println("Error: Usuario no autenticado o token inválido.");
-            return; // O lanzar una excepción, según el caso
+            LOGGER.warning("Error: Usuario no autenticado o token inválido.");
+            return;
         }
 
-        // Crear el mensaje de la notificación
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se han realizado cambios en la configuración del parqueo. A continuación, los detalles:\n" +
@@ -151,22 +146,15 @@ public class GestorNotificaciones {
             usuario.getApellidos(),
             config.getHorarioInicio().format(DateTimeFormatter.ofPattern("HH:mm")),
             config.getHorarioFin().format(DateTimeFormatter.ofPattern("HH:mm")),
-            (float) config.getPrecioHora(), // Asegúrate que este sea un float o double
-            config.getTiempoMinimo() // Este debe ser un int
+            (float) config.getPrecioHora(),
+            config.getTiempoMinimo()
         );
 
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Cambio en la Configuración del Parqueo", mensaje);
+        enviarNotificacion(usuario.getEmail(), "Cambio en la Configuración del Parqueo", mensaje);
     }
 
-
-    
-    //método para notificar sobre cambio en configuración
+    // Método para notificar sobre el pago de una multa
     public void notificarMultaPagada(Multa multa) {
-        // Obtener el usuario del vehiculo
-        Usuario usuario = multa.getVehiculo().getPropietario();
-        
-        // Crear el mensaje de la notificacion
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Se ha registrado el pago de la siguiente multa:\n" +
@@ -175,54 +163,57 @@ public class GestorNotificaciones {
             "Fecha y hora de la infracción: %s\n" +
             "Monto pagado: $%.2f\n\n" +
             "Gracias por regularizar su situación.",
-            usuario.getNombre(),
-            usuario.getApellidos(),
+            multa.getVehiculo().getPropietario().getNombre(),
+            multa.getVehiculo().getPropietario().getApellidos(),
             multa.getVehiculo().getPlaca(),
             multa.getEspacio().getNumero(),
             multa.getFechaHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
             multa.getMonto()
         );
         
-        // Enviar el correo
-        enviarCorreo(usuario.getEmail(), "Confirmación de Pago de Multa", mensaje);
+        enviarNotificacion(multa.getVehiculo().getPropietario().getEmail(), "Confirmación de Pago de Multa", mensaje);
     }
     
-    // Metodo para enviar un correo
-    public void enviarCorreo(String destinatario, String asunto, String mensaje) {
-        // Configurar las propiedades del servidor de correo
+    // Método para enviar una notificación
+    public void enviarNotificacion(String destinatario, String asunto, String mensaje) {
+        if (!emailConfigured) {
+            // Si el correo no está configurado, mostrar en consola
+            LOGGER.info("Notificación (simulada) para: " + destinatario);
+            LOGGER.info("Asunto: " + asunto);
+            LOGGER.info("Mensaje: " + mensaje);
+            return;
+        }
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", SMTP_HOST);
+        props.put("mail.smtp.port", SMTP_PORT);
 
-        // Crear una sesion de correo
-        Session session = Session.getInstance(props, new Authenticator() {
-            
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(REMITENTE_EMAIL, REMITENTE_PASSWORD);
-            }
-        });
-
-        // Crear un mensaje mime
         try {
-            // Un mensaje mime es un mensaje que puede contener texto, html, adjuntos, etc.
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(REMITENTE_EMAIL));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
-            message.setSubject(asunto);
-            message.setText(mensaje);
+            if (destinatario == null || destinatario.trim().isEmpty()) {
+                LOGGER.warning("Dirección de correo de destinatario no válida");
+                return;
+            }
 
-            // Enviar el mensaje
-            Transport.send(message);
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(REMITENTE_EMAIL, REMITENTE_PASSWORD);
+                }
+            });
 
-            // Mensaje de confirmacion
-            System.out.println("Correo enviado exitosamente a " + destinatario);
+            Message mimeMessage = new MimeMessage(session);
+            mimeMessage.setFrom(new InternetAddress(REMITENTE_EMAIL));
+            mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+            mimeMessage.setSubject(asunto);
+            mimeMessage.setText(mensaje);
+
+            Transport.send(mimeMessage);
+            LOGGER.info("Correo enviado exitosamente a " + destinatario);
         } catch (MessagingException e) {
-            // Mensaje de error
-            System.out.println("Error al enviar el correo: " + e.getMessage());
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Error al enviar correo: " + e.getMessage(), e);
+            // No reenviar la excepción para que no interrumpa el flujo de la aplicación
         }
     }
 }

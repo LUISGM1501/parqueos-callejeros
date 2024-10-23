@@ -162,7 +162,7 @@ public class AuthService {
         pinesTemporales.put(idUsuario, pinTemporal);
 
         // Enviar un correo al usuario con el pin temporal
-        gestorNotificaciones.enviarCorreo(usuario.getEmail(), "Restablecimiento de PIN", 
+        gestorNotificaciones.enviarNotificacion(usuario.getEmail(), "Restablecimiento de PIN", 
             "Su PIN temporal es: " + pinTemporal + ". Por favor, cámbielo después de iniciar sesión.");
     }
 

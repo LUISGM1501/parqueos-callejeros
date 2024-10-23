@@ -6,12 +6,19 @@
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
+  "ocupado" : true,
   "id" : "978c2ecf-20b0-4168-9acf-399b356663f1",
   "numero" : "010",
   "pagado" : false,
-  "vehiculoActual" : null,
-  "estaDisponible" : true
+  "vehiculoActual" : {
+    "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+    "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+    "placa" : "ABC123",
+    "marca" : "Toyota",
+    "modelo" : "1995",
+    "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  },
+  "estaDisponible" : false
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
   "ocupado" : true,
   "id" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
