@@ -151,6 +151,10 @@ public class SistemaParqueo {
         }
     }
 
+    public static SistemaParqueo getInstance() {
+        return new SistemaParqueo();
+    }
+
     // Getters para los gestores
     public GestorUsuarios getGestorUsuarios() {
         return gestorUsuarios;
@@ -178,5 +182,9 @@ public class SistemaParqueo {
     
     public GestorReportes getGestorReportes() {
         return gestorReportes;
+    }
+
+    public GestorVehiculos getGestorVehiculos() {
+        return gestorVehiculos;
     }
 }

@@ -1,7 +1,24 @@
 package com.parqueos.ui.vistas;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.componentes.BotonPersonalizado;
@@ -60,6 +77,10 @@ public class VistaUsuarioParqueo extends VistaBase {
 
         // Panel de Multas
         tabbedPane.addTab("Multas", crearPanelMultas());
+
+        inicializarTablas();
+        configurarEventos();
+        agregarTooltips();
 
         setPreferredSize(new Dimension(800, 600));
         pack();
@@ -147,5 +168,50 @@ public class VistaUsuarioParqueo extends VistaBase {
     
     public void actualizarTiempoGuardado(int minutos) {
         lblTiempoGuardado.setText("Tiempo guardado: " + minutos + " minutos");
+    }
+
+    private void inicializarTablas() {
+        // Configurar tabla de reservas activas
+        tblReservasActivas = new JTable();
+        tblReservasActivas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblReservasActivas.getTableHeader().setReorderingAllowed(false);
+        
+        // Configurar tabla de multas
+        tblMultas = new JTable();
+        tblMultas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblMultas.getTableHeader().setReorderingAllowed(false);
+    }
+
+    private void configurarEventos() {
+        // Agregar listeners para los cambios de selección en las tablas
+        tblReservasActivas.getSelectionModel().addListSelectionListener(e -> {
+            boolean reservaSeleccionada = tblReservasActivas.getSelectedRow() != -1;
+            btnAgregarTiempo.setEnabled(reservaSeleccionada);
+            btnDesaparcar.setEnabled(reservaSeleccionada);
+        });
+
+        tblMultas.getSelectionModel().addListSelectionListener(e -> {
+            boolean multaSeleccionada = tblMultas.getSelectedRow() != -1;
+            btnPagarMulta.setEnabled(multaSeleccionada);
+        });
+
+        // Deshabilitar botones inicialmente
+        btnAgregarTiempo.setEnabled(false);
+        btnDesaparcar.setEnabled(false);
+        btnPagarMulta.setEnabled(false);
+    }
+
+    // Agregar tooltips a los componentes
+    private void agregarTooltips() {
+        cmbVehiculos.setToolTipText("Seleccione el vehículo que desea parquear");
+        txtEspacio.setToolTipText("Ingrese el número del espacio de parqueo");
+        spnTiempo.setToolTipText("Seleccione el tiempo en minutos");
+        btnParquear.setToolTipText("Registrar el parqueo del vehículo");
+        btnAgregarTiempo.setToolTipText("Agregar más tiempo a un parqueo activo");
+        btnDesaparcar.setToolTipText("Finalizar un parqueo activo");
+        btnVerEspaciosDisponibles.setToolTipText("Ver lista de espacios disponibles");
+        btnVerHistorial.setToolTipText("Ver historial de parqueos");
+        btnVerMultas.setToolTipText("Ver multas pendientes");
+        btnPagarMulta.setToolTipText("Pagar la multa seleccionada");
     }
 }

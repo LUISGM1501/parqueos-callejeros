@@ -176,25 +176,15 @@ public class Usuario implements Serializable {
         try {
             // Cargar todos los usuarios existentes
             List<Usuario> usuarios = cargarTodos();
-            boolean encontrado = false;
             
-            // Buscar y actualizar el usuario existente
-            for (int i = 0; i < usuarios.size(); i++) {
-                if (usuarios.get(i).getId().equals(this.id)) {
-                    // Actualizar el usuario
-                    usuarios.set(i, this);
-                    encontrado = true;
-                    break;
-                }
-            }
+            // Eliminar el usuario existente
+            usuarios.removeIf(u -> u.getId().equals(this.id));
             
-            // Si no se encontró, agregarlo a la lista
-            if (!encontrado) {
-                usuarios.add(this);
-            }
+            // Agregar el usuario actualizado
+            usuarios.add(this);
             
-            // Guardar la lista completa
-            GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
+            // Guardar todos los usuarios
+            guardarTodos(usuarios);
             
         } catch (Exception e) {
             // Si da error, lanzar una excepcion

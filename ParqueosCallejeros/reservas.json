@@ -1,1 +1,62 @@
-[ "java.util.ArrayList", [ ] ]
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.Reserva", {
+  "idReserva" : "7dba066d-4958-4c63-81d4-69f1b4d1b2f3",
+  "usuario" : {
+    "@class" : "com.parqueos.modelo.usuario.UsuarioParqueo",
+    "id" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+    "nombre" : "Luis",
+    "apellidos" : "Urbina Salazar",
+    "telefono" : 85035348,
+    "email" : "gerardomax64@gmail.com",
+    "direccion" : "Garabito, Jaco",
+    "idUsuario" : "Luis",
+    "pin" : "1234",
+    "fechaIngreso" : "2024-10-22",
+    "tipoUsuario" : "USUARIO_PARQUEO",
+    "numeroTarjeta" : "1234567891234567",
+    "fechaVencimientoTarjeta" : "0202",
+    "codigoValidacionTarjeta" : "333",
+    "vehiculos" : [ "java.util.ArrayList", [ {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+      "placa" : "ABC123",
+      "marca" : "Toyota",
+      "modelo" : "1995",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    }, {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+      "placa" : "ASD111",
+      "marca" : "Toyota",
+      "modelo" : "2000",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    } ] ],
+    "tiempoGuardado" : 0,
+    "reservasActivas" : [ "java.util.ArrayList", [ ] ]
+  },
+  "espacio" : [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+    "ocupado" : true,
+    "id" : "978c2ecf-20b0-4168-9acf-399b356663f1",
+    "numero" : "010",
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+      "placa" : "ASD111",
+      "marca" : "Toyota",
+      "modelo" : "2000",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    },
+    "estaDisponible" : false
+  } ],
+  "vehiculo" : {
+    "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+    "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+    "placa" : "ASD111",
+    "marca" : "Toyota",
+    "modelo" : "2000",
+    "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  },
+  "horaInicio" : "2024-10-22T20:00:35.5843173",
+  "horaFin" : "2024-10-22T20:30:35.5843173",
+  "activa" : true
+} ] ] ]

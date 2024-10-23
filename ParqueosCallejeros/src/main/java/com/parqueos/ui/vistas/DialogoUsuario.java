@@ -246,19 +246,18 @@ public class DialogoUsuario extends JDialog {
 
     // Metodo para agregar un vehiculo
     private void agregarVehiculo() {
-        // Mostrar un dialogo para ingresar la placa del vehiculo
         String placa = JOptionPane.showInputDialog(this, "Ingrese la placa del vehículo:");
-        // Si la placa no es nula y no esta vacia, agregar el vehiculo
         if (placa != null && !placa.trim().isEmpty()) {
-            // Mostrar un dialogo para ingresar la marca del vehiculo
             String marca = JOptionPane.showInputDialog(this, "Ingrese la marca del vehículo (opcional):");
-            // Mostrar un dialogo para ingresar el modelo del vehiculo
             String modelo = JOptionPane.showInputDialog(this, "Ingrese el modelo del vehículo (opcional):");
-            // Crear un nuevo vehiculo con la placa, marca, modelo y color nulo
+            
+            // Crear el vehículo
             Vehiculo vehiculo = new Vehiculo(placa, marca, modelo, null);
-            // Agregar el vehiculo a la lista de vehiculos
+            
+            // Agregar el vehículo a la lista de vehículos
             vehiculos.add(vehiculo);
-            // Agregar el vehiculo a la lista de vehiculos
+            
+            // Agregar la placa a la lista visual
             modeloListaVehiculos.addElement(placa);
         }
     }

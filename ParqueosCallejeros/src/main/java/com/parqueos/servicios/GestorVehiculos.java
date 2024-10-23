@@ -2,7 +2,6 @@ package com.parqueos.servicios;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -15,11 +14,10 @@ public class GestorVehiculos {
     private static final String ARCHIVO_VEHICULOS = "vehiculos.json";
     private static final Logger LOGGER = Logger.getLogger(GestorVehiculos.class.getName());
     
-    private List<Vehiculo> vehiculos;
+    private List<Vehiculo> vehiculos = new ArrayList<>();
 
     // Constructor para inicializar la lista de vehiculos
     public GestorVehiculos() {
-        this.vehiculos = new ArrayList<>();
         cargarVehiculos();
     }
 
@@ -28,13 +26,16 @@ public class GestorVehiculos {
         try {
             // Cargar los vehiculos del archivo json
             vehiculos = GestorArchivos.cargarTodosLosElementos(ARCHIVO_VEHICULOS, Vehiculo.class);
+            if (vehiculos == null) {
+                vehiculos = new ArrayList<>();
+            }
             // Mensaje de confirmacion
             LOGGER.info("Vehículos cargados exitosamente. Total: " + vehiculos.size());
         } catch (Exception e) {
             // Mensaje de error
-            LOGGER.log(Level.SEVERE, "Error al cargar vehículos", e);
+            LOGGER.severe("Error al cargar vehículos: " + e.getMessage());
             // Inicializar la lista de vehiculos
-            inicializarListaVacia();
+            vehiculos = new ArrayList<>();
         }
     }
 
@@ -45,7 +46,7 @@ public class GestorVehiculos {
         // Guardar los vehiculos
         guardarVehiculos();
         // Mensaje de confirmacion
-        LOGGER.info("Vehículo agregado: " + vehiculo.getId());
+        LOGGER.info("Vehículo agregado al gestor: " + vehiculo.getId());
     }
 
     // Metodo para actualizar un vehiculo
@@ -87,8 +88,7 @@ public class GestorVehiculos {
     public List<Vehiculo> obtenerVehiculosPorUsuario(String idUsuario) {
         // Retornar una lista de vehiculos filtrados por el id del usuario
         return vehiculos.stream()
-                // Filtrar el vehiculo por el id del usuario
-                .filter(v -> v.getPropietario() != null && v.getPropietario().getId().equals(idUsuario))
+                .filter(v -> idUsuario.equals(v.getPropietarioId()))
                 .collect(Collectors.toList());
     }
 
@@ -117,7 +117,7 @@ public class GestorVehiculos {
             LOGGER.info("Vehículos guardados exitosamente");
         } catch (Exception e) {
             // Mensaje de error
-            LOGGER.log(Level.SEVERE, "Error al guardar vehículos", e);
+            LOGGER.severe("Error al guardar vehículos: " + e.getMessage());
         }
     }
 

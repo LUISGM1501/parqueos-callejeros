@@ -15,6 +15,8 @@ import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 
+import jakarta.persistence.PostLoad;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuarioParqueo extends Usuario {
@@ -25,8 +27,7 @@ public class UsuarioParqueo extends Usuario {
     @JsonProperty("codigoValidacionTarjeta")
     private String codigoValidacionTarjeta;
     @JsonManagedReference
-    @JsonProperty("vehiculos")
-    private List<Vehiculo> vehiculos;
+    private List<Vehiculo> vehiculos = new ArrayList<>();
     @JsonProperty("tiempoGuardado")
     private int tiempoGuardado; // en minutos
     @JsonIgnore
@@ -57,12 +58,60 @@ public class UsuarioParqueo extends Usuario {
 
     @JsonProperty("vehiculos")
     public List<Vehiculo> getVehiculos() {
-        return new ArrayList<>(vehiculos);
+        if (vehiculos == null) {
+            vehiculos = new ArrayList<>();
+        }
+        return vehiculos;
+    }
+
+    @PostLoad
+    public void recuperarReferencias() {
+        if (vehiculos != null) {
+            for (Vehiculo vehiculo : vehiculos) {
+                vehiculo.setPropietario(this);
+                vehiculo.setPropietarioId(this.getId());
+            }
+        }
+    }
+
+    @PostLoad
+    public void onLoad() {
+        if (vehiculos != null) {
+            for (Vehiculo vehiculo : vehiculos) {
+                vehiculo.setPropietario(this);
+                vehiculo.setPropietarioId(this.getId());
+            }
+        }
     }
 
     @JsonProperty("vehiculos")
     public void setVehiculos(List<Vehiculo> vehiculos) {
         this.vehiculos = vehiculos;
+        if (vehiculos != null) {
+            for (Vehiculo vehiculo : vehiculos) {
+                vehiculo.setPropietario(this);
+                vehiculo.setPropietarioId(this.getId());
+                // Guardar cada vehículo en el archivo
+                vehiculo.guardar();
+            }
+        }
+    }
+
+    public void sincronizarVehiculos() {
+        // Obtener los vehículos del usuario del gestor de vehículos
+        List<Vehiculo> vehiculosActualizados = new ArrayList<>();
+        List<Vehiculo> todosLosVehiculos = Vehiculo.cargarTodos();
+        
+        for (Vehiculo vehiculo : todosLosVehiculos) {
+            if (vehiculo.getPropietarioId() != null && 
+                vehiculo.getPropietarioId().equals(this.getId())) {
+                vehiculo.setPropietario(this);
+                vehiculosActualizados.add(vehiculo);
+            }
+        }
+        
+        // Actualizar la lista de vehículos del usuario
+        this.setVehiculos(vehiculosActualizados);
     }
 
     @JsonProperty("tiempoGuardado")

@@ -147,28 +147,96 @@ public class GestorUsuarios {
                                      String direccion, String idUsuario, String pin, Usuario.TipoUsuario tipoUsuario,
                                      String numeroTarjeta, String fechaVencimiento, String codigoValidacion,
                                      String terminalId, List<Vehiculo> vehiculos) {
-        // Buscar el usuario existente
-        Usuario usuarioExistente = buscarUsuario(id);
-        // Si el usuario no existe, lanzar una excepcion
-        if (usuarioExistente == null) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
+        // Buscar y eliminar el usuario existente
+        usuarios.removeIf(u -> u.getId().equals(id));
 
-        // Obtener el indice del usuario existente
-        int index = usuarios.indexOf(usuarioExistente);
         // Crear el nuevo usuario
-        Usuario usuarioActualizado = crearUsuario(nombre, apellidos, telefono, email, direccion, idUsuario, pin,
-                                                  tipoUsuario, numeroTarjeta, fechaVencimiento, codigoValidacion,
-                                                  terminalId, vehiculos);
+        Usuario usuarioActualizado = crearUsuarioSinGuardar(nombre, apellidos, telefono, email, direccion,
+                idUsuario, pin, tipoUsuario, numeroTarjeta, fechaVencimiento, codigoValidacion,
+                terminalId, vehiculos);
         
-        // Actualizar el usuario en la lista
-        usuarios.set(index, usuarioActualizado);
+        // Asignar el ID original
+        usuarioActualizado.setId(id);
+        
+        // Agregar el usuario actualizado
+        usuarios.add(usuarioActualizado);
+        
         // Guardar los usuarios
         guardarUsuarios();
+        
+        // Registrar el usuario actualizado en el AuthService
+        authService.registrarUsuario(usuarioActualizado);
+        
         // Mensaje de confirmacion
         LOGGER.info("Usuario actualizado: " + id);
         // Retornar el usuario actualizado
         return usuarioActualizado;
+    }
+
+    // Método auxiliar para crear usuario sin guardarlo
+    private Usuario crearUsuarioSinGuardar(String nombre, String apellidos, int telefono, String email,
+                                       String direccion, String idUsuario, String pin, 
+                                       Usuario.TipoUsuario tipoUsuario, String numeroTarjeta,
+                                       String fechaVencimiento, String codigoValidacion,
+                                       String terminalId, List<Vehiculo> vehiculos) {
+        Usuario usuario;
+        
+        switch (tipoUsuario) {
+            case ADMINISTRADOR:
+                usuario = new AdministradorBuilder()
+                        .conNombre(nombre)
+                        .conApellidos(apellidos)
+                        .conTelefono(telefono)
+                        .conEmail(email)
+                        .conDireccion(direccion)
+                        .conIdUsuario(idUsuario)
+                        .conPin(pin)
+                        .construir();
+                break;
+                
+            case INSPECTOR:
+                usuario = new InspectorBuilder()
+                        .conNombre(nombre)
+                        .conApellidos(apellidos)
+                        .conTelefono(telefono)
+                        .conEmail(email)
+                        .conDireccion(direccion)
+                        .conIdUsuario(idUsuario)
+                        .conPin(pin)
+                        .conTerminalId(terminalId)
+                        .construir();
+                break;
+                
+            case USUARIO_PARQUEO:
+                UsuarioParqueo usuarioParqueo = new UsuarioParqueoBuilder()
+                        .conNombre(nombre)
+                        .conApellidos(apellidos)
+                        .conTelefono(telefono)
+                        .conEmail(email)
+                        .conDireccion(direccion)
+                        .conIdUsuario(idUsuario)
+                        .conPin(pin)
+                        .conNumeroTarjeta(numeroTarjeta)
+                        .conFechaVencimientoTarjeta(fechaVencimiento)
+                        .conCodigoValidacionTarjeta(codigoValidacion)
+                        .construir();
+
+                // Asignar vehículos si existen
+                if (vehiculos != null) {
+                    for (Vehiculo vehiculo : vehiculos) {
+                        vehiculo.setPropietario(usuarioParqueo);
+                    }
+                    usuarioParqueo.setVehiculos(new ArrayList<>(vehiculos));
+                }
+                
+                usuario = usuarioParqueo;
+                break;
+                
+            default:
+                throw new IllegalArgumentException("Tipo de usuario no válido");
+        }
+        
+        return usuario;
     }
     
     // Metodo para eliminar un usuario

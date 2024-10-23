@@ -2,6 +2,7 @@ package com.parqueos.ui.controladores;
 
 import java.awt.Frame;
 import java.awt.Window;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import com.parqueos.modelo.usuario.Usuario;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.servicios.SistemaParqueo;
 import com.parqueos.ui.vistas.DialogoUsuario;
@@ -107,6 +109,17 @@ public class ControladorGestionUsuarios {
                     dialogo.getTerminalId(),
                     dialogo.getVehiculos()
                 );
+                
+                // Si es un usuario de parqueo, guardar sus vehículos
+                if (nuevoUsuario instanceof UsuarioParqueo) {
+                    UsuarioParqueo usuarioParqueo = (UsuarioParqueo) nuevoUsuario;
+                    for (Vehiculo vehiculo : dialogo.getVehiculos()) {
+                        vehiculo.setPropietario(usuarioParqueo);
+                        vehiculo.setPropietarioId(usuarioParqueo.getId());
+                        // Guardar el vehículo explícitamente
+                        vehiculo.guardar();
+                    }
+                }
                 
                 // Cargar los usuarios
                 cargarUsuarios();
@@ -316,5 +329,55 @@ public class ControladorGestionUsuarios {
         }
 
         return true;
+    }
+
+    // Metodo para agregar vehiculos al usuario
+    private void agregarVehiculo(DialogoUsuario dialogo, UsuarioParqueo usuarioParqueo) {
+        String placa = JOptionPane.showInputDialog(vista, "Ingrese la placa del vehículo:");
+        if (placa != null && !placa.trim().isEmpty()) {
+            String marca = JOptionPane.showInputDialog(vista, "Ingrese la marca del vehículo (opcional):");
+            String modelo = JOptionPane.showInputDialog(vista, "Ingrese el modelo del vehículo (opcional):");
+        
+            try {
+            // Crear el vehículo
+            Vehiculo vehiculo = new Vehiculo(placa, marca, modelo, usuarioParqueo);
+            
+            // Asegurar que el propietarioId sea el correcto
+            vehiculo.setPropietarioId(usuarioParqueo.getId());
+            
+            // Agregar el vehículo a la lista del usuario
+            if (usuarioParqueo.getVehiculos() == null) {
+                usuarioParqueo.setVehiculos(new ArrayList<>());
+            }
+            usuarioParqueo.getVehiculos().add(vehiculo);
+            
+            // Guardar el vehículo en el sistema
+            sistemaParqueo.getGestorVehiculos().agregarVehiculo(vehiculo);
+            
+            // Actualizar el usuario
+            sistemaParqueo.getGestorUsuarios().actualizarUsuario(
+                usuarioParqueo.getId(),
+                usuarioParqueo.getNombre(),
+                usuarioParqueo.getApellidos(),
+                usuarioParqueo.getTelefono(),
+                usuarioParqueo.getEmail(),
+                usuarioParqueo.getDireccion(),
+                usuarioParqueo.getIdUsuario(),
+                usuarioParqueo.getPin(),
+                usuarioParqueo.getTipoUsuario(),
+                usuarioParqueo.getNumeroTarjeta(),
+                usuarioParqueo.getFechaVencimientoTarjeta(),
+                usuarioParqueo.getCodigoValidacionTarjeta(),
+                null, // terminalId para UsuarioParqueo es null
+                usuarioParqueo.getVehiculos()
+            );
+            
+            LOGGER.info("Vehículo agregado: " + vehiculo.getId() + " para usuario: " + usuarioParqueo.getId());
+            
+            } catch (Exception e) {
+                LOGGER.severe("Error al agregar vehículo: " + e.getMessage());
+                JOptionPane.showMessageDialog(vista, "Error al agregar vehículo: " + e.getMessage());
+            }
+        }
     }
 }

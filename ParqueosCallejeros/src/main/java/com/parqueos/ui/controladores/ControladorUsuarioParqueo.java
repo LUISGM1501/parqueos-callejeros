@@ -15,7 +15,6 @@ import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.servicios.SistemaParqueo;
-import com.parqueos.servicios.GestorNotificaciones;
 import com.parqueos.ui.vistas.VistaUsuarioParqueo;
 
 // Controlador para el usuario parqueo
@@ -41,6 +40,7 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         actualizarTiempoGuardado();
         actualizarTablaReservasActivas();
         actualizarTablaMultas();
+        actualizarComboVehiculos();
 
         vista.getBtnParquear().addActionListener(e -> parquear());
         vista.getBtnAgregarTiempo().addActionListener(e -> agregarTiempo());
@@ -55,12 +55,16 @@ public class ControladorUsuarioParqueo extends ControladorBase {
     private void cargarVehiculos() {
         // Crear el modelo del combo box
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
-        // Agregar los vehiculos al modelo
-        for (Vehiculo vehiculo : usuario.getVehiculos()) {
+        vista.getCmbVehiculos().setModel(model);
+    
+        // Obtener los vehículos del usuario
+        List<Vehiculo> vehiculos = sistemaParqueo.getGestorVehiculos()
+            .obtenerVehiculosPorUsuario(usuario.getId());
+    
+        // Agregar las placas al combo box
+        for (Vehiculo vehiculo : vehiculos) {
             model.addElement(vehiculo.getPlaca());
         }
-        // Asignar el modelo al combo box
-        vista.getCmbVehiculos().setModel(model);
     }
 
     // Metodo para parquear un vehiculo
@@ -281,4 +285,18 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         // Actualizar el tiempo guardado en la vista
         vista.actualizarTiempoGuardado(usuario.getTiempoGuardado());
     }
+
+    // Metodo para sincronizar los vehiculos del usuario
+    private void actualizarComboVehiculos() {
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) vista.getCmbVehiculos().getModel();
+        model.removeAllElements();
+        
+        // Sincronizar vehículos del usuario
+        usuario.sincronizarVehiculos();
+        
+        for (Vehiculo vehiculo : usuario.getVehiculos()) {
+            model.addElement(vehiculo.getPlaca());
+        }
+    }
+    
 }

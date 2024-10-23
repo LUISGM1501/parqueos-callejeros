@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.parqueos.modelo.usuario.Administrador;
-import com.parqueos.modelo.usuario.Inspector;
-import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 
 public class GestorArchivos {
@@ -30,19 +30,23 @@ public class GestorArchivos {
         PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
                 .allowIfBaseType(Object.class)
                 .allowIfSubType(Object.class)
-                .allowIfSubType(Usuario.class)
-                .allowIfSubType(Administrador.class)
-                .allowIfSubType(UsuarioParqueo.class)
-                .allowIfSubType(Inspector.class)
+                .allowIfSubType("com.parqueos.modelo.*")
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT)
+        mapper.registerModule(new JavaTimeModule())
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-            .registerModule(new JavaTimeModule())
-            .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
+            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+            .setDefaultTyping(new DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL, ptv)
+                    .init(JsonTypeInfo.Id.CLASS, null)
+                    .inclusion(JsonTypeInfo.As.PROPERTY));
 
+        mapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL);
+        
         return mapper;
     }
 
@@ -84,7 +88,6 @@ public class GestorArchivos {
     public static <T> List<T> cargarTodosLosElementos(String nombreArchivo, Class<T> tipoClase) {
         File archivo = new File(nombreArchivo);
         if (!archivo.exists() || archivo.length() == 0) {
-            LOGGER.info("El archivo " + nombreArchivo + " no existe o está vacío. Se creará uno nuevo.");
             return new ArrayList<>();
         }
         
@@ -92,26 +95,16 @@ public class GestorArchivos {
             String contenido = new String(Files.readAllBytes(archivo.toPath()), StandardCharsets.UTF_8);
             JavaType tipo = objectMapper.getTypeFactory().constructCollectionType(List.class, tipoClase);
             
-            // Intenta deserializar directamente
-            try {
-                return objectMapper.readValue(contenido, tipo);
-            } catch (Exception e) {
-                LOGGER.warning("Error en la deserialización directa, intentando con un enfoque alternativo: " + e.getMessage());
-                // Si falla, intenta deserializar como un array simple
-                JsonNode root = objectMapper.readTree(contenido);
-                List<T> resultado = new ArrayList<>();
-                if (root.isArray()) {
-                    for (JsonNode node : root) {
-                        try {
-                            T elemento = objectMapper.treeToValue(node, tipoClase);
-                            resultado.add(elemento);
-                        } catch (Exception ex) {
-                            LOGGER.warning("Error al deserializar elemento individual: " + ex.getMessage());
-                        }
-                    }
+            List<T> elementos = objectMapper.readValue(contenido, tipo);
+            
+            // Recuperar referencias para UsuarioParqueo
+            if (!elementos.isEmpty() && elementos.get(0) instanceof UsuarioParqueo) {
+                for (T elemento : elementos) {
+                    ((UsuarioParqueo)elemento).recuperarReferencias();
                 }
-                return resultado;
             }
+            
+            return elementos;
         } catch (Exception e) {
             LOGGER.severe("Error al cargar elementos desde " + nombreArchivo + ": " + e.getMessage());
             e.printStackTrace();

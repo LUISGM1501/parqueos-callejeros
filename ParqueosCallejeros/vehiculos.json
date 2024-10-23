@@ -1,1 +1,13 @@
-[ "java.util.ArrayList", [ ] ]
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.vehiculo.Vehiculo", {
+  "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+  "placa" : "ABC123",
+  "marca" : "Toyota",
+  "modelo" : "1995",
+  "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+} ], [ "com.parqueos.modelo.vehiculo.Vehiculo", {
+  "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+  "placa" : "ASD111",
+  "marca" : "Toyota",
+  "modelo" : "2000",
+  "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+} ] ] ]
