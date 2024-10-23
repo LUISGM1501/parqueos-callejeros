@@ -16,6 +16,10 @@ import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
+import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
+import com.parqueos.modelo.vehiculo.Vehiculo;
+import java.util.List;
 
 
 // Clase para gestionar las notificaciones
@@ -188,6 +192,82 @@ public class GestorNotificaciones {
         // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Confirmación de Pago de Multa", mensaje);
     }
+    
+    //método para enviar datos actulizados
+    public void notificarActualizacionDatos(Usuario usuario) {
+        // Verificar que el usuario no sea nulo
+        if (usuario == null) {
+            System.out.println("Error: Usuario nulo.");
+            return;
+        }
+
+        // Crear el mensaje de la notificación con los datos actualizados
+        String mensaje = String.format(
+            "Estimado/a %s %s,\n\n" +
+            "Sus datos han sido actualizados en nuestro sistema. A continuación, los detalles actualizados de su perfil:\n" +
+            "Nombre: %s\n" +
+            "Apellidos: %s\n" +
+            "Teléfono: %d\n" +
+            "Email: %s\n" +
+            "Dirección: %s\n" +
+            "ID de Usuario: %s\n" +
+            "PIN: %s\n",
+            usuario.getNombre(),
+            usuario.getApellidos(),
+            usuario.getNombre(),
+            usuario.getApellidos(),
+            usuario.getTelefono(),
+            usuario.getEmail(),
+            usuario.getDireccion(),
+            usuario.getIdUsuario(),
+            usuario.getPin()
+        );
+
+        // Verificar si el usuario es de tipo UsuarioParqueo y agregar detalles adicionales
+        if (usuario instanceof UsuarioParqueo) {
+            UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuario;
+            mensaje += String.format(
+                "Número de Tarjeta: %s\n" +
+                "Fecha de Vencimiento: %s\n" +
+                "Código de Validación: %s\n",
+                usuarioParqueo.getNumeroTarjeta(),
+                usuarioParqueo.getFechaVencimientoTarjeta(),
+                usuarioParqueo.getCodigoValidacionTarjeta()
+            );
+
+            // Obtener y agregar la lista de vehículos
+            List<Vehiculo> vehiculos = usuarioParqueo.getVehiculos();
+            if (vehiculos.isEmpty()) {
+                mensaje += "No tiene vehículos registrados.\n";
+            } else {
+                mensaje += "Vehículos registrados:\n";
+                for (Vehiculo vehiculo : vehiculos) {
+                    mensaje += String.format("- Placa: %s, Marca: %s, Modelo: %s\n", 
+                        vehiculo.getPlaca(), 
+                        vehiculo.getMarca(), 
+                        vehiculo.getModelo());
+                }
+            }
+        }
+
+        // Verificar si el usuario es de tipo Inspector y agregar el terminal ID
+        if (usuario instanceof Inspector) {
+            Inspector inspector = (Inspector) usuario;
+            mensaje += String.format(
+                "Terminal ID: %s\n",
+                inspector.getTerminalId()
+            );
+        }
+
+        mensaje += "\nPor favor, revise la información para asegurarse de que esté correcta.\n" +
+                   "Gracias por usar nuestro servicio.";
+
+        // Enviar el correo
+        enviarCorreo(usuario.getEmail(), "Actualización de Datos", mensaje);
+    }
+
+
+
     
     // Metodo para enviar un correo
     public void enviarCorreo(String destinatario, String asunto, String mensaje) {

@@ -162,6 +162,8 @@ public class ControladorGestionUsuarios {
                             dialogo.getTerminalId(),
                             dialogo.getVehiculos()
                         );
+                        //Envío de correo por actulización de datos
+                        sistemaParqueo.getGestorNotificaciones().notificarActualizacionDatos(usuarioActualizado);
 
                         // Actualizar directamente la fila editada
                         DefaultTableModel modelo = (DefaultTableModel) vista.getTblUsuarios().getModel();
