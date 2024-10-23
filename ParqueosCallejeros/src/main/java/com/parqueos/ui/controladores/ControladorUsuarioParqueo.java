@@ -78,6 +78,8 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                 sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio),
                 usuario.getVehiculos().stream().filter(v -> v.getPlaca().equals(placa)).findFirst().orElseThrow(),
                 tiempoComprado));
+            //Enviar correo
+            sistemaParqueo.getGestorNotificaciones().notificarReservaCreada(reserva);
             // Mostrar el mensaje de confirmacion
             JOptionPane.showMessageDialog(vista, "Parqueo exitoso. ID de reserva: " + reserva.getIdReserva());
             // Actualizar la tabla de reservas activas
@@ -103,6 +105,8 @@ public class ControladorUsuarioParqueo extends ControladorBase {
             // Verificar si la reserva pertenece al usuario
             if (reserva != null && reserva.getUsuario().equals(usuario)) {
                 reserva.extenderTiempo(tiempoAdicional);
+                //Enviar correo
+                sistemaParqueo.getGestorNotificaciones().notificarTiempoAgregado(reserva);
                 JOptionPane.showMessageDialog(vista, "Tiempo agregado exitosamente.");
                 // Actualizar la tabla de reservas activas
                 actualizarTablaReservasActivas();
@@ -118,6 +122,7 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     // Metodo para desaparcar un vehiculo
     private void desaparcar() {
+        
         // Obtener el id de la reserva
         String idReserva = JOptionPane.showInputDialog(vista, "Ingrese el ID de la reserva a finalizar:");
         
@@ -130,6 +135,8 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                 int tiempoNoUsado = reserva.finalizarReserva();
                 // Actualizar el tiempo guardado
                 usuario.setTiempoGuardado(usuario.getTiempoGuardado() + tiempoNoUsado);
+                //Enviar correo
+                sistemaParqueo.getGestorNotificaciones().notificarDesaparcado(reserva, tiempoNoUsado);
                 // Mostrar el mensaje de confirmacion
                 JOptionPane.showMessageDialog(vista, "Vehículo desaparcado exitosamente. Tiempo guardado: " + tiempoNoUsado + " minutos.");
                 // Actualizar la tabla de reservas activas

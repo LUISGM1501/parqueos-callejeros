@@ -1,5 +1,6 @@
 package com.parqueos.servicios;
 
+import com.parqueos.modelo.parqueo.EspacioParqueo;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class GestorReservas {
                        .findFirst()
                        .orElse(null);
     }
-
+    
     // Metodo para guardar las reservas
     private void guardarReservas() {
         // Guardar las reservas en el archivo json

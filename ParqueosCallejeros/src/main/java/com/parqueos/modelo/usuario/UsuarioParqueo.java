@@ -193,7 +193,7 @@ public class UsuarioParqueo extends Usuario {
     }
 
     // Metodo para desaparcar un vehiculo
-    public void desaparcar(Reserva reserva) {
+    public void desaparcar(Reserva reserva) { 
         // Verificar si la reserva esta activa para este usuario
         if (!reservasActivas.contains(reserva)) {
             throw new IllegalArgumentException("La reserva no está activa para este usuario");

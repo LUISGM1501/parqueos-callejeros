@@ -1,7 +1,9 @@
 package com.parqueos.servicios;
 
 import java.time.format.DateTimeFormatter;
+
 import java.util.Properties;
+import java.util.List;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -19,7 +21,7 @@ import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.usuario.Inspector;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
-import java.util.List;
+
 
 
 // Clase para gestionar las notificaciones
@@ -33,7 +35,7 @@ public class GestorNotificaciones {
         // Obtener el usuario de la reserva
         Usuario usuario = reserva.getUsuario();
 
-        // Crear el mensaje de la notificacion
+        // Crear el mensaje de la notificación
         String mensaje = String.format(
             "Estimado/a %s %s,\n\n" +
             "Su reserva ha sido creada exitosamente:\n" +
@@ -41,19 +43,21 @@ public class GestorNotificaciones {
             "Vehículo: %s\n" +
             "Inicio: %s\n" +
             "Fin: %s\n\n" +
-            "Gracias por usar nuestro servicio de parqueo.",
+            "Gracias por usar nuestro servicio de parqueo.\n\n" +
+            "**ID Reserva: %s**",  // Texto en negrita para el ID de la reserva
             usuario.getNombre(),
             usuario.getApellidos(),
             reserva.getEspacio().getNumero(),
             reserva.getVehiculo().getPlaca(),
             reserva.getHoraInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
-            reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+            reserva.getHoraFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+            reserva.getIdReserva()  // Obtener el ID de la reserva
         );
-        
+
         // Enviar el correo
         enviarCorreo(usuario.getEmail(), "Reserva Creada", mensaje);
     }
-    
+
     // Metodo para notificar el tiempo agregado a una reserva
     public void notificarTiempoAgregado(Reserva reserva) {
         // Obtener el usuario de la reserva

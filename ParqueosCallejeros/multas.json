@@ -1,1 +1,36 @@
-["java.util.ArrayList", [ ] ]
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.multa.Multa", {
+  "idMulta" : "9e431ddf-a97e-42cb-b0eb-bacb9fe7d949",
+  "vehiculo" : [ "com.parqueos.modelo.vehiculo.Vehiculo", {
+    "id" : "fb3aa0a5-701b-493d-9b8b-d65a63ab3112",
+    "placa" : "1111",
+    "marca" : "wedwed",
+    "modelo" : "dewd",
+    "propietario" : "7c52fec3-69dc-4fff-a46d-7aaf4d6d9b36"
+  } ],
+  "espacio" : [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+    "id" : "118ce2b3-4ed1-4774-9445-f82012d27ecb",
+    "numero" : "019",
+    "vehiculoActual" : [ "com.parqueos.modelo.vehiculo.Vehiculo", {
+      "id" : "fb3aa0a5-701b-493d-9b8b-d65a63ab3112",
+      "placa" : "1111",
+      "marca" : "wedwed",
+      "modelo" : "dewd",
+      "propietario" : "7c52fec3-69dc-4fff-a46d-7aaf4d6d9b36"
+    } ]
+  } ],
+  "inspector" : [ "com.parqueos.modelo.usuario.Inspector", {
+    "id" : "61a2303d-b01b-4d02-8424-7feaf883ad58",
+    "nombre" : "esteban",
+    "apellidos" : "azr",
+    "telefono" : 12121212,
+    "email" : "eazoportu@gmail.com",
+    "direccion" : "edwedwe",
+    "idUsuario" : "esteban2",
+    "pin" : "1234",
+    "tipoUsuario" : "INSPECTOR",
+    "terminalId" : "123456"
+  } ],
+  "fechaHora" : [ 2024, 10, 22, 21, 40, 12, 384637300 ],
+  "monto" : 500.0,
+  "pagada" : false
+} ] ] ]
