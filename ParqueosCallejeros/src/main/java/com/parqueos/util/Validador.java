@@ -59,7 +59,11 @@ public class Validador {
     }
 
     public static boolean validarFechaVencimiento(String fechaVencimiento) {
-        return fechaVencimiento != null && fechaVencimiento.length() == 5 && fechaVencimiento.matches("\\d+");
+        // Expresión regular para verificar el formato MM/YY
+        String patron = "^(0[1-9]|1[0-2])/\\d{2}$";
+
+        // Verificar si la fecha cumple con el patrón
+        return fechaVencimiento != null && Pattern.matches(patron, fechaVencimiento);
     }
 
 }
