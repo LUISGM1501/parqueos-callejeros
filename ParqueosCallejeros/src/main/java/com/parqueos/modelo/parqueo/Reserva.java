@@ -5,40 +5,95 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
 
+import jakarta.persistence.PostLoad;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Reserva implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_RESERVAS = "reservas.json";
     
-    private final String idReserva;
-    private final UsuarioParqueo usuario;
-    private final EspacioParqueo espacio;
-    private final Vehiculo vehiculo;
-    private final LocalDateTime horaInicio;
+    @JsonProperty("idReserva")
+    private String idReserva;
+    
+    @JsonProperty("usuarioId")
+    private String usuarioId;
+    
+    @JsonProperty("espacioId")
+    private String espacioId;
+    
+    @JsonProperty("vehiculoId")
+    private String vehiculoId;
+    
+    @JsonProperty("horaInicio")
+    private LocalDateTime horaInicio;
+    
+    @JsonProperty("horaFin")
     private LocalDateTime horaFin;
+    
+    @JsonProperty("activa")
     private boolean activa;
+    
+    @JsonIgnore
+    private transient UsuarioParqueo usuario;
+    
+    @JsonIgnore
+    private transient EspacioParqueo espacio;
+    
+    @JsonIgnore
+    private transient Vehiculo vehiculo;
 
-    // Constructor de la reserva
-    public Reserva(UsuarioParqueo usuario, EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
+    // Constructor sin argumentos requerido por Jackson
+    @JsonCreator
+    public Reserva() {
         this.idReserva = UUID.randomUUID().toString();
-        this.usuario = usuario;
-        this.espacio = espacio;
-        this.vehiculo = vehiculo;
-        this.horaInicio = LocalDateTime.now();
-        this.horaFin = horaInicio.plusMinutes(tiempoComprado);
-        this.activa = true;
-        
+    }
+
+    // Constructor principal
+    public Reserva(UsuarioParqueo usuario, EspacioParqueo espacio, Vehiculo vehiculo, int tiempoComprado) {
+        this(); // Llama al constructor sin argumentos para generar el idReserva
         // Verificar si el espacio esta disponible
         if (!espacio.estaDisponible()) {
             // Lanzar una excepcion si el espacio no esta disponible
             throw new IllegalStateException("El espacio no está disponible");
         }
 
+        this.usuario = usuario;
+        this.usuarioId = usuario.getId();
+        this.espacio = espacio;
+        this.espacioId = espacio.getId();
+        this.vehiculo = vehiculo;
+        this.vehiculoId = vehiculo.getId();
+        this.horaInicio = LocalDateTime.now();
+        this.horaFin = horaInicio.plusMinutes(tiempoComprado);
+        this.activa = true;
+
         // Ocupar el espacio
         espacio.ocupar(vehiculo);
+    }
+
+    // Metodo para cargar las referencias después de deserializar
+    @PostLoad
+    public void cargarReferencias() {
+        if (usuarioId != null) {
+            this.usuario = (UsuarioParqueo) Usuario.cargar(usuarioId);
+        }
+        if (espacioId != null) {
+            this.espacio = EspacioParqueo.cargar(espacioId);
+        }
+        if (vehiculoId != null) {
+            this.vehiculo = Vehiculo.cargar(vehiculoId);
+        }
     }
 
     // Metodo para guardar una reserva
@@ -146,7 +201,7 @@ public class Reserva implements Serializable {
         
         // Desactivar la reserva
         this.activa = false;
-        espacio.liberar();
+        getEspacio().liberar();
 
         //  Guardar la reserva
         this.actualizar();
@@ -155,33 +210,67 @@ public class Reserva implements Serializable {
         return tiempoNoUsado;
     }
 
-    // Getters and Setters
-    public boolean estaActiva() {
-        return activa && LocalDateTime.now().isBefore(horaFin);
-    }
-
+    // Getters y setters con anotaciones JsonProperty
+    @JsonProperty("idReserva")
     public String getIdReserva() {
         return idReserva;
     }
 
-    public UsuarioParqueo getUsuario() {
-        return usuario;
+    @JsonProperty("usuarioId")
+    public String getUsuarioId() {
+        return usuarioId;
     }
 
-    public EspacioParqueo getEspacio() {
-        return espacio;
+    @JsonProperty("espacioId")
+    public String getEspacioId() {
+        return espacioId;
     }
 
-    public Vehiculo getVehiculo() {
-        return vehiculo;
+    @JsonProperty("vehiculoId")
+    public String getVehiculoId() {
+        return vehiculoId;
     }
 
+    @JsonProperty("horaInicio")
     public LocalDateTime getHoraInicio() {
         return horaInicio;
     }
 
+    @JsonProperty("horaFin")
     public LocalDateTime getHoraFin() {
         return horaFin;
+    }
+
+    @JsonProperty("activa")
+    public boolean isActiva() {
+        return activa;
+    }
+
+    // Getters para objetos relacionados que cargan bajo demanda
+    public UsuarioParqueo getUsuario() {
+        if (usuario == null && usuarioId != null) {
+            usuario = (UsuarioParqueo) Usuario.cargar(usuarioId);
+        }
+        return usuario;
+    }
+
+    public EspacioParqueo getEspacio() {
+        if (espacio == null && espacioId != null) {
+            espacio = EspacioParqueo.cargar(espacioId);
+        }
+        return espacio;
+    }
+
+    public Vehiculo getVehiculo() {
+        if (vehiculo == null && vehiculoId != null) {
+            vehiculo = Vehiculo.cargar(vehiculoId);
+        }
+        return vehiculo;
+    }
+
+    // Metodo para verificar si la reserva esta activa
+    public boolean estaActiva() {
+        return activa && LocalDateTime.now().isBefore(horaFin);
     }
 
     // Metodo para convertir la reserva a un string
@@ -189,9 +278,9 @@ public class Reserva implements Serializable {
     public String toString() {
         return "Reserva{" +
                 "idReserva='" + idReserva + '\'' +
-                ", usuario=" + usuario.getIdUsuario() +
-                ", espacio=" + espacio.getNumero() +
-                ", vehiculo=" + vehiculo.getPlaca() +
+                ", usuario=" + getUsuario().getIdUsuario() +
+                ", espacio=" + getEspacio().getNumero() +
+                ", vehiculo=" + getVehiculo().getPlaca() +
                 ", horaInicio=" + horaInicio +
                 ", horaFin=" + horaFin +
                 ", activa=" + activa +

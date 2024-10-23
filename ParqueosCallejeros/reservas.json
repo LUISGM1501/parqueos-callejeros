@@ -1,5 +1,4 @@
 [ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.Reserva", {
-  "idReserva" : "7dba066d-4958-4c63-81d4-69f1b4d1b2f3",
   "usuario" : {
     "@class" : "com.parqueos.modelo.usuario.UsuarioParqueo",
     "id" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
@@ -33,10 +32,75 @@
     "tiempoGuardado" : 0,
     "reservasActivas" : [ "java.util.ArrayList", [ ] ]
   },
+  "vehiculo" : {
+    "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+    "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+    "placa" : "ASD111",
+    "marca" : "Toyota",
+    "modelo" : "2000",
+    "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  },
   "espacio" : [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-    "ocupado" : true,
+    "ocupado" : false,
     "id" : "978c2ecf-20b0-4168-9acf-399b356663f1",
     "numero" : "010",
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  } ],
+  "idReserva" : "eb13323e-67ab-4345-a981-c9fe56e09d42",
+  "usuarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+  "espacioId" : "978c2ecf-20b0-4168-9acf-399b356663f1",
+  "vehiculoId" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+  "horaInicio" : "2024-10-22T20:24:45.1829681",
+  "horaFin" : "2024-10-22T20:54:45.1829681",
+  "activa" : false
+} ], [ "com.parqueos.modelo.parqueo.Reserva", {
+  "usuario" : {
+    "@class" : "com.parqueos.modelo.usuario.UsuarioParqueo",
+    "id" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+    "nombre" : "Luis",
+    "apellidos" : "Urbina Salazar",
+    "telefono" : 85035348,
+    "email" : "gerardomax64@gmail.com",
+    "direccion" : "Garabito, Jaco",
+    "idUsuario" : "Luis",
+    "pin" : "1234",
+    "fechaIngreso" : "2024-10-22",
+    "tipoUsuario" : "USUARIO_PARQUEO",
+    "numeroTarjeta" : "1234567891234567",
+    "fechaVencimientoTarjeta" : "0202",
+    "codigoValidacionTarjeta" : "333",
+    "vehiculos" : [ "java.util.ArrayList", [ {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+      "placa" : "ABC123",
+      "marca" : "Toyota",
+      "modelo" : "1995",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    }, {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+      "placa" : "ASD111",
+      "marca" : "Toyota",
+      "modelo" : "2000",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    } ] ],
+    "tiempoGuardado" : 0,
+    "reservasActivas" : [ "java.util.ArrayList", [ ] ]
+  },
+  "vehiculo" : {
+    "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+    "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+    "placa" : "ASD111",
+    "marca" : "Toyota",
+    "modelo" : "2000",
+    "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  },
+  "espacio" : [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+    "ocupado" : true,
+    "id" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
+    "numero" : "011",
     "pagado" : false,
     "vehiculoActual" : {
       "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
@@ -48,15 +112,68 @@
     },
     "estaDisponible" : false
   } ],
+  "idReserva" : "1386c01b-a28f-417f-b6a2-4a73aed876ce",
+  "usuarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+  "espacioId" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
+  "vehiculoId" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+  "horaInicio" : "2024-10-22T20:37:52.3102167",
+  "horaFin" : "2024-10-22T21:07:52.3102167",
+  "activa" : true
+} ], [ "com.parqueos.modelo.parqueo.Reserva", {
+  "usuario" : {
+    "@class" : "com.parqueos.modelo.usuario.UsuarioParqueo",
+    "id" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+    "nombre" : "Luis",
+    "apellidos" : "Urbina Salazar",
+    "telefono" : 85035348,
+    "email" : "gerardomax64@gmail.com",
+    "direccion" : "Garabito, Jaco",
+    "idUsuario" : "Luis",
+    "pin" : "1234",
+    "fechaIngreso" : "2024-10-22",
+    "tipoUsuario" : "USUARIO_PARQUEO",
+    "numeroTarjeta" : "1234567891234567",
+    "fechaVencimientoTarjeta" : "0202",
+    "codigoValidacionTarjeta" : "333",
+    "vehiculos" : [ "java.util.ArrayList", [ {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+      "placa" : "ABC123",
+      "marca" : "Toyota",
+      "modelo" : "1995",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    }, {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
+      "placa" : "ASD111",
+      "marca" : "Toyota",
+      "modelo" : "2000",
+      "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+    } ] ],
+    "tiempoGuardado" : 0,
+    "reservasActivas" : [ "java.util.ArrayList", [ ] ]
+  },
   "vehiculo" : {
     "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
-    "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
-    "placa" : "ASD111",
+    "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+    "placa" : "ABC123",
     "marca" : "Toyota",
-    "modelo" : "2000",
+    "modelo" : "1995",
     "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
   },
-  "horaInicio" : "2024-10-22T20:00:35.5843173",
-  "horaFin" : "2024-10-22T20:30:35.5843173",
-  "activa" : true
+  "espacio" : [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+    "ocupado" : false,
+    "id" : "2d4c2a16-7e53-4a0b-bfcd-7d1da3da99a0",
+    "numero" : "90",
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  } ],
+  "idReserva" : "a6f946d4-8aee-47e4-a869-cbced2658f6b",
+  "usuarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6",
+  "espacioId" : "2d4c2a16-7e53-4a0b-bfcd-7d1da3da99a0",
+  "vehiculoId" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
+  "horaInicio" : "2024-10-22T20:45:49.0627245",
+  "horaFin" : "2024-10-22T21:15:49.0627245",
+  "activa" : false
 } ] ] ]

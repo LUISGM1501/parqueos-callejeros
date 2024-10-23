@@ -6,9 +6,16 @@
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : true,
+  "ocupado" : false,
   "id" : "978c2ecf-20b0-4168-9acf-399b356663f1",
   "numero" : "010",
+  "pagado" : false,
+  "vehiculoActual" : null,
+  "estaDisponible" : true
+} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "ocupado" : true,
+  "id" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
+  "numero" : "011",
   "pagado" : false,
   "vehiculoActual" : {
     "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
@@ -19,13 +26,6 @@
     "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
   },
   "estaDisponible" : false
-} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
-  "numero" : "011",
-  "pagado" : false,
-  "vehiculoActual" : null,
-  "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
   "ocupado" : false,
   "id" : "13741b5b-a927-4472-b8da-0c30123ed6c3",

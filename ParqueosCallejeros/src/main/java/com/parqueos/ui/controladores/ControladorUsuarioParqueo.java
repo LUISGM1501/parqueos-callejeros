@@ -1,12 +1,17 @@
 package com.parqueos.ui.controladores;
 
+import java.awt.Dimension;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 import com.parqueos.modelo.multa.Multa;
@@ -42,6 +47,7 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         actualizarTablaMultas();
         actualizarComboVehiculos();
 
+        // Agregar los listeners a los botones
         vista.getBtnParquear().addActionListener(e -> parquear());
         vista.getBtnAgregarTiempo().addActionListener(e -> agregarTiempo());
         vista.getBtnDesaparcar().addActionListener(e -> desaparcar());
@@ -49,6 +55,10 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         vista.getBtnVerHistorial().addActionListener(e -> verHistorial());
         vista.getBtnVerMultas().addActionListener(e -> actualizarTablaMultas());
         vista.getBtnPagarMulta().addActionListener(e -> pagarMulta());
+
+        // Iniciar un timer para actualizar la tabla de reservas activas cada minuto
+        Timer timer = new Timer(60000, e -> actualizarTablaReservasActivas());
+        timer.start();
     }
 
     // Metodo para cargar los vehiculos del usuario
@@ -69,28 +79,81 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     // Metodo para parquear un vehiculo
     private void parquear() {
-        // Obtener la placa del vehiculo
-        String placa = (String) vista.getCmbVehiculos().getSelectedItem();
-        // Obtener el numero del espacio
-        String numeroEspacio = vista.getTxtEspacio().getText();
-        // Obtener el tiempo comprado
-        int tiempoComprado = (Integer) vista.getSpnTiempo().getValue();
-
         try {
+            // Validar que se haya seleccionado un vehículo
+            if (vista.getCmbVehiculos().getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(vista, "Debe seleccionar un vehículo");
+                return;
+            }
+
+            // Validar que se haya ingresado un espacio
+            String numeroEspacio = vista.getTxtEspacio().getText().trim();
+            if (numeroEspacio.isEmpty()) {
+                JOptionPane.showMessageDialog(vista, "Debe ingresar un número de espacio");
+                return;
+            }
+
+            // Obtener el vehículo seleccionado
+            String placa = (String) vista.getCmbVehiculos().getSelectedItem();
+            Vehiculo vehiculo = usuario.getVehiculos().stream()
+                .filter(v -> v.getPlaca().equals(placa))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Vehículo no encontrado"));
+
+            // Verificar si el vehículo ya está parqueado
+            List<Reserva> reservasActivas = sistemaParqueo.getGestorReservas().getReservas().stream()
+                .filter(r -> r.estaActiva() && r.getVehiculo().getPlaca().equals(placa))
+                .collect(Collectors.toList());
+
+            if (!reservasActivas.isEmpty()) {
+                JOptionPane.showMessageDialog(vista, 
+                    "El vehículo ya se encuentra parqueado en el espacio " + 
+                    reservasActivas.get(0).getEspacio().getNumero(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Buscar el espacio
+            EspacioParqueo espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio);
+            if (espacio == null) {
+                JOptionPane.showMessageDialog(vista, "El espacio no existe");
+                return;
+            }
+
+            if (!espacio.estaDisponible()) {
+                JOptionPane.showMessageDialog(vista, "El espacio no está disponible");
+                return;
+            }
+
+            // Obtener el tiempo
+            int tiempoComprado = (Integer) vista.getSpnTiempo().getValue();
+
             // Crear la reserva
-            Reserva reserva = sistemaParqueo.getGestorReservas().crearReserva(new Reserva(usuario, 
-                sistemaParqueo.getGestorEspacios().buscarEspacio(numeroEspacio),
-                usuario.getVehiculos().stream().filter(v -> v.getPlaca().equals(placa)).findFirst().orElseThrow(),
-                tiempoComprado));
-            // Mostrar el mensaje de confirmacion
-            JOptionPane.showMessageDialog(vista, "Parqueo exitoso. ID de reserva: " + reserva.getIdReserva());
-            // Actualizar la tabla de reservas activas
+            Reserva reserva = new Reserva(usuario, espacio, vehiculo, tiempoComprado);
+            sistemaParqueo.getGestorReservas().crearReserva(reserva);
+            
+            // Enviar notificación
+            sistemaParqueo.getGestorNotificaciones().notificarReservaCreada(reserva);
+
+            JOptionPane.showMessageDialog(vista, 
+                "Parqueo exitoso.\nEspacio: " + espacio.getNumero() + 
+                "\nTiempo: " + tiempoComprado + " minutos" +
+                "\nID Reserva: " + reserva.getIdReserva());
+
+            // Actualizar interfaces
             actualizarTablaReservasActivas();
-            // Actualizar el tiempo guardado
             actualizarTiempoGuardado();
+            
+            // Limpiar campos
+            vista.getTxtEspacio().setText("");
+            vista.getSpnTiempo().setValue(30);
+
         } catch (Exception e) {
-            // Mostrar el mensaje de error
-            JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(vista, 
+                "Error al parquear: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -122,31 +185,63 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     // Metodo para desaparcar un vehiculo
     private void desaparcar() {
-        // Obtener el id de la reserva
-        String idReserva = JOptionPane.showInputDialog(vista, "Ingrese el ID de la reserva a finalizar:");
-        
         try {
-            // Buscar la reserva
+            int filaSeleccionada = vista.getTblReservasActivas().getSelectedRow();
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(vista, 
+                    "Por favor, seleccione una reserva de la tabla para desaparcar",
+                    "Error",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String idReserva = (String) vista.getTblReservasActivas().getValueAt(filaSeleccionada, 0);
+            if (idReserva == null || idReserva.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(vista, 
+                    "Error: ID de reserva inválido",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Reserva reserva = sistemaParqueo.getGestorReservas().buscarReserva(idReserva);
-            // Verificar si la reserva pertenece al usuario
-            if (reserva != null && reserva.getUsuario().equals(usuario)) {
-                // Finalizar la reserva
-                int tiempoNoUsado = reserva.finalizarReserva();
-                // Actualizar el tiempo guardado
-                usuario.setTiempoGuardado(usuario.getTiempoGuardado() + tiempoNoUsado);
-                // Mostrar el mensaje de confirmacion
-                JOptionPane.showMessageDialog(vista, "Vehículo desaparcado exitosamente. Tiempo guardado: " + tiempoNoUsado + " minutos.");
-                // Actualizar la tabla de reservas activas
+            if (reserva == null || !reserva.estaActiva()) {
+                JOptionPane.showMessageDialog(vista, 
+                    "La reserva no está activa o ya no existe",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
                 actualizarTablaReservasActivas();
-                // Actualizar el tiempo guardado
+                return;
+            }
+
+            // Confirmar la acción
+            int confirmacion = JOptionPane.showConfirmDialog(vista,
+                "¿Está seguro que desea desaparcar el vehículo " + reserva.getVehiculo().getPlaca() + 
+                " del espacio " + reserva.getEspacio().getNumero() + "?",
+                "Confirmar Desaparcado",
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                int tiempoNoUsado = reserva.finalizarReserva();
+                usuario.setTiempoGuardado(usuario.getTiempoGuardado() + tiempoNoUsado);
+                
+                // Enviar notificación
+                sistemaParqueo.getGestorNotificaciones().notificarDesaparcado(reserva, tiempoNoUsado);
+
+                JOptionPane.showMessageDialog(vista, 
+                    "Vehículo desaparcado exitosamente.\n" +
+                    "Tiempo no usado: " + tiempoNoUsado + " minutos\n" +
+                    "Este tiempo ha sido agregado a su tiempo guardado.");
+
+                actualizarTablaReservasActivas();
                 actualizarTiempoGuardado();
-            } else {
-                // Mostrar el mensaje de error
-                JOptionPane.showMessageDialog(vista, "Reserva no encontrada o no pertenece al usuario.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            // Mostrar el mensaje de error
-            JOptionPane.showMessageDialog(vista, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(vista, 
+                "Error al desaparcar: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
@@ -166,21 +261,33 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     // Metodo para ver el historial de reservas
     private void verHistorial() {
-        // Obtener el historial de reservas
-        List<Reserva> historial = sistemaParqueo.getGestorReservas().obtenerHistorialReservas(usuario);
-        // Verificar si el historial esta vacio
-        if (historial.isEmpty()) {
-            // Mostrar el mensaje de error
-            JOptionPane.showMessageDialog(vista, "No tiene reservas en su historial.");
-        } else {
-            // Crear el modelo de la tabla
-            DefaultTableModel modelo = new DefaultTableModel();
-            // Asignar los encabezados de la tabla
-            modelo.setColumnIdentifiers(new Object[]{"ID", "Espacio", "Vehículo", "Inicio", "Fin"});
-            // Formatear la fecha y hora
+        try {
+            List<Reserva> todasLasReservas = sistemaParqueo.getGestorReservas().getReservas();
+            List<Reserva> historialReservas = todasLasReservas.stream()
+                .filter(r -> r.getUsuario().getId().equals(usuario.getId()))
+                .sorted((r1, r2) -> r2.getHoraInicio().compareTo(r1.getHoraInicio()))
+                .collect(Collectors.toList());
+
+            if (historialReservas.isEmpty()) {
+                JOptionPane.showMessageDialog(vista, "No tiene reservas en su historial.");
+                return;
+            }
+
+            DefaultTableModel modelo = new DefaultTableModel() {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+
+            modelo.addColumn("ID");
+            modelo.addColumn("Espacio");
+            modelo.addColumn("Vehículo");
+            modelo.addColumn("Inicio");
+            modelo.addColumn("Fin");
+
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            // Agregar las reservas al modelo
-            for (Reserva reserva : historial) {
+            for (Reserva reserva : historialReservas) {
                 modelo.addRow(new Object[]{
                     reserva.getIdReserva(),
                     reserva.getEspacio().getNumero(),
@@ -189,37 +296,69 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                     reserva.getHoraFin().format(formatter)
                 });
             }
-            // Crear la tabla
+
             JTable tablaHistorial = new JTable(modelo);
-            // Crear el panel de desplazamiento
             JScrollPane scrollPane = new JScrollPane(tablaHistorial);
-            // Mostrar la tabla
-            JOptionPane.showMessageDialog(vista, scrollPane, "Historial de Reservas", JOptionPane.PLAIN_MESSAGE);
+            scrollPane.setPreferredSize(new Dimension(800, 300));
+
+            JOptionPane.showMessageDialog(vista, scrollPane, 
+                "Historial de Reservas", 
+                JOptionPane.PLAIN_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(vista,
+                "Error al mostrar historial: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 
     // Metodo para actualizar la tabla de reservas activas
     private void actualizarTablaReservasActivas() {
-        // Obtener las reservas activas
-        List<Reserva> reservasActivas = usuario.getReservasActivas();
-        // Crear el modelo de la tabla
-        DefaultTableModel modelo = new DefaultTableModel();
-        // Asignar los encabezados de la tabla
-        modelo.setColumnIdentifiers(new Object[]{"ID", "Espacio", "Vehículo", "Inicio", "Fin"});
-        // Formatear la fecha y hora
+        DefaultTableModel modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        modelo.addColumn("ID Reserva");
+        modelo.addColumn("Espacio");
+        modelo.addColumn("Vehículo");
+        modelo.addColumn("Inicio");
+        modelo.addColumn("Fin");
+        modelo.addColumn("Tiempo Restante (min)");
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        // Agregar las reservas al modelo
+        LocalDateTime ahora = LocalDateTime.now();
+        
+        List<Reserva> reservasActivas = sistemaParqueo.getGestorReservas()
+            .getReservas().stream()
+            .filter(r -> r.getUsuario().getId().equals(usuario.getId()) && r.estaActiva())
+            .collect(Collectors.toList());
+
         for (Reserva reserva : reservasActivas) {
+            long minutosRestantes = ChronoUnit.MINUTES.between(ahora, reserva.getHoraFin());
+            if (minutosRestantes < 0) minutosRestantes = 0;
+            
             modelo.addRow(new Object[]{
                 reserva.getIdReserva(),
                 reserva.getEspacio().getNumero(),
                 reserva.getVehiculo().getPlaca(),
                 reserva.getHoraInicio().format(formatter),
-                reserva.getHoraFin().format(formatter)
+                reserva.getHoraFin().format(formatter),
+                minutosRestantes
             });
         }
-        // Asignar el modelo a la tabla
+        
         vista.getTblReservasActivas().setModel(modelo);
+        // Ajustar el ancho de las columnas
+        vista.getTblReservasActivas().getColumnModel().getColumn(0).setPreferredWidth(200); // ID Reserva
+        vista.getTblReservasActivas().getColumnModel().getColumn(1).setPreferredWidth(80);  // Espacio
+        vista.getTblReservasActivas().getColumnModel().getColumn(2).setPreferredWidth(100); // Vehículo
+        vista.getTblReservasActivas().getColumnModel().getColumn(3).setPreferredWidth(130); // Inicio
+        vista.getTblReservasActivas().getColumnModel().getColumn(4).setPreferredWidth(130); // Fin
+        vista.getTblReservasActivas().getColumnModel().getColumn(5).setPreferredWidth(100); // Tiempo Restante
     }
 
     // Metodo para actualizar la tabla de multas

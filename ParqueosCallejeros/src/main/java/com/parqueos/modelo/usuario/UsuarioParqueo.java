@@ -14,6 +14,7 @@ import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
+import com.parqueos.servicios.SistemaParqueo;
 
 import jakarta.persistence.PostLoad;
 
@@ -32,6 +33,8 @@ public class UsuarioParqueo extends Usuario {
     private int tiempoGuardado; // en minutos
     @JsonIgnore
     private final List<Reserva> reservasActivas;
+    @JsonIgnore
+    private SistemaParqueo sistemaParqueo;
 
     // Constructor de usuario parqueo
     public UsuarioParqueo(String nombre, String apellidos, int telefono, String email, 
@@ -156,7 +159,13 @@ public class UsuarioParqueo extends Usuario {
     
     @JsonProperty("reservasActivas")
     public List<Reserva> getReservasActivas() {
-        return new ArrayList<>(reservasActivas);
+        if (sistemaParqueo == null) {
+            inicializarSistemaParqueo();
+        }
+        return sistemaParqueo.getGestorReservas()
+            .getReservas().stream()
+            .filter(r -> r.getUsuario().getId().equals(this.getId()) && r.estaActiva())
+            .collect(Collectors.toList());
     }
 
     // Metodos
@@ -294,5 +303,10 @@ public class UsuarioParqueo extends Usuario {
         return espacios.stream()
                 .filter(EspacioParqueo::estaDisponible)
                 .collect(Collectors.toList());
+    }
+
+    @PostLoad
+    public void inicializarSistemaParqueo() {
+        this.sistemaParqueo = SistemaParqueo.getInstance();
     }
 }
