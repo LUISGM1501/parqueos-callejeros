@@ -1,13 +1,13 @@
 [ "java.util.ArrayList", [ [ "com.parqueos.modelo.vehiculo.Vehiculo", {
-  "id" : "8323c875-6a49-4c83-bfd4-5262d6b4f7e1",
-  "placa" : "ABC123",
+  "id" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+  "placa" : "ASD123",
   "marca" : "Toyota",
   "modelo" : "1995",
-  "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
 } ], [ "com.parqueos.modelo.vehiculo.Vehiculo", {
-  "id" : "8fb0102e-e01c-40a0-9d71-409528d14482",
-  "placa" : "ASD111",
-  "marca" : "Toyota",
-  "modelo" : "2000",
-  "propietarioId" : "8be097af-3f7b-4feb-93bf-4efd5b3d00a6"
+  "id" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+  "placa" : "DFG111",
+  "marca" : "Kayasaki",
+  "modelo" : "2015",
+  "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
 } ] ] ]

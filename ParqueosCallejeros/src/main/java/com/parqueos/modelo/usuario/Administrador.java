@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
@@ -13,6 +15,12 @@ import com.parqueos.reportes.Reporte;
 import com.parqueos.reportes.ReporteFactory;
 import com.parqueos.reportes.ReporteFactory.TipoReporte;
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Administrador extends Usuario {
 
     // Constructor con argumentos

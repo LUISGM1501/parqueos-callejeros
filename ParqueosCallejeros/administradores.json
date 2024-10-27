@@ -1,0 +1,12 @@
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.usuario.Administrador", {
+  "id" : "6e7e7cdb-2b06-4b40-9390-d73e070462a8",
+  "nombre" : "Samir",
+  "apellidos" : "Cabrera Tabash",
+  "telefono" : 55552222,
+  "email" : "tabash@gmail.com",
+  "direccion" : "Alajuela Centro",
+  "idUsuario" : "Samir",
+  "pin" : "1234",
+  "fechaIngreso" : "2024-10-27",
+  "tipoUsuario" : "ADMINISTRADOR"
+} ] ] ]

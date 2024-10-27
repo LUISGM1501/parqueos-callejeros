@@ -17,7 +17,11 @@ import com.parqueos.util.GestorArchivos;
 
 import jakarta.persistence.PostLoad;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Reserva implements Serializable {
     private static final long serialVersionUID = 1L;

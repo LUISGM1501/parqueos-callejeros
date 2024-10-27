@@ -5,18 +5,31 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EspacioParqueo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_ESPACIOS = "espacios.json";
 
+    @JsonProperty("id")
     private final String id;
+    @JsonProperty("numero")
     private final String numero;
+    @JsonProperty("ocupado")
     private boolean ocupado;
+    @JsonProperty("pagado")
     private boolean pagado;
+    @JsonProperty("vehiculoActual")
     private Vehiculo vehiculoActual;
 
     // Constructor del espacio de parqueo

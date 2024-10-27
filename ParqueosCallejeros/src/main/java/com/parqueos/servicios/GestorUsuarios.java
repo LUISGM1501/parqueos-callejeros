@@ -7,8 +7,9 @@ import java.util.logging.Logger;
 
 import com.parqueos.builders.AdministradorBuilder;
 import com.parqueos.builders.InspectorBuilder;
-import com.parqueos.builders.UsuarioBuilder;
 import com.parqueos.builders.UsuarioParqueoBuilder;
+import com.parqueos.modelo.usuario.Administrador;
+import com.parqueos.modelo.usuario.Inspector;
 import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
@@ -16,174 +17,75 @@ import com.parqueos.util.GestorArchivos;
 
 // Clase para gestionar los usuarios
 public class GestorUsuarios {
-    // Archivo de usuarios
-    private static final String ARCHIVO_USUARIOS = "usuarios.json";
+    // Archivos de usuarios por tipo
+    private static final String ARCHIVO_ADMINISTRADORES = "administradores.json";
+    private static final String ARCHIVO_INSPECTORES = "inspectores.json"; 
+    private static final String ARCHIVO_USUARIOS_PARQUEO = "usuarios_parqueo.json";
     private static final Logger LOGGER = Logger.getLogger(GestorUsuarios.class.getName());
     
-    private List<Usuario> usuarios;
+    private List<Administrador> administradores;
+    private List<Inspector> inspectores;
+    private List<UsuarioParqueo> usuariosParqueo;
     private final AuthService authService;
     private final GestorVehiculos gestorVehiculos;
+    private final SistemaParqueo sistemaParqueo;
 
     // Constructor para inicializar el gestor de usuarios
-    public GestorUsuarios(AuthService authService, GestorVehiculos gestorVehiculos) {
+    public GestorUsuarios(AuthService authService, GestorVehiculos gestorVehiculos, SistemaParqueo sistemaParqueo) {
         this.authService = authService;
         this.gestorVehiculos = gestorVehiculos;
-        this.usuarios = new ArrayList<>();
+        this.sistemaParqueo = sistemaParqueo;
+        this.administradores = new ArrayList<>();
+        this.inspectores = new ArrayList<>();
+        this.usuariosParqueo = new ArrayList<>();
         cargarUsuarios();
     }
 
     // Metodo para cargar los usuarios
     public void cargarUsuarios() {
         try {
-            // Cargar los usuarios del archivo json
-            usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
-            
-            if (usuarios == null) {
-                usuarios = new ArrayList<>();
+            // Cargar cada tipo de usuario por separado
+            administradores = GestorArchivos.cargarTodosLosElementos(ARCHIVO_ADMINISTRADORES, Administrador.class);
+            inspectores = GestorArchivos.cargarTodosLosElementos(ARCHIVO_INSPECTORES, Inspector.class);
+            usuariosParqueo = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS_PARQUEO, UsuarioParqueo.class);
+
+            if (administradores == null) administradores = new ArrayList<>();
+            if (inspectores == null) inspectores = new ArrayList<>();
+            if (usuariosParqueo == null) usuariosParqueo = new ArrayList<>();
+
+            // Procesar usuarios parqueo
+            for (UsuarioParqueo usuario : usuariosParqueo) {
+                List<Vehiculo> vehiculos = gestorVehiculos.obtenerVehiculosPorUsuario(usuario.getId());
+                usuario.setVehiculos(vehiculos);
+                authService.registrarUsuario(usuario);
             }
 
-            // Recorrer la lista de usuarios
-            for (Usuario usuario : usuarios) {
-                // Si el usuario es un usuario parqueo, obtener los vehiculos del usuario parqueo
-                if (usuario instanceof UsuarioParqueo) {
-                    // Obtener los vehiculos del usuario parqueo
-                    UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuario;
-                    List<Vehiculo> vehiculos = gestorVehiculos.obtenerVehiculosPorUsuario(usuarioParqueo.getId());
-                    // Asignar los vehiculos al usuario parqueo
-                    usuarioParqueo.setVehiculos(vehiculos);
-                }
-                // Registrar el usuario en el servicio de autenticacion
-                authService.registrarUsuario(usuario);
-                LOGGER.info("Usuario cargado: " + usuario.getIdUsuario());
-            }
-            // Mensaje de confirmacion
-            LOGGER.info("Total de usuarios cargados: " + usuarios.size());
+            // Registrar administradores e inspectores
+            administradores.forEach(authService::registrarUsuario);
+            inspectores.forEach(authService::registrarUsuario);
+
+            LOGGER.info("Usuarios cargados -> Administradores: " + administradores.size() + 
+                       ", Inspectores: " + inspectores.size() + 
+                       ", Usuarios Parqueo: " + usuariosParqueo.size());
+
         } catch (Exception e) {
-            // Mensaje de error
             LOGGER.log(Level.SEVERE, "Error al cargar usuarios", e);
-            // Inicializar la lista de usuarios
-            usuarios = new ArrayList<>();
+            inicializarListasVacias();
         }
     }
 
     // Metodo para crear un usuario
     public Usuario crearUsuario(String nombre, String apellidos, int telefono, String email, String direccion,
-                                String idUsuario, String pin, Usuario.TipoUsuario tipoUsuario,
-                                String numeroTarjeta, String fechaVencimiento, String codigoValidacion,
-                                String terminalId, List<Vehiculo> vehiculos) {
-        // Crear un builder para crear el usuario
-        UsuarioBuilder builder;
-        // Switch para crear el usuario segun el tipo de usuario
-        switch (tipoUsuario) {
-            case ADMINISTRADOR:
-                builder = new AdministradorBuilder();
-                break;
-            case INSPECTOR:
-                builder = new InspectorBuilder();
-                break;
-            case USUARIO_PARQUEO:
-                builder = new UsuarioParqueoBuilder();
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de usuario no válido");
-        }
-
-        // Asignar los atributos del usuario
-        builder.conNombre(nombre)
-               .conApellidos(apellidos)
-               .conTelefono(telefono)
-               .conEmail(email)
-               .conDireccion(direccion)
-               .conIdUsuario(idUsuario)
-               .conPin(pin);
-
-        Usuario nuevoUsuario;
-        // Si el usuario es un usuario parqueo, asignar los atributos del usuario parqueo
-        if (builder instanceof UsuarioParqueoBuilder) {
-            ((UsuarioParqueoBuilder) builder)
-                .conNumeroTarjeta(numeroTarjeta)
-                .conFechaVencimientoTarjeta(fechaVencimiento)
-                .conCodigoValidacionTarjeta(codigoValidacion);
-            
-            // Construir el usuario parqueo
-            UsuarioParqueo usuarioParqueo = (UsuarioParqueo) builder.construir();
-
-            // Recorrer la lista de vehiculos
-            for (Vehiculo vehiculo : vehiculos) {
-                // Asignar el propietario del vehiculo
-                vehiculo.setPropietario(usuarioParqueo);
-                // Agregar el vehiculo al gestor de vehiculos
-                gestorVehiculos.agregarVehiculo(vehiculo);
-            }
-            // Asignar los vehiculos al usuario parqueo
-            usuarioParqueo.setVehiculos(vehiculos);
-            // Asignar el nuevo usuario parqueo
-            nuevoUsuario = usuarioParqueo;
-
-        // Si el usuario es un inspector, asignar el terminal id
-        } else if (builder instanceof InspectorBuilder) {
-            ((InspectorBuilder) builder).conTerminalId(terminalId);
-            nuevoUsuario = builder.construir();
-            
-        // Si el usuario es un administrador, no asignar terminal id
-        } else {
-            nuevoUsuario = builder.construir();
-        }
-
-        // Agregar el nuevo usuario a la lista de usuarios
-        usuarios.add(nuevoUsuario);
-        // Registrar el usuario en el servicio de autenticacion
-        authService.registrarUsuario(nuevoUsuario);
-        // Guardar los usuarios
-        guardarUsuarios();
-        // Mensaje de confirmacion
-        LOGGER.info("Usuario creado: " + nuevoUsuario.getId());
-        // Retornar el nuevo usuario
-        return nuevoUsuario;
-    }
-
-    // Metodo para actualizar un usuario
-    public Usuario actualizarUsuario(String id, String nombre, String apellidos, int telefono, String email,
-                                     String direccion, String idUsuario, String pin, Usuario.TipoUsuario tipoUsuario,
-                                     String numeroTarjeta, String fechaVencimiento, String codigoValidacion,
-                                     String terminalId, List<Vehiculo> vehiculos) {
-        // Buscar y eliminar el usuario existente
-        usuarios.removeIf(u -> u.getId().equals(id));
-
-        // Crear el nuevo usuario
-        Usuario usuarioActualizado = crearUsuarioSinGuardar(nombre, apellidos, telefono, email, direccion,
-                idUsuario, pin, tipoUsuario, numeroTarjeta, fechaVencimiento, codigoValidacion,
-                terminalId, vehiculos);
+                              String idUsuario, String pin, Usuario.TipoUsuario tipoUsuario,
+                              String numeroTarjeta, String fechaVencimiento, String codigoValidacion,
+                              String terminalId, List<Vehiculo> vehiculos) {
         
-        // Asignar el ID original
-        usuarioActualizado.setId(id);
+        Usuario nuevoUsuario = null;
         
-        // Agregar el usuario actualizado
-        usuarios.add(usuarioActualizado);
-        
-        // Guardar los usuarios
-        guardarUsuarios();
-        
-        // Registrar el usuario actualizado en el AuthService
-        authService.registrarUsuario(usuarioActualizado);
-        
-        // Mensaje de confirmacion
-        LOGGER.info("Usuario actualizado: " + id);
-        // Retornar el usuario actualizado
-        return usuarioActualizado;
-    }
-
-    // Método auxiliar para crear usuario sin guardarlo
-    private Usuario crearUsuarioSinGuardar(String nombre, String apellidos, int telefono, String email,
-                                       String direccion, String idUsuario, String pin, 
-                                       Usuario.TipoUsuario tipoUsuario, String numeroTarjeta,
-                                       String fechaVencimiento, String codigoValidacion,
-                                       String terminalId, List<Vehiculo> vehiculos) {
-        Usuario usuario;
-        
-        switch (tipoUsuario) {
-            case ADMINISTRADOR:
-                usuario = new AdministradorBuilder()
+        try {
+            switch (tipoUsuario) {
+                case ADMINISTRADOR:
+                    Administrador admin = new AdministradorBuilder()
                         .conNombre(nombre)
                         .conApellidos(apellidos)
                         .conTelefono(telefono)
@@ -192,10 +94,12 @@ public class GestorUsuarios {
                         .conIdUsuario(idUsuario)
                         .conPin(pin)
                         .construir();
-                break;
-                
-            case INSPECTOR:
-                usuario = new InspectorBuilder()
+                    administradores.add(admin);
+                    nuevoUsuario = admin;
+                    break;
+                    
+                case INSPECTOR:
+                    Inspector inspector = new InspectorBuilder()
                         .conNombre(nombre)
                         .conApellidos(apellidos)
                         .conTelefono(telefono)
@@ -205,10 +109,12 @@ public class GestorUsuarios {
                         .conPin(pin)
                         .conTerminalId(terminalId)
                         .construir();
-                break;
-                
-            case USUARIO_PARQUEO:
-                UsuarioParqueo usuarioParqueo = new UsuarioParqueoBuilder()
+                    inspectores.add(inspector);
+                    nuevoUsuario = inspector;
+                    break;
+                    
+                case USUARIO_PARQUEO:
+                    UsuarioParqueo usuarioParqueo = new UsuarioParqueoBuilder()
                         .conNombre(nombre)
                         .conApellidos(apellidos)
                         .conTelefono(telefono)
@@ -220,81 +126,225 @@ public class GestorUsuarios {
                         .conFechaVencimientoTarjeta(fechaVencimiento)
                         .conCodigoValidacionTarjeta(codigoValidacion)
                         .construir();
-
-                // Asignar vehículos si existen
-                if (vehiculos != null) {
-                    for (Vehiculo vehiculo : vehiculos) {
-                        vehiculo.setPropietario(usuarioParqueo);
+                        
+                    if (vehiculos != null) {
+                        for (Vehiculo vehiculo : vehiculos) {
+                            vehiculo.setPropietario(usuarioParqueo);
+                            gestorVehiculos.agregarVehiculo(vehiculo);
+                        }
+                        usuarioParqueo.setVehiculos(new ArrayList<>(vehiculos));
                     }
-                    usuarioParqueo.setVehiculos(new ArrayList<>(vehiculos));
-                }
-                
-                usuario = usuarioParqueo;
-                break;
-                
-            default:
-                throw new IllegalArgumentException("Tipo de usuario no válido");
-        }
-        
-        return usuario;
-    }
-    
-    // Metodo para eliminar un usuario
-    public void eliminarUsuario(String id) {
-        // Buscar el usuario existente
-        Usuario usuario = buscarUsuario(id);
-
-        // Si el usuario no existe, lanzar una excepcion
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
-
-        // Si el usuario es un usuario parqueo, eliminar los vehiculos del usuario parqueo
-        if (usuario instanceof UsuarioParqueo) {
-            UsuarioParqueo usuarioParqueo = (UsuarioParqueo) usuario;
-            // Recorrer la lista de vehiculos
-            for (Vehiculo vehiculo : usuarioParqueo.getVehiculos()) {
-                // Eliminar el vehiculo del gestor de vehiculos
-                gestorVehiculos.eliminarVehiculo(vehiculo.getId());
+                    
+                    usuariosParqueo.add(usuarioParqueo);
+                    nuevoUsuario = usuarioParqueo;
+                    break;
             }
-        }
-        
-        // Eliminar el usuario de la lista de usuarios
-        boolean removido = usuarios.removeIf(u -> u.getId().equals(id));
-
-        // Si se elimino el usuario, guardar los usuarios
-        if (removido) {
+            
             guardarUsuarios();
-            LOGGER.info("Usuario eliminado: " + id);
-        } else {
-            // Mensaje de error
-            LOGGER.warning("No se pudo eliminar el usuario: " + id);
+            authService.registrarUsuario(nuevoUsuario);
+            LOGGER.info("Usuario creado: " + nuevoUsuario.getId());
+            return nuevoUsuario;
+            
+        } catch (Exception e) {
+            LOGGER.severe("Error al crear usuario: " + e.getMessage());
+            throw new RuntimeException("Error al crear usuario", e);
         }
     }
 
     // Metodo para guardar los usuarios
     private void guardarUsuarios() {
         try {
-            // Guardar los usuarios en el archivo json
-            GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
+            GestorArchivos.guardarTodo(administradores, ARCHIVO_ADMINISTRADORES);
+            GestorArchivos.guardarTodo(inspectores, ARCHIVO_INSPECTORES);
+            GestorArchivos.guardarTodo(usuariosParqueo, ARCHIVO_USUARIOS_PARQUEO);
             LOGGER.info("Usuarios guardados exitosamente");
         } catch (Exception e) {
-            // Mensaje de error
             LOGGER.log(Level.SEVERE, "Error al guardar usuarios", e);
         }
     }
 
-    // Metodo para obtener los usuarios
+    // Metodo para eliminar un usuario
+    public void eliminarUsuario(String id) {
+        try {
+            // Eliminar de cada lista según corresponda
+            administradores.removeIf(a -> a.getId().equals(id));
+            inspectores.removeIf(i -> i.getId().equals(id));
+            
+            // Manejo especial para usuarios parqueo
+            usuariosParqueo.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .ifPresent(usuario -> {
+                    // Eliminar vehículos asociados
+                    usuario.getVehiculos().forEach(v -> 
+                        gestorVehiculos.eliminarVehiculo(v.getId())
+                    );
+                });
+            
+            usuariosParqueo.removeIf(u -> u.getId().equals(id));
+            
+            guardarUsuarios();
+            LOGGER.info("Usuario eliminado: " + id);
+        } catch (Exception e) {
+            LOGGER.severe("Error al eliminar usuario: " + e.getMessage());
+            throw new RuntimeException("Error al eliminar usuario", e);
+        }
+    }
+
+    // Metodo para actualizar un usuario
+    public Usuario actualizarUsuario(String id, String nombre, String apellidos, int telefono, 
+                               String email, String direccion, String idUsuario, String pin,
+                               Usuario.TipoUsuario tipoUsuario, String numeroTarjeta,
+                               String fechaVencimiento, String codigoValidacion,
+                               String terminalId, List<Vehiculo> vehiculos) {
+    
+    try {
+        // Buscar y remover el usuario existente de todas las listas
+        Usuario usuarioExistente = null;
+        
+        // Buscar en administradores
+        usuarioExistente = administradores.stream()
+            .filter(a -> a.getId().equals(id))
+            .findFirst()
+            .orElse(null);
+        if (usuarioExistente != null) {
+            administradores.removeIf(a -> a.getId().equals(id));
+        }
+        
+        // Buscar en inspectores
+        if (usuarioExistente == null) {
+            usuarioExistente = inspectores.stream()
+                .filter(i -> i.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+            if (usuarioExistente != null) {
+                inspectores.removeIf(i -> i.getId().equals(id));
+            }
+        }
+        
+        // Buscar en usuarios parqueo
+        if (usuarioExistente == null) {
+            usuarioExistente = usuariosParqueo.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+            if (usuarioExistente != null) {
+                usuariosParqueo.removeIf(u -> u.getId().equals(id));
+            }
+        }
+
+        if (usuarioExistente == null) {
+            throw new IllegalArgumentException("Usuario no encontrado con ID: " + id);
+        }
+
+        // Crear el usuario actualizado manteniendo el mismo ID
+        Usuario usuarioActualizado;
+        switch (tipoUsuario) {
+            case ADMINISTRADOR:
+                Administrador admin = new AdministradorBuilder()
+                    .conNombre(nombre)
+                    .conApellidos(apellidos)
+                    .conTelefono(telefono)
+                    .conEmail(email)
+                    .conDireccion(direccion)
+                    .conIdUsuario(idUsuario)
+                    .conPin(pin)
+                    .construir();
+                admin.setId(id); // Mantener el mismo ID
+                administradores.add(admin);
+                usuarioActualizado = admin;
+                break;
+
+            case INSPECTOR:
+                Inspector inspector = new InspectorBuilder()
+                    .conNombre(nombre)
+                    .conApellidos(apellidos)
+                    .conTelefono(telefono)
+                    .conEmail(email)
+                    .conDireccion(direccion)
+                    .conIdUsuario(idUsuario)
+                    .conPin(pin)
+                    .conTerminalId(terminalId)
+                    .construir();
+                inspector.setId(id); // Mantener el mismo ID
+                inspectores.add(inspector);
+                usuarioActualizado = inspector;
+                break;
+
+            case USUARIO_PARQUEO:
+                UsuarioParqueo usuarioParqueo = new UsuarioParqueoBuilder()
+                    .conNombre(nombre)
+                    .conApellidos(apellidos)
+                    .conTelefono(telefono)
+                    .conEmail(email)
+                    .conDireccion(direccion)
+                    .conIdUsuario(idUsuario)
+                    .conPin(pin)
+                    .conNumeroTarjeta(numeroTarjeta)
+                    .conFechaVencimientoTarjeta(fechaVencimiento)
+                    .conCodigoValidacionTarjeta(codigoValidacion)
+                    .construir();
+                usuarioParqueo.setId(id); // Mantener el mismo ID
+
+                // Actualizar vehículos
+                if (vehiculos != null) {
+                    // Eliminar los vehículos antiguos
+                    List<Vehiculo> vehiculosAntiguos = gestorVehiculos.obtenerVehiculosPorUsuario(id);
+                    for (Vehiculo vehiculo : vehiculosAntiguos) {
+                        gestorVehiculos.eliminarVehiculo(vehiculo.getId());
+                    }
+
+                    // Agregar los nuevos vehículos
+                    for (Vehiculo vehiculo : vehiculos) {
+                        vehiculo.setPropietario(usuarioParqueo);
+                        vehiculo.setPropietarioId(usuarioParqueo.getId());
+                        gestorVehiculos.agregarVehiculo(vehiculo);
+                    }
+                    usuarioParqueo.setVehiculos(new ArrayList<>(vehiculos));
+                }
+
+                usuariosParqueo.add(usuarioParqueo);
+                usuarioActualizado = usuarioParqueo;
+                break;
+
+            default:
+                throw new IllegalArgumentException("Tipo de usuario no válido");
+        }
+
+        // Guardar los cambios en los archivos
+        guardarUsuarios();
+
+        // Actualizar el usuario en el servicio de autenticación
+        authService.registrarUsuario(usuarioActualizado);
+
+        // Enviar notificación de actualización
+        sistemaParqueo.getGestorNotificaciones().enviarNotificacion(
+            usuarioActualizado.getEmail(),
+            "Actualización de datos",
+            "Sus datos han sido actualizados exitosamente."
+        );
+
+        LOGGER.info("Usuario actualizado exitosamente: " + id);
+        return usuarioActualizado;
+
+    } catch (Exception e) {
+        LOGGER.log(Level.SEVERE, "Error al actualizar usuario", e);
+        throw new RuntimeException("Error al actualizar usuario: " + e.getMessage(), e);
+    }
+}
+
+    // Metodo para obtener todos los usuarios
     public List<Usuario> getUsuarios() {
-        // Retornar una copia de la lista de usuarios
-        return new ArrayList<>(usuarios);
+        List<Usuario> todosLosUsuarios = new ArrayList<>();
+        todosLosUsuarios.addAll(administradores);
+        todosLosUsuarios.addAll(inspectores);
+        todosLosUsuarios.addAll(usuariosParqueo);
+        return todosLosUsuarios;
     }
 
     // Metodo para buscar un usuario por id
     public Usuario buscarUsuario(String id) {
-        // Buscar el usuario en la lista de usuarios
-        return usuarios.stream()
-            // Filtrar el usuario por id
+        return getUsuarios().stream()
             .filter(u -> u.getId().equals(id))
             .findFirst()
             .orElse(null);
@@ -302,17 +352,24 @@ public class GestorUsuarios {
 
     // Metodo para buscar usuarios por tipo
     public List<Usuario> buscarUsuariosPorTipo(Usuario.TipoUsuario tipo) {
-        // Retornar una lista de usuarios filtrados por tipo
-        return usuarios.stream()
-            // Filtrar el usuario por tipo
-            .filter(u -> u.getTipoUsuario() == tipo)
-            .collect(java.util.stream.Collectors.toList());
+        switch (tipo) {
+            case ADMINISTRADOR:
+                return new ArrayList<>(administradores);
+            case INSPECTOR:
+                return new ArrayList<>(inspectores);
+            case USUARIO_PARQUEO:
+                return new ArrayList<>(usuariosParqueo);
+            default:
+                return new ArrayList<>();
+        }
     }
 
-    // Metodo para inicializar la lista de usuarios
-    public void inicializarListaVacia() {
-        // Se usa para inicializar la lista de usuarios en caso de que no se pueda cargar del archivo json
-        this.usuarios = new ArrayList<>();
-        LOGGER.info("Lista de usuarios inicializada vacía");
+
+    // Metodo para inicializar las listas vacías
+    private void inicializarListasVacias() {
+        this.administradores = new ArrayList<>();
+        this.inspectores = new ArrayList<>();
+        this.usuariosParqueo = new ArrayList<>();
+        LOGGER.info("Listas de usuarios inicializadas vacías");
     }
 }

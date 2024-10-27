@@ -18,7 +18,11 @@ import com.parqueos.servicios.SistemaParqueo;
 
 import jakarta.persistence.PostLoad;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsuarioParqueo extends Usuario {
     @JsonProperty("numeroTarjeta")

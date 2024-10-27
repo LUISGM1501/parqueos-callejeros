@@ -51,3 +51,6 @@ build/
 
 ### Archivos pdf ###
 *.pdf
+
+### Backups ###
+*.bak 

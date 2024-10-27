@@ -29,7 +29,7 @@ public class SistemaParqueo {
         this.gestorEspacios = new GestorEspacios();
         this.gestorReportes = new GestorReportes();
         this.gestorVehiculos = new GestorVehiculos();
-        this.gestorUsuarios = new GestorUsuarios(authService, gestorVehiculos);
+        this.gestorUsuarios = new GestorUsuarios(authService, gestorVehiculos, this);
         cargarDatos();
     }
 

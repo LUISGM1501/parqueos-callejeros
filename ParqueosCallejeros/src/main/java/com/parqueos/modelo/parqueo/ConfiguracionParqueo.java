@@ -5,21 +5,44 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.util.GestorArchivos;
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConfiguracionParqueo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_CONFIGURACION = "configuracion.json";
     
     private static ConfiguracionParqueo instancia;
+    
+    @JsonProperty("horarioInicio")
     private LocalTime horarioInicio;
+    
+    @JsonProperty("horarioFin")
     private LocalTime horarioFin;
+    
+    @JsonProperty("precioHora") 
     private int precioHora;
+    
+    @JsonProperty("tiempoMinimo")
     private int tiempoMinimo;
+    
+    @JsonProperty("costoMulta")
     private int costoMulta;
+    
+    @JsonProperty("espacios")
     private final List<EspacioParqueo> espacios;
 
     // Constructor de la configuracion del parqueo
+    @JsonCreator
     private ConfiguracionParqueo() {
         // Valores por defecto
         this.horarioInicio = LocalTime.of(8, 0);

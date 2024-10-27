@@ -12,7 +12,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.util.GestorArchivos;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;

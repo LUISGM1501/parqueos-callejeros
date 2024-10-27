@@ -5,21 +5,43 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.usuario.Inspector;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Multa implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_MULTAS = "multas.json";
     
+    @JsonProperty("idMulta")
     private final String idMulta;
+    
+    @JsonProperty("vehiculo")
     private final Vehiculo vehiculo;
+    
+    @JsonProperty("espacio")
     private final EspacioParqueo espacio;
+    
+    @JsonProperty("inspector")
     private final Inspector inspector;
+    
+    @JsonProperty("fechaHora")
     private final LocalDateTime fechaHora;
+    
+    @JsonProperty("monto")
     private double monto;
+    
+    @JsonProperty("pagada")
     private boolean pagada;
 
     // Constructor de la multa

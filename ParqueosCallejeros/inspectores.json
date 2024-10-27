@@ -1,0 +1,13 @@
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.usuario.Inspector", {
+  "id" : "3d198213-00e8-4c3f-b307-a53ce99fe3f1",
+  "nombre" : "Pamela",
+  "apellidos" : "Morataya Sandoval",
+  "telefono" : 88885555,
+  "email" : "morataya@gmail.com",
+  "direccion" : "Guanacaste",
+  "idUsuario" : "Pamela",
+  "pin" : "1234",
+  "fechaIngreso" : "2024-10-27",
+  "tipoUsuario" : "INSPECTOR",
+  "terminalId" : "123123"
+} ] ] ]
