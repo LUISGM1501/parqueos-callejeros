@@ -10,4 +10,10 @@
   "marca" : "Kayasaki",
   "modelo" : "2015",
   "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
+} ], [ "com.parqueos.modelo.vehiculo.Vehiculo", {
+  "id" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+  "placa" : "LKJ222",
+  "marca" : "No se",
+  "modelo" : "2052",
+  "propietarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f"
 } ] ] ]

@@ -1,22 +1,45 @@
 package com.parqueos.reportes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.multa.Multa;
 
 // ReporteMultas implementa la interface Reporte
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReporteMultas implements Reporte {
-    // Atributos para la fecha de inicio, fecha de fin y las multas
+    @JsonProperty("fechaInicio")
     private final LocalDate fechaInicio;
+    
+    @JsonProperty("fechaFin")
     private final LocalDate fechaFin;
+    
+    @JsonProperty("multas")
     private final List<Multa> multas;
 
     // Constructor para el reporte de multas
     public ReporteMultas(LocalDate fechaInicio, LocalDate fechaFin, List<Multa> multas) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.multas = multas;
+        this.multas = multas != null ? multas : new ArrayList<>();
+    }
+
+    // Constructor sin argumentos para Jackson
+    @JsonCreator
+    public ReporteMultas() {
+        this.fechaInicio = LocalDate.now();
+        this.fechaFin = LocalDate.now();
+        this.multas = new ArrayList<>();
     }
 
     // Metodo para generar un reporte de multas
@@ -48,4 +71,14 @@ public class ReporteMultas implements Reporte {
         // Retornar el reporte
         return sb.toString();
     }
+
+    // Getters para Jackson
+    @JsonProperty("fechaInicio")
+    public LocalDate getFechaInicio() { return fechaInicio; }
+
+    @JsonProperty("fechaFin")
+    public LocalDate getFechaFin() { return fechaFin; }
+
+    @JsonProperty("multas")
+    public List<Multa> getMultas() { return multas; }
 }

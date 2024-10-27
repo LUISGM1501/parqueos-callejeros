@@ -9,4 +9,15 @@
   "pin" : "1234",
   "fechaIngreso" : "2024-10-27",
   "tipoUsuario" : "ADMINISTRADOR"
+} ], [ "com.parqueos.modelo.usuario.Administrador", {
+  "id" : "cd10f5c8-22b5-455e-999d-740a62670692",
+  "nombre" : "Administrador",
+  "apellidos" : "General",
+  "telefono" : 22221111,
+  "email" : "admingeneral@gmail.com",
+  "direccion" : "No se que aja ",
+  "idUsuario" : "AdminG",
+  "pin" : "1234",
+  "fechaIngreso" : "2024-10-27",
+  "tipoUsuario" : "ADMINISTRADOR"
 } ] ] ]

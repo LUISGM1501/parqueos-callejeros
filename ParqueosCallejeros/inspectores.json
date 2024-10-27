@@ -10,4 +10,16 @@
   "fechaIngreso" : "2024-10-27",
   "tipoUsuario" : "INSPECTOR",
   "terminalId" : "123123"
+} ], [ "com.parqueos.modelo.usuario.Inspector", {
+  "id" : "d5cb687d-9d00-4b99-9ba7-ff0993c3cc67",
+  "nombre" : "Inspector",
+  "apellidos" : "General",
+  "telefono" : 22225555,
+  "email" : "InspecGeneral@gmail.com",
+  "direccion" : "no se xdxdxd",
+  "idUsuario" : "InspecG",
+  "pin" : "1234",
+  "fechaIngreso" : "2024-10-27",
+  "tipoUsuario" : "INSPECTOR",
+  "terminalId" : "123456"
 } ] ] ]

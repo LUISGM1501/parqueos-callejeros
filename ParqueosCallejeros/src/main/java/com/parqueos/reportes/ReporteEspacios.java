@@ -1,17 +1,35 @@
 package com.parqueos.reportes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;  
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 
-// ResporteEspacios implementa la interface Reporte
+// ReporteEspacios implementa la interface Reporte
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReporteEspacios implements Reporte {
+    @JsonProperty("espacios")
     private final List<EspacioParqueo> espacios;
 
     // Constructor para el reporte de espacios de parqueo
     public ReporteEspacios(List<EspacioParqueo> espacios) {
-        this.espacios = espacios;
+        this.espacios = espacios != null ? espacios : new ArrayList<>();
+    }
+
+    // Constructor sin argumentos para Jackson
+    @JsonCreator
+    public ReporteEspacios() {
+        this.espacios = new ArrayList<>();
     }
 
     // Metodo para generar un reporte de los espacios de parqueo
@@ -71,5 +89,11 @@ public class ReporteEspacios implements Reporte {
 
         // Retornar el reporte
         return sb.toString();
+    }
+
+    // Getter para Jackson
+    @JsonProperty("espacios")
+    public List<EspacioParqueo> getEspacios() {
+        return espacios;
     }
 }

@@ -29,4 +29,28 @@
   } ] ],
   "tiempoGuardado" : 0,
   "reservasActivas" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.modelo.usuario.UsuarioParqueo", {
+  "id" : "ed32bd95-4d53-48ab-a95a-86f6037df37f",
+  "nombre" : "Javier",
+  "apellidos" : "Urbina Salazar",
+  "telefono" : 99996666,
+  "email" : "javier@gmail.com",
+  "direccion" : "Jaco Garabito",
+  "idUsuario" : "Josh",
+  "pin" : "1234",
+  "fechaIngreso" : "2024-10-27",
+  "tipoUsuario" : "USUARIO_PARQUEO",
+  "numeroTarjeta" : "2222555588884444",
+  "fechaVencimientoTarjeta" : "0202",
+  "codigoValidacionTarjeta" : "222",
+  "vehiculos" : [ "java.util.ArrayList", [ {
+    "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+    "id" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+    "placa" : "LKJ222",
+    "marca" : "No se",
+    "modelo" : "2052",
+    "propietarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f"
+  } ] ],
+  "tiempoGuardado" : 0,
+  "reservasActivas" : [ "java.util.ArrayList", [ ] ]
 } ] ] ]

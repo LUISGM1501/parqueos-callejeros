@@ -2,23 +2,47 @@ package com.parqueos.reportes;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.parqueo.Reserva;
 
 // ReporteHistorial implementa la interface Reporte
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReporteHistorial implements Reporte {
+    @JsonProperty("fechaInicio")
     private final LocalDate fechaInicio;
+    
+    @JsonProperty("fechaFin") 
     private final LocalDate fechaFin;
+    
+    @JsonProperty("reservas")
     private final List<Reserva> reservas;
 
     // Constructor para el reporte de historial
     public ReporteHistorial(LocalDate fechaInicio, LocalDate fechaFin, List<Reserva> reservas) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.reservas = reservas;
+        this.reservas = reservas != null ? reservas : new ArrayList<>();
+    }
+
+    // Constructor sin argumentos para Jackson
+    @JsonCreator
+    public ReporteHistorial() {
+        this.fechaInicio = LocalDate.now();
+        this.fechaFin = LocalDate.now();
+        this.reservas = new ArrayList<>();
     }
 
     // Metodo para generar un reporte de historial
@@ -67,4 +91,14 @@ public class ReporteHistorial implements Reporte {
         // Retornar el reporte
         return sb.toString();
     }
+
+    // Getters para Jackson
+    @JsonProperty("fechaInicio")
+    public LocalDate getFechaInicio() { return fechaInicio; }
+
+    @JsonProperty("fechaFin")
+    public LocalDate getFechaFin() { return fechaFin; }
+
+    @JsonProperty("reservas") 
+    public List<Reserva> getReservas() { return reservas; }
 }

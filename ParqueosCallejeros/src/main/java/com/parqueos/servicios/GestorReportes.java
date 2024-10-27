@@ -1,14 +1,17 @@
 package com.parqueos.servicios;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.parqueos.modelo.multa.Multa;
+import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.reportes.Reporte;
 import com.parqueos.reportes.ReporteFactory;
+import com.parqueos.reportes.ReporteIngresos;
 import com.parqueos.util.GestorArchivos;
 
 // Clase para gestionar los reportes
@@ -30,11 +33,26 @@ public class GestorReportes {
 
     // Metodo para generar un reporte de ingresos
     public Reporte generarReporteIngresos(LocalDate fechaInicio, LocalDate fechaFin, List<Reserva> reservas) {
-        // Crear un reporte de ingresos
-        Reporte reporte = ReporteFactory.crearReporte(ReporteFactory.TipoReporte.INGRESOS, fechaInicio, fechaFin, null, reservas, null, null);
-        // Guardar el reporte
+        List<Double> ingresosPorDia = new ArrayList<>();
+        
+        // Calcular los ingresos por día
+        LocalDate fecha = fechaInicio;
+        while (!fecha.isAfter(fechaFin)) {
+            final LocalDate fechaActual = fecha;
+            double ingresoDia = reservas.stream()
+                .filter(r -> r.getHoraInicio().toLocalDate().equals(fechaActual))
+                .mapToDouble(r -> {
+                    long minutos = ChronoUnit.MINUTES.between(r.getHoraInicio(), r.getHoraFin());
+                    return (minutos / 60.0) * ConfiguracionParqueo.obtenerInstancia().getPrecioHora();
+                })
+                .sum();
+            
+            ingresosPorDia.add(ingresoDia);
+            fecha = fecha.plusDays(1);
+        }
+        
+        ReporteIngresos reporte = new ReporteIngresos(fechaInicio, fechaFin, ingresosPorDia);
         guardarReporte(reporte);
-        // Retornar el reporte
         return reporte;
     }
 

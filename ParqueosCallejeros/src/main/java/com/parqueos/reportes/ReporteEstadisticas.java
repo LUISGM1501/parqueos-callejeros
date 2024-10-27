@@ -4,24 +4,51 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 
 // ReporteEstadisticas implementa la interface Reporte
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.CLASS,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "@class"
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReporteEstadisticas implements Reporte {
+    @JsonProperty("fechaInicio")
     private final LocalDate fechaInicio;
+    
+    @JsonProperty("fechaFin")
     private final LocalDate fechaFin;
+    
+    @JsonProperty("espacios")
     private final List<EspacioParqueo> espacios;
+    
+    @JsonProperty("reservas")
     private final List<Reserva> reservas;
 
     // Constructor para el reporte de estadisticas
     public ReporteEstadisticas(LocalDate fechaInicio, LocalDate fechaFin, List<EspacioParqueo> espacios, List<Reserva> reservas) {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
-        this.espacios = espacios;
-        this.reservas = reservas;
+        this.espacios = espacios != null ? espacios : new ArrayList<>();
+        this.reservas = reservas != null ? reservas : new ArrayList<>();
+    }
+
+    // Constructor sin argumentos para Jackson
+    @JsonCreator
+    public ReporteEstadisticas() {
+        this.fechaInicio = LocalDate.now();
+        this.fechaFin = LocalDate.now();
+        this.espacios = new ArrayList<>();
+        this.reservas = new ArrayList<>();
     }
 
     // Metodo para generar un reporte de estadisticas
@@ -94,4 +121,17 @@ public class ReporteEstadisticas implements Reporte {
         // Retornar el reporte
         return sb.toString();
     }
+
+    // Getters para Jackson
+    @JsonProperty("fechaInicio")
+    public LocalDate getFechaInicio() { return fechaInicio; }
+
+    @JsonProperty("fechaFin")
+    public LocalDate getFechaFin() { return fechaFin; }
+
+    @JsonProperty("espacios")
+    public List<EspacioParqueo> getEspacios() { return espacios; }
+
+    @JsonProperty("reservas")
+    public List<Reserva> getReservas() { return reservas; }
 }

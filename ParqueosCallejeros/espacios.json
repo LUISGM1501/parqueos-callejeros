@@ -1,105 +1,105 @@
 [ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "978c2ecf-20b0-4168-9acf-399b356663f1",
-  "numero" : "010", 
-  "pagado" : false,
-  "vehiculoActual" : null,
-  "estaDisponible" : true
-} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "e461ccd5-6e28-49cf-b90d-abba95e326c7",
-  "numero" : "011",
-  "pagado" : false,
-  "vehiculoActual" : null,
-  "estaDisponible" : true
-} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "1c259e00-2fe2-4f11-a357-5db0c7d4023d",
+  "id" : "7fffe999-c774-4d97-a52e-a08832a78065",
   "numero" : "001",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "a03b3ed1-311c-45a6-aca8-2843b8ae64c3",
+  "id" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
   "numero" : "002",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "0b704f4c-d172-4352-ad89-de97acaccfaa",
+  "id" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
   "numero" : "003",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "14740b7e-05d6-4fdb-b25b-1a38b7a55b5c",
+  "id" : "3b3d6c0d-158d-40e8-89b8-959846bc645d",
   "numero" : "004",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "667d28f3-67bc-4d0d-86e5-e519d77b88a8",
+  "id" : "d6a9e487-c732-45c0-9659-eacfd9857ea1",
   "numero" : "005",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "c9d511bb-3d3c-411d-9dbe-edec67135fd0",
+  "id" : "02737f20-b2a3-4425-aaa3-17faf610c863",
   "numero" : "006",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "63b1e14a-6eca-4457-8ecf-80366937fc7e",
+  "id" : "673c408b-0cbb-4646-bc45-e49fd1c17ef4",
   "numero" : "007",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "e6327026-bf8e-4a89-b598-0c641474a282",
+  "id" : "2f028cd9-0c84-40de-a217-38670c59e8a4",
   "numero" : "008",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "6abb4e58-c974-413a-9ea1-a298d89cf4ff",
+  "id" : "d98f64f4-258d-4c0c-8482-588b6bf31646",
   "numero" : "009",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "47dfde46-47bf-4701-b915-468cd11284c9",
+  "numero" : "010",
   "ocupado" : false,
-  "id" : "d9b5b316-d3d5-4d86-ae7d-21fffb86aa3b",
+  "pagado" : false,
+  "vehiculoActual" : null,
+  "estaDisponible" : true
+} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "5726d444-e037-4e6e-a0f8-82097a7b9301",
+  "numero" : "011",
+  "ocupado" : false,
+  "pagado" : false,
+  "vehiculoActual" : null,
+  "estaDisponible" : true
+} ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
+  "id" : "aa201180-347b-442f-88f2-a5b8bb703e37",
   "numero" : "012",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "d556b981-15f1-402f-b904-31dbd7f7ebb1",
+  "id" : "e0cc7fa0-acfe-48e1-8962-29717dddfeae",
   "numero" : "013",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "ed725bd8-0458-499f-972f-3a454c245f64",
+  "id" : "b4970302-d5dd-4999-bb2d-29341d82b0bd",
   "numero" : "014",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
 } ], [ "com.parqueos.modelo.parqueo.EspacioParqueo", {
-  "ocupado" : false,
-  "id" : "91880fed-ecf6-4feb-867a-89a03266d6ca",
+  "id" : "da086fa2-fd12-42c4-8760-d9b9ee5b1795",
   "numero" : "015",
+  "ocupado" : false,
   "pagado" : false,
   "vehiculoActual" : null,
   "estaDisponible" : true
