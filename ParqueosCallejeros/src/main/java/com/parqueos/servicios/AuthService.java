@@ -44,33 +44,7 @@ public class AuthService {
             .conPin("1234")
             .construir();
 
-        UsuarioParqueo usuario = new UsuarioParqueoBuilder()
-            .conNombre("Usuario")
-            .conApellidos("Usuario")
-            .conTelefono(87654321)
-            .conEmail("usuario@example.com")
-            .conDireccion("Dirección Usuario")
-            .conIdUsuario("user")
-            .conPin("1234")
-            .conNumeroTarjeta("1234567890123456")
-            .conFechaVencimientoTarjeta("12/25")
-            .conCodigoValidacionTarjeta("123")
-            .construir();
-
-        Inspector inspector = new InspectorBuilder()
-            .conNombre("Inspector")
-            .conApellidos("Inspector")
-            .conTelefono(13579246)
-            .conEmail("inspector@example.com")
-            .conDireccion("Dirección Inspector")
-            .conIdUsuario("inspector")
-            .conPin("1234")
-            .conTerminalId("INS001")
-            .construir();
-
         registrarUsuario(admin);
-        registrarUsuario(usuario);
-        registrarUsuario(inspector);
 
         System.out.println("Usuarios de prueba agregados:");
         for (Usuario u : usuarios.values()) {

@@ -48,16 +48,17 @@ public class ReporteMultas implements Reporte {
         // Crear un StringBuilder para construir el reporte
         StringBuilder sb = new StringBuilder();
         sb.append("Reporte de Multas\n");
-        sb.append("Desde: ").append(this.fechaInicio).append(" Hasta: ").append(this.fechaFin).append("\n\n");
+        sb.append("Desde: ").append(fechaInicio).append(" Hasta: ").append(fechaFin).append("\n\n");
 
         double total = 0;
         for (Multa multa : multas) {
             // Filtrar las multas que estan dentro del rango de fechas de inicio y fin
-            if (!multa.getFechaHora().toLocalDate().isBefore(this.fechaInicio) && !multa.getFechaHora().toLocalDate().isAfter(this.fechaFin)) {
+            if (!multa.getFechaHora().toLocalDate().isBefore(fechaInicio) && 
+                !multa.getFechaHora().toLocalDate().isAfter(fechaFin)) {
                 // Agregar la fecha, la placa, el monto y una linea de separacion
                 sb.append(multa.getFechaHora().toLocalDate())
                   .append(": Placa: ").append(multa.getVehiculo().getPlaca())
-                  .append(", Monto: $").append(String.format("%.2f", multa.getMonto()))
+                  .append(", Monto: ₡").append(multa.getMonto())
                   .append("\n");
 
                 // Sumar el monto de la multa al total
@@ -66,7 +67,7 @@ public class ReporteMultas implements Reporte {
         }
 
         // Agregar el total de multas al reporte
-        sb.append("\nTotal de multas: $").append(String.format("%.2f", total));
+        sb.append("\nTotal de multas: ₡").append(String.format("%d", (int)total));
 
         // Retornar el reporte
         return sb.toString();

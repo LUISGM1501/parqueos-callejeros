@@ -160,7 +160,7 @@ public class ControladorInspector extends ControladorBase {
             Multa multa = inspector.generarMulta(espacio, costoMulta);
             sistemaParqueo.getGestorMultas().agregarMulta(multa);
             System.out.println("Multa creada con ID: " + multa.getIdMulta());
-            
+
             multa.guardar();
             System.out.println("Multa guardada exitosamente");
 
@@ -172,12 +172,15 @@ public class ControladorInspector extends ControladorBase {
                 System.out.println("No se pudo notificar: vehículo o propietario no registrado");
             }
 
-            JOptionPane.showMessageDialog(vista, 
-                String.format("Multa generada con éxito.\nMonto base: ₡%d\nMonto total: ₡%d", 
-                    costoMulta,
-                    multa.getMonto()),
-                "Multa Generada",
-                JOptionPane.INFORMATION_MESSAGE);
+            String mensaje = String.format(
+                "Multa generada con éxito.\n" +
+                "Monto base: ₡%d\n" +
+                "Monto total: ₡%d",
+                costoMulta,
+                multa.getMonto()
+            );
+
+            JOptionPane.showMessageDialog(vista, mensaje, "Multa Generada", JOptionPane.INFORMATION_MESSAGE);
 
             // Limpiar campos y actualizar vista
             vista.getTxtEspacio().setText("");
@@ -240,53 +243,62 @@ public class ControladorInspector extends ControladorBase {
 
     // Metodo para actualizar la tabla de multas
     private void actualizarTablaMultas() {
-        // Crear el modelo de la tabla 
-        DefaultTableModel modelo = new DefaultTableModel(
-            // Crear las columnas
-            new String[]{"ID", "Esp.", "Placa", "Fecha", "Mont. Base", "Mont. Total", "Est.", "Propietario"},
-            // Crear las filas
-            0
-        );
+        try {
+            // Crear el modelo de la tabla que no permite edición
+            DefaultTableModel modelo = new DefaultTableModel() {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
 
-        // Crear el formateador de fecha
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            // Establecer los nombres de las columnas
+            modelo.setColumnIdentifiers(new Object[]{
+                "ID", "Esp.", "Placa", "Fecha", "Mont. Base", "Mont. Total", "Est.", "Propietario"
+            });
 
-        // Obtener las multas del gestor de multas
-        List<Multa> multas = sistemaParqueo.getGestorMultas().getMultas().stream()
-            // Filtrar las multas por el inspector
-            .filter(m -> m.getInspector().getId().equals(inspector.getId()))
-            // Ordenar las multas por fecha
-            .sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora()))
-            // Convertir a lista
-            .collect(Collectors.toList());
+            // Obtener las multas del gestor de multas
+            List<Multa> multas = sistemaParqueo.getGestorMultas().getMultas();
+            
+            if (multas != null) {
+                // Crear el formateador de fecha
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                
+                // Iterar sobre las multas
+                for (Multa multa : multas) {
+                    // Filtrar las multas por el inspector
+                    if (multa.getInspector().getId().equals(inspector.getId())) {
+                        String propietario = "No registrado";
+                        // Verificar si el vehículo tiene un propietario
+                        if (multa.getVehiculo().getPropietario() != null) {
+                            UsuarioParqueo usuario = multa.getVehiculo().getPropietario();
+                            propietario = usuario.getNombre() + " " + usuario.getApellidos();
+                        }
 
-        // Iterar sobre las multas
-        for (Multa multa : multas) {
-            String propietario = "No registrado";
-            // Verificar si el vehículo tiene un propietario
-            if (multa.getVehiculo() != null && multa.getVehiculo().getPropietarioId() != null) {
-                // Buscar el propietario en el sistema
-                UsuarioParqueo prop = (UsuarioParqueo) Usuario.cargar(multa.getVehiculo().getPropietarioId());
-                // Verificar si el propietario existe
-                if (prop != null) {
-                    propietario = prop.getNombre() + " " + prop.getApellidos();
+                        // Agregar la fila a la tabla
+                        modelo.addRow(new Object[]{
+                            multa.getIdMulta(),
+                            multa.getEspacio().getNumero(),
+                            multa.getVehiculo().getPlaca(),
+                            multa.getFechaHora().format(formatter),
+                            String.format("₡%d", ConfiguracionParqueo.obtenerInstancia().getCostoMulta()),
+                            String.format("₡%d", multa.getMonto()),
+                            multa.getPagada() ? "Pagada" : "Pendiente",
+                            propietario
+                        });
+                    }
                 }
             }
 
-            // Agregar la fila a la tabla
-            modelo.addRow(new Object[]{
-                multa.getIdMulta(),
-                multa.getEspacio().getNumero(),
-                multa.getVehiculo().getPlaca(),
-                multa.getFechaHora().format(formatter),
-                String.format("₡%d", ConfiguracionParqueo.obtenerInstancia().getCostoMulta()),
-                String.format("₡%d", multa.getMonto()),
-                multa.getPagada() ? "Pagada" : "Pendiente",
-                propietario
-            });
-        }
+            // Actualizar la tabla
+            vista.getTblMultasGeneradas().setModel(modelo);
 
-        // Actualizar la tabla
-        vista.getTblMultasGeneradas().setModel(modelo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(vista, 
+                "Error al actualizar la tabla de multas: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

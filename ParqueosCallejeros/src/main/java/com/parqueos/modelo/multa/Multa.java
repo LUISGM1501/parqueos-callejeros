@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
@@ -57,6 +58,18 @@ public class Multa implements Serializable {
     @JsonProperty("detallesInfraccion")
     private final String detallesInfraccion;
 
+    @JsonCreator
+    public Multa() {
+        this.idMulta = UUID.randomUUID().toString();
+        this.fechaHora = LocalDateTime.now();
+        this.monto = 0;
+        this.pagada = false;
+        this.detallesInfraccion = "";
+        this.vehiculo = null;
+        this.espacio = null;
+        this.inspector = null;
+    }
+
     // Constructor de la multa
     public Multa(Vehiculo vehiculo, EspacioParqueo espacio, Inspector inspector, int montoBase) {
         this.idMulta = UUID.randomUUID().toString();
@@ -67,7 +80,7 @@ public class Multa implements Serializable {
         this.pagada = false;
         
         // Calcular el monto total incluyendo el tiempo sin pagar
-        this.monto = calcularMontoTotal(montoBase);
+        this.monto = calcularMontoTotal();
         this.detallesInfraccion = generarDetallesInfraccion();
     }
 
@@ -84,50 +97,42 @@ public class Multa implements Serializable {
     }
 
     // Metodo para calcular el monto total de la multa
-    private int calcularMontoTotal(int montoBase) {
-        // Obtener la configuracion del parqueo
+    private int calcularMontoTotal( ) {
         ConfiguracionParqueo config = ConfiguracionParqueo.obtenerInstancia();
-        int montoTotal = montoBase; // Monto base de la multa
+        int precioHora = config.getPrecioHora();
+        int costoMulta = config.getCostoMulta();
+        int montoTotal = 0;
 
-        // Si el espacio esta ocupado, calcular el monto total
         if (espacio != null && espacio.estaOcupado()) {
-            // Obtener la última reserva del espacio
+            // Buscar la última reserva para este espacio
             List<Reserva> reservas = Reserva.cargarTodas().stream()
-                // Filtrar las reservas por el espacio
                 .filter(r -> r.getEspacio().getId().equals(espacio.getId()))
-                // Ordenar las reservas por la hora de inicio de manera descendente
-                .sorted((r1, r2) -> r2.getHoraInicio().compareTo(r1.getHoraInicio()))
-                // Convertir las reservas a una lista
+                .sorted((r1, r2) -> r2.getHoraFin().compareTo(r1.getHoraFin()))
                 .collect(Collectors.toList());
 
-            // Obtener la fecha y hora actual
-            LocalDateTime inicioTiempoSinPago;
-            LocalDateTime ahora = LocalDateTime.now();
-
-            // Si hay reservas, obtener la última reserva
             if (!reservas.isEmpty()) {
-                // Obtener la última reserva
                 Reserva ultimaReserva = reservas.get(0);
-                if (ahora.isAfter(ultimaReserva.getHoraFin())) {
-                    // Si la última reserva ya venció
-                    inicioTiempoSinPago = ultimaReserva.getHoraFin();
-                } else {
-                    // Si hay una reserva activa, no debería generarse multa
-                    return montoBase;
-                }
-            } else {
-                // Si no hay reservas, considerar desde el inicio del día
-                inicioTiempoSinPago = ahora.toLocalDate().atTime(config.getHorarioInicio());
-            }
+                LocalDateTime horaFinReserva = ultimaReserva.getHoraFin();
+                LocalDateTime horaActual = LocalDateTime.now();
 
-            // Calcular horas sin pago dentro del horario de regulación
-            long horasSinPago = calcularHorasEnHorarioRegulacion(inicioTiempoSinPago, ahora, config);
-            
-            // Agregar el costo por cada hora sin pago
-            montoTotal += horasSinPago * config.getPrecioHora();
+                // 1. Calcular el costo de la reserva original
+                long minutosReservados = ChronoUnit.MINUTES.between(
+                    ultimaReserva.getHoraInicio(), 
+                    ultimaReserva.getHoraFin()
+                );
+                double horasReservadas = minutosReservados / 60.0;
+                montoTotal += (int)(horasReservadas * precioHora);
+
+                // 2. Si hay tiempo extra después de la reserva, aplicar la multa
+                if (horaActual.isAfter(horaFinReserva)) {
+                    long minutosExtra = ChronoUnit.MINUTES.between(horaFinReserva, horaActual);
+                    // Convertir a horas redondeando hacia arriba
+                    int horasExtra = (int) Math.ceil(minutosExtra / 60.0);
+                    montoTotal += horasExtra * costoMulta;
+                }
+            }
         }
 
-        // Retornar el monto total
         return montoTotal;
     }
 

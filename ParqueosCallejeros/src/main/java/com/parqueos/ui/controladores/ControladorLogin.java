@@ -52,34 +52,24 @@ public class ControladorLogin extends ControladorBase {
 
     // Metodo para redirigir al usuario
     private void redirigirUsuario(Usuario usuario, String token) {
-        // Ocultar la vista de login
         vista.setVisible(false);
-        // Si el usuario es un administrador
-        if (usuario instanceof Administrador) {
-            // Crear la vista del administrador
-            VistaAdministrador vistaAdmin = new VistaAdministrador(sistemaParqueo, token);
-            // Crear el controlador del administrador
-            new ControladorAdministrador(vistaAdmin, sistemaParqueo, token);
-            // Mostrar la vista del administrador
-            vistaAdmin.setVisible(true);
-        } else if (usuario instanceof UsuarioParqueo) {
-            // Crear la vista del usuario parqueo
+        if (usuario instanceof UsuarioParqueo) {
             VistaUsuarioParqueo vistaUsuario = new VistaUsuarioParqueo(sistemaParqueo, token);
-            // Crear el controlador del usuario parqueo
             new ControladorUsuarioParqueo(vistaUsuario, sistemaParqueo, (UsuarioParqueo) usuario, token);
-            // Mostrar la vista del usuario parqueo
             vistaUsuario.setVisible(true);
+
+        } else if (usuario instanceof Administrador) {
+            VistaAdministrador vistaAdmin = new VistaAdministrador(sistemaParqueo, token);
+            new ControladorAdministrador(vistaAdmin, sistemaParqueo, token);
+            vistaAdmin.setVisible(true);
+
         } else if (usuario instanceof Inspector) {
-            // Crear la vista del inspector
             VistaInspector vistaInspector = new VistaInspector(sistemaParqueo, token);
-            // Crear el controlador del inspector
             new ControladorInspector(vistaInspector, sistemaParqueo, (Inspector) usuario, token);
-            // Mostrar la vista del inspector
             vistaInspector.setVisible(true);
+
         } else {
-            // Mostrar el mensaje de error
             vista.mostrarMensajeError("Tipo de usuario no reconocido.");
-            // Mostrar la vista de login
             vista.setVisible(true);
         }
     }

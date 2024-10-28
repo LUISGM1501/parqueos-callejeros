@@ -25,11 +25,9 @@ public class Main {
 
                     // Mostrar informacion de usuarios de prueba
                     JOptionPane.showMessageDialog(null, 
-                        "Usuarios de prueba:\n" +
-                        "Administrador: admin / 1234\n" +
-                        "Usuario: user / 1234\n" +
-                        "Inspector: inspector / 1234",
-                        "Información de Prueba",
+                        "Usuario Default:\n" +
+                        "Administrador: admin / 1234",
+                        "Información",
                         JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception e) {
                     System.err.println("Error al iniciar la aplicación: " + e.getMessage());

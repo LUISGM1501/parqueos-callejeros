@@ -14,6 +14,7 @@ import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.vehiculo.Vehiculo;
+import com.parqueos.modelo.multa.Multa;
 import com.parqueos.servicios.SistemaParqueo;
 
 import jakarta.persistence.PostLoad;
@@ -327,6 +328,24 @@ public class UsuarioParqueo extends Usuario {
         return espacios.stream()
                 .filter(EspacioParqueo::estaDisponible)
                 .collect(Collectors.toList());
+    }
+
+    // Método para verificar si un vehículo tiene multa pendiente
+    public boolean tieneMultaPendiente(Vehiculo vehiculo, List<Multa> multas) {
+        // Verificar si el vehiculo tiene una multa pendiente
+        return multas.stream()
+            .anyMatch(m -> m.getVehiculo().getPlaca().equals(vehiculo.getPlaca()) 
+                    && !m.getPagada());
+    }
+
+    // Método para buscar la multa pendiente de un vehículo
+    public Multa obtenerMultaPendiente(Vehiculo vehiculo, List<Multa> multas) {
+        // Buscar la multa pendiente del vehiculo
+        return multas.stream()
+            .filter(m -> m.getVehiculo().getPlaca().equals(vehiculo.getPlaca()) 
+                    && !m.getPagada())
+            .findFirst()
+            .orElse(null);
     }
 
     @PostLoad

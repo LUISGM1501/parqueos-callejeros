@@ -1,25 +1,25 @@
 [ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.Reserva", {
-  "idReserva" : "ddae41f9-fa34-4e19-9711-0d4daa1e0e99",
-  "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+  "idReserva" : "586e1d5e-005d-46bc-bc5e-c313ae0fd6db",
+  "usuarioId" : "0641ba12-97e1-4f18-ba8b-aea353c52923",
   "espacioId" : "7fffe999-c774-4d97-a52e-a08832a78065",
-  "vehiculoId" : "4ddabefa-286c-4094-881e-b328cf2d2554",
-  "horaInicio" : "2024-10-27T18:56:19.5399525",
-  "horaFin" : "2024-10-27T19:56:19.5399525",
+  "vehiculoId" : "ac0b5e6e-e78c-4e61-984b-bc13e7bacba3",
+  "horaInicio" : "2024-10-28T04:01:17.4189603",
+  "horaFin" : "2024-10-28T04:31:17.4189603",
   "activa" : true
 } ], [ "com.parqueos.modelo.parqueo.Reserva", {
-  "idReserva" : "907a29fd-6a41-4346-8ffd-cb32c6aecfcc",
-  "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+  "idReserva" : "72b81d3c-723b-4303-a910-a95e8f6d5d7a",
+  "usuarioId" : "0641ba12-97e1-4f18-ba8b-aea353c52923",
   "espacioId" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
-  "vehiculoId" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
-  "horaInicio" : "2024-10-27T18:56:51.4672234",
-  "horaFin" : "2024-10-27T19:26:51.4672234",
+  "vehiculoId" : "d137ed9d-a78e-4fab-9ba6-2ccab22d5f93",
+  "horaInicio" : "2024-10-28T04:02:22.0940048",
+  "horaFin" : "2024-10-28T11:02:22.0940048",
   "activa" : true
 } ], [ "com.parqueos.modelo.parqueo.Reserva", {
-  "idReserva" : "0d701e13-ae7f-4b4f-8058-1214c000503f",
-  "usuarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f",
+  "idReserva" : "53d8c5b7-239e-43f5-971b-532781c023a9",
+  "usuarioId" : "a140be1b-b831-4162-bb07-f933a6f51032",
   "espacioId" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
-  "vehiculoId" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
-  "horaInicio" : "2024-10-27T18:58:13.4313295",
-  "horaFin" : "2024-10-27T19:28:13.4313295",
+  "vehiculoId" : "b9c4a826-5ccd-4688-bd4b-44a0388a63f2",
+  "horaInicio" : "2024-10-28T04:03:00.9976986",
+  "horaFin" : "2024-10-28T04:33:00.9976986",
   "activa" : true
 } ] ] ]
