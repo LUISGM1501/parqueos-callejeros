@@ -4,8 +4,10 @@ import java.awt.Dimension;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -17,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
 import com.parqueos.modelo.parqueo.Reserva;
+import com.parqueos.modelo.usuario.Usuario;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.servicios.SistemaParqueo;
@@ -28,7 +31,7 @@ public class ControladorUsuarioParqueo extends ControladorBase {
     private final SistemaParqueo sistemaParqueo;
     private final UsuarioParqueo usuario;
     private final String token;
-
+    private static final Logger LOGGER = Logger.getLogger(ControladorUsuarioParqueo.class.getName());
     // Constructor para inicializar el controlador
     public ControladorUsuarioParqueo(VistaUsuarioParqueo vista, SistemaParqueo sistemaParqueo, UsuarioParqueo usuario, String token) {
         this.vista = vista;
@@ -272,16 +275,39 @@ public class ControladorUsuarioParqueo extends ControladorBase {
     private void verHistorial() {
         try {
             List<Reserva> todasLasReservas = sistemaParqueo.getGestorReservas().getReservas();
-            List<Reserva> historialReservas = todasLasReservas.stream()
-                .filter(r -> r.getUsuario().getId().equals(usuario.getId()))
-                .sorted((r1, r2) -> r2.getHoraInicio().compareTo(r1.getHoraInicio()))
-                .collect(Collectors.toList());
+            List<Reserva> historialReservas = new ArrayList<>();
+            
+            // Recorrer y validar cada reserva antes de filtrar
+            for (Reserva reserva : todasLasReservas) {
+                try {
+                    // Intentar cargar el usuario si es null
+                    if (reserva.getUsuario() == null && reserva.getUsuarioId() != null) {
+                        Usuario usuarioCargado = Usuario.cargar(reserva.getUsuarioId());
+                        if (usuarioCargado instanceof UsuarioParqueo) {
+                            reserva.setUsuario((UsuarioParqueo)usuarioCargado);
+                        }
+                    }
+
+                    // Solo agregar si la reserva tiene usuario válido y coincide con el usuario actual
+                    if (reserva.getUsuario() != null && 
+                        reserva.getUsuario().getId().equals(usuario.getId())) {
+                        historialReservas.add(reserva);
+                    }
+                } catch (Exception e) {
+                    Logger.getLogger(ControladorUsuarioParqueo.class.getName())
+                          .warning("Error procesando reserva: " + reserva.getIdReserva());
+                }
+            }
 
             if (historialReservas.isEmpty()) {
                 JOptionPane.showMessageDialog(vista, "No tiene reservas en su historial.");
                 return;
             }
 
+            // Ordenar por fecha descendente
+            historialReservas.sort((r1, r2) -> r2.getHoraInicio().compareTo(r1.getHoraInicio()));
+
+            // Crear el modelo de tabla y mostrar datos...
             DefaultTableModel modelo = new DefaultTableModel() {
                 @Override
                 public boolean isCellEditable(int row, int column) {
@@ -313,40 +339,96 @@ public class ControladorUsuarioParqueo extends ControladorBase {
             JOptionPane.showMessageDialog(vista, scrollPane, 
                 "Historial de Reservas", 
                 JOptionPane.PLAIN_MESSAGE);
+
         } catch (Exception e) {
+            Logger.getLogger(ControladorUsuarioParqueo.class.getName())
+                  .log(Level.SEVERE, "Error al mostrar historial", e);
             JOptionPane.showMessageDialog(vista,
                 "Error al mostrar historial: " + e.getMessage(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
     // Metodo para actualizar la tabla de reservas activas
     private void actualizarTablaReservasActivas() {
-        DefaultTableModel modelo = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+        try {
+            DefaultTableModel modelo = new DefaultTableModel() {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            
+            modelo.addColumn("ID Reserva");
+            modelo.addColumn("Espacio");
+            modelo.addColumn("Vehículo");
+            modelo.addColumn("Inicio");
+            modelo.addColumn("Fin");
+            modelo.addColumn("Tiempo Restante (min)");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            LocalDateTime ahora = LocalDateTime.now();
+            
+            List<Reserva> todasLasReservas = sistemaParqueo.getGestorReservas().getReservas();
+            List<Reserva> reservasActivas = new ArrayList<>();
+            
+            // Procesar cada reserva individualmente
+            for (Reserva reserva : todasLasReservas) {
+                try {
+                    // Cargar el usuario si es necesario
+                    if (reserva.getUsuario() == null && reserva.getUsuarioId() != null) {
+                        Usuario usuarioCargado = Usuario.cargar(reserva.getUsuarioId());
+                        if (usuarioCargado instanceof UsuarioParqueo) {
+                            reserva.setUsuario((UsuarioParqueo)usuarioCargado);
+                        }
+                    }
+
+                    // Verificar si la reserva pertenece al usuario actual y está activa
+                    if (reserva.getUsuario() != null && 
+                        reserva.getUsuario().getId().equals(usuario.getId()) && 
+                        reserva.estaActiva()) {
+                        reservasActivas.add(reserva);
+                    }
+                } catch (Exception e) {
+                    Logger.getLogger(ControladorUsuarioParqueo.class.getName())
+                          .warning("Error procesando reserva: " + reserva.getIdReserva());
+                }
             }
-        };
-        
-        modelo.addColumn("ID Reserva");
-        modelo.addColumn("Espacio");
-        modelo.addColumn("Vehículo");
-        modelo.addColumn("Inicio");
-        modelo.addColumn("Fin");
-        modelo.addColumn("Tiempo Restante (min)");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        LocalDateTime ahora = LocalDateTime.now();
-        
-        List<Reserva> reservasActivas = sistemaParqueo.getGestorReservas()
-            .getReservas().stream()
-            .filter(r -> r.getUsuario().getId().equals(usuario.getId()) && r.estaActiva())
-            .collect(Collectors.toList());
+            // Agregar las reservas activas a la tabla
+            for (Reserva reserva : reservasActivas) {
+                long minutosRestantes = ChronoUnit.MINUTES.between(ahora, reserva.getHoraFin());
+                if (minutosRestantes < 0) minutosRestantes = 0;
+                
+                modelo.addRow(new Object[]{
+                    reserva.getIdReserva(),
+                    reserva.getEspacio().getNumero(),
+                    reserva.getVehiculo().getPlaca(),
+                    reserva.getHoraInicio().format(formatter),
+                    reserva.getHoraFin().format(formatter),
+                    minutosRestantes
+                });
+            }
+            
+            vista.getTblReservasActivas().setModel(modelo);
+            
+        } catch (Exception e) {
+            Logger.getLogger(ControladorUsuarioParqueo.class.getName())
+                  .log(Level.SEVERE, "Error al actualizar tabla de reservas activas", e);
+        }
+    }
 
-        for (Reserva reserva : reservasActivas) {
+    private boolean esReservaValida(Reserva reserva) {
+        return reserva != null && 
+               reserva.getUsuario() != null && 
+               reserva.getEspacio() != null && 
+               reserva.getVehiculo() != null;
+    }
+
+    private void agregarFilaReserva(DefaultTableModel modelo, Reserva reserva, 
+                                  LocalDateTime ahora, DateTimeFormatter formatter) {
+        try {
             long minutosRestantes = ChronoUnit.MINUTES.between(ahora, reserva.getHoraFin());
             if (minutosRestantes < 0) minutosRestantes = 0;
             
@@ -358,10 +440,12 @@ public class ControladorUsuarioParqueo extends ControladorBase {
                 reserva.getHoraFin().format(formatter),
                 minutosRestantes
             });
+        } catch (Exception e) {
+            LOGGER.warning("Error al procesar reserva: " + reserva.getIdReserva());
         }
-        
-        vista.getTblReservasActivas().setModel(modelo);
-        // Ajustar el ancho de las columnas
+    }
+
+    private void ajustarColumnasTabla() {
         vista.getTblReservasActivas().getColumnModel().getColumn(0).setPreferredWidth(200); // ID Reserva
         vista.getTblReservasActivas().getColumnModel().getColumn(1).setPreferredWidth(80);  // Espacio
         vista.getTblReservasActivas().getColumnModel().getColumn(2).setPreferredWidth(100); // Vehículo

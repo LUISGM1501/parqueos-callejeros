@@ -3,6 +3,7 @@ package com.parqueos.modelo.parqueo;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,6 +21,7 @@ import com.parqueos.util.GestorArchivos;
 public class EspacioParqueo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_ESPACIOS = "espacios.json";
+    private static final Logger LOGGER = Logger.getLogger(EspacioParqueo.class.getName());
 
     @JsonProperty("id")
     private final String id;
@@ -176,6 +178,18 @@ public class EspacioParqueo implements Serializable {
 
             // Guardar en el json
             this.actualizar();
+        }
+    }
+
+    // Metodo para cargar referencias
+    public void cargarReferencias() {
+        if (vehiculoActual != null) {
+            try {
+                this.vehiculoActual = Vehiculo.cargar(vehiculoActual.getId());
+            } catch (Exception e) {
+                // Log del error pero no detener la ejecución
+                LOGGER.warning("No se pudo cargar el vehículo con ID: " + vehiculoActual.getId());
+            }
         }
     }
 

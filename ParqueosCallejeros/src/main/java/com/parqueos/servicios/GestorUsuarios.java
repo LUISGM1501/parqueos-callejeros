@@ -30,6 +30,19 @@ public class GestorUsuarios {
     private final GestorVehiculos gestorVehiculos;
     private final SistemaParqueo sistemaParqueo;
 
+    // get para los json de usuarios
+    public static String getArchivoAdministradores() {
+        return ARCHIVO_ADMINISTRADORES;
+    }
+
+    public static String getArchivoInspectores() {
+        return ARCHIVO_INSPECTORES;
+    }
+
+    public static String getArchivoUsuariosParqueo() {
+        return ARCHIVO_USUARIOS_PARQUEO;
+    }
+
     // Constructor para inicializar el gestor de usuarios
     public GestorUsuarios(AuthService authService, GestorVehiculos gestorVehiculos, SistemaParqueo sistemaParqueo) {
         this.authService = authService;

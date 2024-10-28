@@ -2,8 +2,10 @@ package com.parqueos.modelo.parqueo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +28,7 @@ import jakarta.persistence.PostLoad;
 public class Reserva implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_RESERVAS = "reservas.json";
+    private static final Logger LOGGER = Logger.getLogger(Reserva.class.getName());
     
     @JsonProperty("idReserva")
     private String idReserva;
@@ -89,14 +92,31 @@ public class Reserva implements Serializable {
     // Metodo para cargar las referencias después de deserializar
     @PostLoad
     public void cargarReferencias() {
+        // Cargar usuario
         if (usuarioId != null) {
-            this.usuario = (UsuarioParqueo) Usuario.cargar(usuarioId);
+            try {
+                this.usuario = (UsuarioParqueo) Usuario.cargar(usuarioId);
+            } catch (Exception e) {
+                LOGGER.warning("No se pudo cargar el usuario con ID: " + usuarioId);
+            }
         }
+
+        // Cargar espacio
         if (espacioId != null) {
-            this.espacio = EspacioParqueo.cargar(espacioId);
+            try {
+                this.espacio = EspacioParqueo.cargar(espacioId);
+            } catch (Exception e) {
+                LOGGER.warning("No se pudo cargar el espacio con ID: " + espacioId);
+            }
         }
+
+        // Cargar vehículo
         if (vehiculoId != null) {
-            this.vehiculo = Vehiculo.cargar(vehiculoId);
+            try {
+                this.vehiculo = Vehiculo.cargar(vehiculoId);
+            } catch (Exception e) {
+                LOGGER.warning("No se pudo cargar el vehículo con ID: " + vehiculoId);
+            }
         }
     }
 
@@ -158,8 +178,21 @@ public class Reserva implements Serializable {
 
     // Metodo para cargar todas las reservas
     public static List<Reserva> cargarTodas() {
-        // Cargar todas las reservas del json
-        return GestorArchivos.cargarTodosLosElementos(ARCHIVO_RESERVAS, Reserva.class);
+        // Cargar las reservas
+        List<Reserva> reservas = GestorArchivos.cargarTodosLosElementos(ARCHIVO_RESERVAS, Reserva.class);
+        
+        // Cargar las referencias para cada reserva
+        if (reservas != null) {
+            for (Reserva reserva : reservas) {
+                try {
+                    reserva.cargarReferencias();
+                } catch (Exception e) {
+                    LOGGER.warning("Error al cargar referencias para reserva " + reserva.getIdReserva());
+                }
+            }
+        }
+        
+        return reservas != null ? reservas : new ArrayList<>();
     }
 
     // Metodo para guardar todas las reservas
@@ -275,6 +308,11 @@ public class Reserva implements Serializable {
     // Metodo para verificar si la reserva esta activa
     public boolean estaActiva() {
         return activa && LocalDateTime.now().isBefore(horaFin);
+    }
+
+    // Metodo para establecer el usuario
+    public void setUsuario(UsuarioParqueo usuario) {
+        this.usuario = usuario;
     }
 
     // Metodo para convertir la reserva a un string

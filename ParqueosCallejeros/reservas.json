@@ -1,0 +1,25 @@
+[ "java.util.ArrayList", [ [ "com.parqueos.modelo.parqueo.Reserva", {
+  "idReserva" : "ddae41f9-fa34-4e19-9711-0d4daa1e0e99",
+  "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+  "espacioId" : "7fffe999-c774-4d97-a52e-a08832a78065",
+  "vehiculoId" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+  "horaInicio" : "2024-10-27T18:56:19.5399525",
+  "horaFin" : "2024-10-27T19:56:19.5399525",
+  "activa" : true
+} ], [ "com.parqueos.modelo.parqueo.Reserva", {
+  "idReserva" : "907a29fd-6a41-4346-8ffd-cb32c6aecfcc",
+  "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+  "espacioId" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
+  "vehiculoId" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+  "horaInicio" : "2024-10-27T18:56:51.4672234",
+  "horaFin" : "2024-10-27T19:26:51.4672234",
+  "activa" : true
+} ], [ "com.parqueos.modelo.parqueo.Reserva", {
+  "idReserva" : "0d701e13-ae7f-4b4f-8058-1214c000503f",
+  "usuarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f",
+  "espacioId" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
+  "vehiculoId" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+  "horaInicio" : "2024-10-27T18:58:13.4313295",
+  "horaFin" : "2024-10-27T19:28:13.4313295",
+  "activa" : true
+} ] ] ]

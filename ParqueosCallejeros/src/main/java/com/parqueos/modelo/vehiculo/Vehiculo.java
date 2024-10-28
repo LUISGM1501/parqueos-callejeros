@@ -3,6 +3,7 @@ package com.parqueos.modelo.vehiculo;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -22,6 +23,7 @@ import com.parqueos.util.GestorArchivos;
 public class Vehiculo implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String ARCHIVO_VEHICULOS = "vehiculos.json";
+    private static final Logger LOGGER = Logger.getLogger(Vehiculo.class.getName());
 
     @JsonProperty("id")
     private final String id;
@@ -205,8 +207,14 @@ public class Vehiculo implements Serializable {
 
     // Metodo para cargar el propietario del vehiculo
     public void cargarPropietario() {
-        // Cargar el propietario del vehiculo
-        this.propietario = (UsuarioParqueo) Usuario.cargar(this.propietarioId);
+        if (propietarioId != null) {
+            try {
+                this.propietario = (UsuarioParqueo) Usuario.cargar(propietarioId);
+            } catch (Exception e) {
+                // Log del error pero no detener la ejecución
+                LOGGER.warning("No se pudo cargar el propietario con ID: " + propietarioId);
+            }
+        }
     }
 
     // Metodo para convertir a string

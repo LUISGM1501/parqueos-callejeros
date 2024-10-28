@@ -16,7 +16,8 @@ public class GestorReservas {
 
     // Metodo para cargar las reservas
     public void cargarReservas() {
-        reservas = GestorArchivos.cargarTodosLosElementos(ARCHIVO_RESERVAS, Reserva.class);
+        // Usar el método específico de Reserva que maneja la carga de referencias
+        reservas = Reserva.cargarTodas();
     }
 
     // Metodo para crear una reserva

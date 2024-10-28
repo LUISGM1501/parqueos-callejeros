@@ -383,4 +383,359 @@
   "fechaInicio" : "2024-09-27",
   "fechaFin" : "2024-10-27",
   "reservas" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.reportes.ReporteIngresos", {
+  "fechaInicio" : "2024-10-27",
+  "fechaFin" : "2024-10-27",
+  "ingresosPorDia" : [ "java.util.ArrayList", [ 5000.0 ] ]
+} ], [ "com.parqueos.reportes.ReporteMultas", {
+  "fechaInicio" : "2024-10-27",
+  "fechaFin" : "2024-10-27",
+  "multas" : [ "java.util.ArrayList", [ ] ]
+} ], [ "com.parqueos.reportes.ReporteEspacios", {
+  "espacios" : [ "java.util.ArrayList", [ {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "7fffe999-c774-4d97-a52e-a08832a78065",
+    "numero" : "001",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+      "placa" : "ASD123",
+      "marca" : "Toyota",
+      "modelo" : "1995",
+      "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
+    "numero" : "002",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+      "placa" : "DFG111",
+      "marca" : "Kayasaki",
+      "modelo" : "2015",
+      "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
+    "numero" : "003",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+      "placa" : "LKJ222",
+      "marca" : "No se",
+      "modelo" : "2052",
+      "propietarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "3b3d6c0d-158d-40e8-89b8-959846bc645d",
+    "numero" : "004",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "d6a9e487-c732-45c0-9659-eacfd9857ea1",
+    "numero" : "005",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "02737f20-b2a3-4425-aaa3-17faf610c863",
+    "numero" : "006",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "673c408b-0cbb-4646-bc45-e49fd1c17ef4",
+    "numero" : "007",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "2f028cd9-0c84-40de-a217-38670c59e8a4",
+    "numero" : "008",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "d98f64f4-258d-4c0c-8482-588b6bf31646",
+    "numero" : "009",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "47dfde46-47bf-4701-b915-468cd11284c9",
+    "numero" : "010",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "5726d444-e037-4e6e-a0f8-82097a7b9301",
+    "numero" : "011",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "aa201180-347b-442f-88f2-a5b8bb703e37",
+    "numero" : "012",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "e0cc7fa0-acfe-48e1-8962-29717dddfeae",
+    "numero" : "013",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "b4970302-d5dd-4999-bb2d-29341d82b0bd",
+    "numero" : "014",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "da086fa2-fd12-42c4-8760-d9b9ee5b1795",
+    "numero" : "015",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  } ] ]
+} ], [ "com.parqueos.reportes.ReporteHistorial", {
+  "fechaInicio" : "2024-10-27",
+  "fechaFin" : "2024-10-27",
+  "reservas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "ddae41f9-fa34-4e19-9711-0d4daa1e0e99",
+    "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+    "espacioId" : "7fffe999-c774-4d97-a52e-a08832a78065",
+    "vehiculoId" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+    "horaInicio" : "2024-10-27T18:56:19.5399525",
+    "horaFin" : "2024-10-27T19:56:19.5399525",
+    "activa" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "907a29fd-6a41-4346-8ffd-cb32c6aecfcc",
+    "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+    "espacioId" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
+    "vehiculoId" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+    "horaInicio" : "2024-10-27T18:56:51.4672234",
+    "horaFin" : "2024-10-27T19:26:51.4672234",
+    "activa" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "0d701e13-ae7f-4b4f-8058-1214c000503f",
+    "usuarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f",
+    "espacioId" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
+    "vehiculoId" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+    "horaInicio" : "2024-10-27T18:58:13.4313295",
+    "horaFin" : "2024-10-27T19:28:13.4313295",
+    "activa" : true
+  } ] ]
+} ], [ "com.parqueos.reportes.ReporteEstadisticas", {
+  "fechaInicio" : "2024-10-27",
+  "fechaFin" : "2024-10-27",
+  "espacios" : [ "java.util.ArrayList", [ {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "7fffe999-c774-4d97-a52e-a08832a78065",
+    "numero" : "001",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+      "placa" : "ASD123",
+      "marca" : "Toyota",
+      "modelo" : "1995",
+      "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
+    "numero" : "002",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+      "placa" : "DFG111",
+      "marca" : "Kayasaki",
+      "modelo" : "2015",
+      "propietarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
+    "numero" : "003",
+    "ocupado" : true,
+    "pagado" : false,
+    "vehiculoActual" : {
+      "@class" : "com.parqueos.modelo.vehiculo.Vehiculo",
+      "id" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+      "placa" : "LKJ222",
+      "marca" : "No se",
+      "modelo" : "2052",
+      "propietarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f"
+    },
+    "estaDisponible" : false
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "3b3d6c0d-158d-40e8-89b8-959846bc645d",
+    "numero" : "004",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "d6a9e487-c732-45c0-9659-eacfd9857ea1",
+    "numero" : "005",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "02737f20-b2a3-4425-aaa3-17faf610c863",
+    "numero" : "006",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "673c408b-0cbb-4646-bc45-e49fd1c17ef4",
+    "numero" : "007",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "2f028cd9-0c84-40de-a217-38670c59e8a4",
+    "numero" : "008",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "d98f64f4-258d-4c0c-8482-588b6bf31646",
+    "numero" : "009",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "47dfde46-47bf-4701-b915-468cd11284c9",
+    "numero" : "010",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "5726d444-e037-4e6e-a0f8-82097a7b9301",
+    "numero" : "011",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "aa201180-347b-442f-88f2-a5b8bb703e37",
+    "numero" : "012",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "e0cc7fa0-acfe-48e1-8962-29717dddfeae",
+    "numero" : "013",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "b4970302-d5dd-4999-bb2d-29341d82b0bd",
+    "numero" : "014",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.EspacioParqueo",
+    "id" : "da086fa2-fd12-42c4-8760-d9b9ee5b1795",
+    "numero" : "015",
+    "ocupado" : false,
+    "pagado" : false,
+    "vehiculoActual" : null,
+    "estaDisponible" : true
+  } ] ],
+  "reservas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "ddae41f9-fa34-4e19-9711-0d4daa1e0e99",
+    "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+    "espacioId" : "7fffe999-c774-4d97-a52e-a08832a78065",
+    "vehiculoId" : "4ddabefa-286c-4094-881e-b328cf2d2554",
+    "horaInicio" : "2024-10-27T18:56:19.5399525",
+    "horaFin" : "2024-10-27T19:56:19.5399525",
+    "activa" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "907a29fd-6a41-4346-8ffd-cb32c6aecfcc",
+    "usuarioId" : "14ac5031-172c-41ba-827d-ac42b3ce1031",
+    "espacioId" : "342e6cd0-1dfe-452c-bd67-792c852fdb24",
+    "vehiculoId" : "e3c7f6e4-9d13-421c-be43-7bad979bd047",
+    "horaInicio" : "2024-10-27T18:56:51.4672234",
+    "horaFin" : "2024-10-27T19:26:51.4672234",
+    "activa" : true
+  }, {
+    "@class" : "com.parqueos.modelo.parqueo.Reserva",
+    "idReserva" : "0d701e13-ae7f-4b4f-8058-1214c000503f",
+    "usuarioId" : "ed32bd95-4d53-48ab-a95a-86f6037df37f",
+    "espacioId" : "e3e4c82a-2264-4579-a109-bc5ec8f85c56",
+    "vehiculoId" : "9bd79445-31ee-4b0a-8d5f-0b9b2d80628c",
+    "horaInicio" : "2024-10-27T18:58:13.4313295",
+    "horaFin" : "2024-10-27T19:28:13.4313295",
+    "activa" : true
+  } ] ]
 } ] ] ]

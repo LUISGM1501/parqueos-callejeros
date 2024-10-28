@@ -3,6 +3,7 @@ package com.parqueos.modelo.usuario;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.parqueos.servicios.GestorUsuarios;
 import com.parqueos.util.GestorArchivos;
 
 @JsonTypeInfo(
@@ -20,7 +22,6 @@ import com.parqueos.util.GestorArchivos;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String ARCHIVO_USUARIOS = "usuarios.json";
         
     @JsonProperty("id")
     private String id; 
@@ -163,75 +164,183 @@ public class Usuario implements Serializable {
         return tipoUsuario;
     }
 
+    // Metodo para obtener el archivo correspondiente según el tipo de usuario
+    private String obtenerArchivoSegunTipo() {
+        return switch (tipoUsuario) {
+            case ADMINISTRADOR -> GestorUsuarios.getArchivoAdministradores();
+            case INSPECTOR -> GestorUsuarios.getArchivoInspectores();
+            case USUARIO_PARQUEO -> GestorUsuarios.getArchivoUsuariosParqueo();
+        };
+    }
+
     // Metodo para guardar un usuario
     public void guardar() {
-        // Cargar todos los usuarios
-        List<Usuario> usuarios = cargarTodos();
+        // Obtener la lista de usuarios según el tipo
+        List<?> usuarios = switch (tipoUsuario) {
+            case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoAdministradores(), 
+                Administrador.class
+            );
+            case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoInspectores(), 
+                Inspector.class
+            );
+            case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoUsuariosParqueo(), 
+                UsuarioParqueo.class
+            );
+        };
+
+        List<Usuario> listaUsuarios = new ArrayList<>();
+        if (usuarios != null) {
+            listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
+        }
 
         // Agregar el usuario actual
-        usuarios.add(this);
+        listaUsuarios.add(this);
 
-        // Guardar todos los usuarios
-        guardarTodos(usuarios);
+        // Guardar en el archivo correspondiente
+        GestorArchivos.guardarTodo(listaUsuarios, obtenerArchivoSegunTipo());
     }
 
     // Metodo para actualizar un usuario en el archivo
     public void actualizarEnArchivo() {
         try {
-            // Cargar todos los usuarios existentes
-            List<Usuario> usuarios = cargarTodos();
+            // Obtener la lista de usuarios según el tipo
+            List<?> usuarios = switch (tipoUsuario) {
+                case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
+                    GestorUsuarios.getArchivoAdministradores(), 
+                    Administrador.class
+                );
+                case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
+                    GestorUsuarios.getArchivoInspectores(), 
+                    Inspector.class
+                );
+                case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
+                    GestorUsuarios.getArchivoUsuariosParqueo(), 
+                    UsuarioParqueo.class
+                );
+            };
+            
+            List<Usuario> listaUsuarios = new ArrayList<>();
+            if (usuarios != null) {
+                listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
+            }
             
             // Eliminar el usuario existente
-            usuarios.removeIf(u -> u.getId().equals(this.id));
+            listaUsuarios.removeIf(u -> u.getId().equals(this.id));
             
             // Agregar el usuario actualizado
-            usuarios.add(this);
+            listaUsuarios.add(this);
             
-            // Guardar todos los usuarios
-            guardarTodos(usuarios);
+            // Guardar en el archivo correspondiente
+            GestorArchivos.guardarTodo(listaUsuarios, obtenerArchivoSegunTipo());
             
         } catch (Exception e) {
-            // Si da error, lanzar una excepcion
             throw new RuntimeException("Error al actualizar el usuario en el archivo", e);
         }
     }
 
+    // Metodo para eliminar un usuario
+    public void eliminar() {
+        // Obtener la lista de usuarios según el tipo
+        List<?> usuarios = switch (tipoUsuario) {
+            case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoAdministradores(), 
+                Administrador.class
+            );
+            case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoInspectores(), 
+                Inspector.class
+            );
+            case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
+                GestorUsuarios.getArchivoUsuariosParqueo(), 
+                UsuarioParqueo.class
+            );
+        };
+
+        List<Usuario> listaUsuarios = new ArrayList<>();
+        if (usuarios != null) {
+            listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
+        }
+
+        // Eliminar el usuario actual
+        listaUsuarios.removeIf(u -> u.getId().equals(this.id));
+
+        // Guardar en el archivo correspondiente
+        GestorArchivos.guardarTodo(listaUsuarios, obtenerArchivoSegunTipo());
+    }
+
     // Metodo para cargar un usuario por id
     public static Usuario cargar(String id) {
-        // Cargar todos los usuarios
-        List<Usuario> usuarios = cargarTodos();
+        // Primero intentar cargar de administradores
+        List<Administrador> administradores = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoAdministradores(), 
+            Administrador.class
+        );
+        if (administradores != null) {
+            for (Administrador admin : administradores) {
+                if (admin.getId().equals(id)) return admin;
+            }
+        }
 
-        // Buscar el usuario por id
-        return usuarios.stream()
-                .filter(u -> u.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        // Si no se encuentra, intentar cargar de inspectores
+        List<Inspector> inspectores = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoInspectores(), 
+            Inspector.class
+        );
+        if (inspectores != null) {
+            for (Inspector inspector : inspectores) {
+                if (inspector.getId().equals(id)) return inspector;
+            }
+        }
+
+        // Si no se encuentra, intentar cargar de usuarios parqueo
+        List<UsuarioParqueo> usuariosParqueo = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoUsuariosParqueo(), 
+            UsuarioParqueo.class
+        );
+        if (usuariosParqueo != null) {
+            for (UsuarioParqueo usuarioParqueo : usuariosParqueo) {
+                if (usuarioParqueo.getId().equals(id)) return usuarioParqueo;
+            }
+        }
+
+        return null;
     }
 
     // Metodo para cargar todos los usuarios
     public static List<Usuario> cargarTodos() {
-        // Cargar todos los usuarios del archivo json
-        List<Usuario> usuarios = GestorArchivos.cargarTodosLosElementos(ARCHIVO_USUARIOS, Usuario.class);
-        // Retornar la lista de usuarios
-        return usuarios != null ? usuarios : new ArrayList<>();
-    }
+        List<Usuario> todosLosUsuarios = new ArrayList<>();
+        
+        // Cargar administradores
+        List<Administrador> administradores = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoAdministradores(), 
+            Administrador.class
+        );
+        if (administradores != null) {
+            todosLosUsuarios.addAll(administradores);
+        }
 
-    // Metodo para guardar todos los usuarios
-    public static void guardarTodos(List<Usuario> usuarios) {
-        // Guardar todos los usuarios en el archivo json
-        GestorArchivos.guardarTodo(usuarios, ARCHIVO_USUARIOS);
-    }
+        // Cargar inspectores
+        List<Inspector> inspectores = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoInspectores(), 
+            Inspector.class
+        );
+        if (inspectores != null) {
+            todosLosUsuarios.addAll(inspectores);
+        }
 
-    // Metodo para eliminar un usuario
-    public void eliminar() {
-        // Cargar todos los usuarios
-        List<Usuario> usuarios = cargarTodos();
+        // Cargar usuarios parqueo
+        List<UsuarioParqueo> usuariosParqueo = GestorArchivos.cargarTodosLosElementos(
+            GestorUsuarios.getArchivoUsuariosParqueo(), 
+            UsuarioParqueo.class
+        );
+        if (usuariosParqueo != null) {
+            todosLosUsuarios.addAll(usuariosParqueo);
+        }
 
-        // Eliminar el usuario actual
-        usuarios.removeIf(u -> u.getId().equals(this.id));
-
-        // Guardar todos los usuarios
-        guardarTodos(usuarios);
+        return todosLosUsuarios;
     }
 
     // Metodo para convertir a string
