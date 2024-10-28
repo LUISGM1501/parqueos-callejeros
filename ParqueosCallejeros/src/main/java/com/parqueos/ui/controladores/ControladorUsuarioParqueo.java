@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -62,6 +63,10 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         // Iniciar un timer para actualizar la tabla de reservas activas cada minuto
         Timer timer = new Timer(60000, e -> actualizarTablaReservasActivas());
         timer.start();
+        
+        // Timer para actualizar tabla de multas cada 30 segundos
+        Timer timerMultas = new Timer(30000, e -> actualizarTablaMultas());
+        timerMultas.start();
     }
 
     // Metodo para cargar los vehiculos del usuario
@@ -456,26 +461,30 @@ public class ControladorUsuarioParqueo extends ControladorBase {
 
     // Metodo para actualizar la tabla de multas
     private void actualizarTablaMultas() {
-        // Obtener las multas del usuario
-        List<Multa> multas = sistemaParqueo.getGestorMultas().obtenerMultasUsuario(usuario);
-        // Crear el modelo de la tabla
-        DefaultTableModel modelo = new DefaultTableModel();
-        // Asignar los encabezados de la tabla
-        modelo.setColumnIdentifiers(new Object[]{"ID", "Vehículo", "Espacio", "Fecha", "Monto", "Pagada"});
-        // Formatear la fecha y hora
+        DefaultTableModel modelo = new DefaultTableModel(
+            new String[]{"ID", "Vehículo", "Espacio", "Fecha", "Monto Total", "Estado"},
+            0
+        );
+
+        List<Multa> multasUsuario = sistemaParqueo.getGestorMultas().getMultas().stream()
+            .filter(m -> usuario.getVehiculos().stream()
+                .anyMatch(v -> v.getPlaca().equals(m.getVehiculo().getPlaca())))
+            .sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora()))
+            .collect(Collectors.toList());
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        // Agregar las multas al modelo
-        for (Multa multa : multas) {
+
+        for (Multa multa : multasUsuario) {
             modelo.addRow(new Object[]{
                 multa.getIdMulta(),
                 multa.getVehiculo().getPlaca(),
                 multa.getEspacio().getNumero(),
                 multa.getFechaHora().format(formatter),
-                multa.getMonto(),
-                multa.getPagada() ? "Sí" : "No"
+                String.format("₡%d", multa.getMonto()),
+                multa.getPagada() ? "Pagada" : "Pendiente"
             });
         }
-        // Asignar el modelo a la tabla
+
         vista.getTblMultas().setModel(modelo);
     }
 
@@ -526,7 +535,9 @@ public class ControladorUsuarioParqueo extends ControladorBase {
         // Sincronizar vehículos del usuario
         usuario.sincronizarVehiculos();
         
+        // Iterar sobre los vehículos del usuario
         for (Vehiculo vehiculo : usuario.getVehiculos()) {
+            // Agregar el vehículo al combo box
             model.addElement(vehiculo.getPlaca());
         }
     }

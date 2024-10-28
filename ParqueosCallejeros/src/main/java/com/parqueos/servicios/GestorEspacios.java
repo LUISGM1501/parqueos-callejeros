@@ -50,16 +50,23 @@ public class GestorEspacios {
                        .orElse(null);
     }
     
+    // Metodo para eliminar un espacio de parqueo
     public void eliminarEspacio(String numeroEspacio) {
-    EspacioParqueo espacio = buscarEspacio(numeroEspacio);
-    
-    if (espacio != null) {
-        espacios.remove(espacio);
-        guardarEspacios(); // Guardar los cambios en el archivo
-        System.out.println("El espacio " + numeroEspacio + " fue eliminado con éxito.");
-    } else {
-        System.out.println("El espacio " + numeroEspacio + " no existe.");
-    }
+        // Buscar el espacio de parqueo
+        EspacioParqueo espacio = buscarEspacio(numeroEspacio);
+
+        // Si el espacio existe, eliminarlo
+        if (espacio != null) {
+            // Eliminar el espacio
+            espacios.remove(espacio);
+            // Guardar los cambios en el archivo
+            guardarEspacios();
+            // Imprimir un mensaje de confirmacion
+            System.out.println("El espacio " + numeroEspacio + " fue eliminado con éxito.");
+        } else {
+            // Imprimir un mensaje de error
+            System.out.println("El espacio " + numeroEspacio + " no existe.");
+        }
 }
 
 

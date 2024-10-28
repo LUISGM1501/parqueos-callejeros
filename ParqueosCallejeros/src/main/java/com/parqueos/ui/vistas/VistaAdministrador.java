@@ -33,6 +33,7 @@ public class VistaAdministrador extends VistaBase {
         inicializarComponentes();
     }
 
+    // Metodo para inicializar los componentes de la vista
     @Override
     public void inicializarComponentes() {
         setLayout(new BorderLayout());
@@ -81,11 +82,16 @@ public class VistaAdministrador extends VistaBase {
         setLocationRelativeTo(null);
     }
 
+    // Metodo para crear el panel de la sección
     private JPanel crearPanelSeccion(String titulo) {
+        // Crear el panel
         JPanel panel = new JPanel(new GridBagLayout());
+        // Crear el borde del panel
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2), titulo));
+        // Establecer el color de fondo del panel
         panel.setBackground(Color.WHITE);
 
+        // Crear el grid bag constraint
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -93,20 +99,24 @@ public class VistaAdministrador extends VistaBase {
         gbc.weightx = 1.0;
 
         if (titulo.equals("Configuración y Gestión")) {
+            // Crear los botones
             btnConfigurarParqueo = crearBoton("Configurar Parqueo");
             btnGestionarUsuarios = crearBoton("Gestionar Usuarios");
             btnGestionarEspacios = crearBoton("Gestionar Espacios");
             
+            // Agregar los botones al panel
             panel.add(btnConfigurarParqueo, gbc);
             panel.add(btnGestionarUsuarios, gbc);
             panel.add(btnGestionarEspacios, gbc);
         } else {
+            // Crear los botones
             btnGenerarReporteIngresos = crearBoton("Reporte de Ingresos");
             btnGenerarReporteMultas = crearBoton("Reporte de Multas");
             btnGenerarReporteEspacios = crearBoton("Reporte de Espacios");
             btnGenerarReporteHistorial = crearBoton("Reporte de Historial");
             btnGenerarReporteEstadisticas = crearBoton("Reporte de Estadísticas");
 
+            // Agregar los botones al panel
             panel.add(btnGenerarReporteIngresos, gbc);
             panel.add(btnGenerarReporteMultas, gbc);
             panel.add(btnGenerarReporteEspacios, gbc);
@@ -121,6 +131,7 @@ public class VistaAdministrador extends VistaBase {
         return panel;
     }
 
+    // Metodo para crear el botón personalizado
     private BotonPersonalizado crearBoton(String texto) {
         BotonPersonalizado boton = new BotonPersonalizado(texto);
         boton.setFont(new Font("Arial", Font.PLAIN, 14));

@@ -22,7 +22,8 @@ import com.parqueos.ui.componentes.BotonPersonalizado;
 import com.parqueos.ui.componentes.PanelPersonalizado;
 import java.time.ZoneId;
 
-public class VistaConfiguracionParqueo extends JDialog {
+// Clase para la vista de configuración del parqueo 
+public class VistaConfiguracionParqueo extends JDialog { // JDialog para la vista de configuración del parqueo
     private JSpinner spnHorarioInicio;
     private JSpinner spnHorarioFin;
     private JSpinner spnPrecioHora;
@@ -46,6 +47,7 @@ public class VistaConfiguracionParqueo extends JDialog {
         return calendar.getTime();
     }
 
+    // Metodo para inicializar los componentes
     private void inicializarComponentes(ConfiguracionParqueo configuracionActual) {
         PanelPersonalizado panel = new PanelPersonalizado();
         panel.setLayout(new GridBagLayout());
@@ -122,55 +124,62 @@ public class VistaConfiguracionParqueo extends JDialog {
         setLocationRelativeTo(null);
     }
 
-
+    // Metodo para validar el valor
     private int validarValor(int valor, int min, int max) {
         return Math.max(min, Math.min(valor, max));
     }
-    
+
+    // Metodo para obtener la configuración
     public ConfiguracionParqueo getConfiguracion() {
-    Date inicioDate = (Date) spnHorarioInicio.getValue();
-    Date finDate = (Date) spnHorarioFin.getValue();
-    LocalTime horarioInicio = localTimeFromCalendar(calendarFromLocalTime(inicioDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
-    LocalTime horarioFin = localTimeFromCalendar(calendarFromLocalTime(finDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
+        Date inicioDate = (Date) spnHorarioInicio.getValue();
+        Date finDate = (Date) spnHorarioFin.getValue();
+        LocalTime horarioInicio = localTimeFromCalendar(calendarFromLocalTime(inicioDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
+        LocalTime horarioFin = localTimeFromCalendar(calendarFromLocalTime(finDate.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()));
 
-    int precioHora = validarValor((Integer) spnPrecioHora.getValue(), 0, 10000);
-    int tiempoMinimo = validarValor((Integer) spnTiempoMinimo.getValue(), 30, 300);
-    int costoMulta = validarValor((Integer) spnCostoMulta.getValue(), 0, 50000);
+        int precioHora = validarValor((Integer) spnPrecioHora.getValue(), 0, 10000);
+        int tiempoMinimo = validarValor((Integer) spnTiempoMinimo.getValue(), 30, 300);
+        int costoMulta = validarValor((Integer) spnCostoMulta.getValue(), 0, 50000);
 
-    ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
-    configuracion.setHorarioInicio(horarioInicio);
-    configuracion.setHorarioFin(horarioFin);
-    configuracion.setPrecioHora(precioHora);
-    configuracion.setTiempoMinimo(tiempoMinimo);
-    configuracion.setCostoMulta(costoMulta);
+        ConfiguracionParqueo configuracion = ConfiguracionParqueo.obtenerInstancia();
+        configuracion.setHorarioInicio(horarioInicio);
+        configuracion.setHorarioFin(horarioFin);
+        configuracion.setPrecioHora(precioHora);
+        configuracion.setTiempoMinimo(tiempoMinimo);
+        configuracion.setCostoMulta(costoMulta);
 
     return configuracion;
 }
 
-
+    // Metodo para convertir de LocalTime a Calendar
     private Calendar calendarFromLocalTime(LocalTime time) {
         Calendar cal = Calendar.getInstance();
+        // Si el tiempo es nulo, establecer el tiempo predeterminado a 8:00 AM
         if (time == null) {
             // Valor predeterminado: 8:00 AM
             cal.set(Calendar.HOUR_OF_DAY, 8);
             cal.set(Calendar.MINUTE, 0);
         } else {
+            // Establecer el tiempo del calendario con el tiempo proporcionado
             cal.set(Calendar.HOUR_OF_DAY, time.getHour());
             cal.set(Calendar.MINUTE, time.getMinute());
         }
+        // Establecer el segundo y milisegundo a 0
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         return cal;
     }
 
+    // Metodo para convertir de Calendar a LocalTime
     private LocalTime localTimeFromCalendar(Calendar cal) {
         return LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
     }
 
+    // Getter para el botón de guardar
     public BotonPersonalizado getBtnGuardar() {
         return btnGuardar;
     }
 
+    // Getter para el botón de cancelar
     public BotonPersonalizado getBtnCancelar() {
         return btnCancelar;
     }

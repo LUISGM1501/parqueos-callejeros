@@ -128,6 +128,7 @@ public class Vehiculo implements Serializable {
     public void guardar() {
         // Asegurar que el propietarioId esté sincronizado antes de guardar
         if (propietario != null) {
+            // Si no es nulo, actualizar el id del propietario
             this.propietarioId = propietario.getId();
         }
 
@@ -135,8 +136,12 @@ public class Vehiculo implements Serializable {
         
         // Actualizar si ya existe
         boolean encontrado = false;
+
+        // Iterar sobre todos los vehiculos 
         for (int i = 0; i < vehiculos.size(); i++) {
+            // Si el id del vehiculo actual es igual al id del vehiculo actual, actualizarlo
             if (vehiculos.get(i).getId().equals(this.id)) {
+                // Actualizar el vehiculo
                 vehiculos.set(i, this);
                 encontrado = true;
                 break;
@@ -148,6 +153,7 @@ public class Vehiculo implements Serializable {
             vehiculos.add(this);
         }
 
+        // Guardar todos los vehiculos en el archivo json
         guardarTodos(vehiculos);
     }
 

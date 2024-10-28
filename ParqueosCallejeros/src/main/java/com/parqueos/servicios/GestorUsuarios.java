@@ -348,15 +348,21 @@ public class GestorUsuarios {
 
     // Metodo para obtener todos los usuarios
     public List<Usuario> getUsuarios() {
+        // Crear una lista para almacenar todos los usuarios
         List<Usuario> todosLosUsuarios = new ArrayList<>();
+        // Agregar todos los administradores a la lista
         todosLosUsuarios.addAll(administradores);
+        // Agregar todos los inspectores a la lista
         todosLosUsuarios.addAll(inspectores);
+        // Agregar todos los usuarios parqueo a la lista
         todosLosUsuarios.addAll(usuariosParqueo);
+        // Retornar la lista de todos los usuarios
         return todosLosUsuarios;
     }
 
     // Metodo para buscar un usuario por id
     public Usuario buscarUsuario(String id) {
+        // Buscar el usuario por id
         return getUsuarios().stream()
             .filter(u -> u.getId().equals(id))
             .findFirst()
@@ -365,6 +371,7 @@ public class GestorUsuarios {
 
     // Metodo para buscar usuarios por tipo
     public List<Usuario> buscarUsuariosPorTipo(Usuario.TipoUsuario tipo) {
+        // Buscar los usuarios por tipo
         switch (tipo) {
             case ADMINISTRADOR:
                 return new ArrayList<>(administradores);

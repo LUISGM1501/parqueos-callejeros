@@ -64,35 +64,52 @@ public class ControladorGestionarEspacios {
     }
 
 
-    //funcionalidad del botón agregar espacio
-    // funcionalidad del botón agregar espacio
+    // Funcionalidad del botón agregar espacio
     private void agregarEspacios() {
+        // Variables para almacenar los números de espacio
         int e1, e2;
+        // Variables para almacenar los textos de los espacios
         String txtEspacio1, txtEspacio2;
+        // Variable para almacenar el espacio
         EspacioParqueo espacio;
+        // Lista para almacenar los números de los espacios
         List<Integer> listaNums = new ArrayList<>();
         try {
+            // Verificar si se seleccionó un solo espacio
             if (vistaGestEspacios.getRdbUnEspacio().isSelected()) {
+                // Obtener el número de espacio
                 txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
+                // Validar el número de espacio
                 if (!esNumeroValido(txtEspacio1)) {
+                    // Mostrar el mensaje de error
                     JOptionPane.showMessageDialog(vistaGestEspacios, "El número de espacio debe tener entre 1 y 5 dígitos y ser solo numérico.");
                     return;
                 }
+                // Buscar el espacio en el sistema
                 if (sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1) == null) {
+                    // Crear el espacio
                     espacio = new EspacioParqueo(txtEspacio1);
+                    // Agregar el espacio al sistema
                     sistemaParqueo.getGestorEspacios().agregarEspacio(espacio);
+                    // Cargar los espacios en la tabla
                     cargarEspacios();
+                    // Mostrar el mensaje de éxito
                     JOptionPane.showMessageDialog(vistaGestEspacios, "Espacio agregado con éxito.");
                 } else {
+                    // Mostrar el mensaje de error
                     JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " ya existe.");
                 }
 
+            // Verificar si se seleccionó varios espacios
             } else if (vistaGestEspacios.getRdbVariosEspacios().isSelected()) {
+                // Obtener el número de espacio
                 txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
+                // Obtener el límite de espacios
                 txtEspacio2 = vistaGestEspacios.getTxtLimiteEspacios().getText();
 
                 // Validar ambos números
                 if (!esNumeroValido(txtEspacio1) || !esNumeroValido(txtEspacio2)) {
+                    // Mostrar el mensaje de error
                     JOptionPane.showMessageDialog(vistaGestEspacios, "Los números de espacio deben tener entre 1 y 5 dígitos y ser solo numéricos.");
                     return;
                 }
@@ -111,22 +128,32 @@ public class ControladorGestionarEspacios {
                 int longitud = txtEspacio1.length();
                 String formato = "%0" + longitud + "d";
 
+                // Iterar sobre el rango de números
                 for (int i = e1; i <= e2; i++) {
                     listaNums.add(i);
                 }
-
+                
+                // Iterar sobre la lista de números
                 for (int num : listaNums) {
+                    // Formatear el número
                     txtEspacio1 = String.format(formato, num);
+                    // Buscar el espacio en el sistema
                     if (sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1) == null) {
+                        // Crear el espacio
                         espacio = new EspacioParqueo(txtEspacio1);
+                        // Agregar el espacio al sistema
                         sistemaParqueo.getGestorEspacios().agregarEspacio(espacio);
                     } else {
+                        // Mostrar el mensaje de error
                         JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " ya existe.");
                     }
                 }
+                // Cargar los espacios en la tabla
                 cargarEspacios();
+                // Mostrar el mensaje de éxito
                 JOptionPane.showMessageDialog(vistaGestEspacios, "Espacios agregados con éxito.");
             } else {
+                // Mostrar el mensaje de error
                 JOptionPane.showMessageDialog(vistaGestEspacios, "Seleccione una opción antes de iniciar.");
             }
         } catch (Exception e) {
@@ -134,35 +161,50 @@ public class ControladorGestionarEspacios {
         }
     }
 
-// funcionalidad botón eliminar espacio
+    // Funcionalidad botón eliminar espacio
     private void eliminarEspacios() {
+        // Variables para almacenar los números de espacio
         int e1, e2;
         String txtEspacio1, txtEspacio2;
         EspacioParqueo espacio;
+        // Lista para almacenar los números de los espacios
         List<Integer> listaNums = new ArrayList<>();
         try {
+            // Verificar si se seleccionó un solo espacio
             if (vistaGestEspacios.getRdbUnEspacio().isSelected()) {
+                // Obtener el número de espacio
                 txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
+                // Validar el número de espacio
                 if (!esNumeroValido(txtEspacio1)) {
                     JOptionPane.showMessageDialog(vistaGestEspacios, "El número de espacio debe tener entre 1 y 5 dígitos y ser solo numérico.");
                     return;
                 }
+                // Buscar el espacio en el sistema
                 espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1);
-
+                // Verificar si el espacio existe
                 if (espacio != null) {
+                    // Verificar si el espacio está ocupado
                     if (!espacio.estaOcupado()) {
+                        // Eliminar el espacio del sistema
                         sistemaParqueo.getGestorEspacios().eliminarEspacio(txtEspacio1);
+                        // Cargar los espacios en la tabla
                         cargarEspacios();
+                        // Mostrar el mensaje de éxito
                         JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio fue eliminado con éxito.");
                     } else {
+                        // Mostrar el mensaje de error
                         JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " está ocupado.");
                     }
                 } else {
+                    // Mostrar el mensaje de error
                     JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " no existe.");
                 }
 
+            // Verificar si se seleccionó varios espacios
             } else if (vistaGestEspacios.getRdbVariosEspacios().isSelected()) {
+                // Obtener el número de espacio
                 txtEspacio1 = vistaGestEspacios.getTxtNumeroParqueo().getText();
+                // Obtener el límite de espacios
                 txtEspacio2 = vistaGestEspacios.getTxtLimiteEspacios().getText();
 
                 // Validar ambos números
@@ -185,26 +227,37 @@ public class ControladorGestionarEspacios {
                 int longitud = txtEspacio1.length();
                 String formato = "%0" + longitud + "d";
 
+                // Iterar sobre el rango de números
                 for (int i = e1; i <= e2; i++) {
                     listaNums.add(i);
                 }
 
+                // Iterar sobre la lista de números
                 for (int num : listaNums) {
+                    // Formatear el número
                     txtEspacio1 = String.format(formato, num);
                     espacio = sistemaParqueo.getGestorEspacios().buscarEspacio(txtEspacio1);
+                    // Verificar si el espacio existe
                     if (espacio != null) {
+                        // Verificar si el espacio está ocupado
                         if (!espacio.estaOcupado()) {
+                            // Eliminar el espacio del sistema
                             sistemaParqueo.getGestorEspacios().eliminarEspacio(txtEspacio1);
                         } else {
+                            // Mostrar el mensaje de error
                             JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " está ocupado.");
                         }
                     } else {
+                        // Mostrar el mensaje de error
                         JOptionPane.showMessageDialog(vistaGestEspacios, "El espacio " + txtEspacio1 + " no existe.");
                     }
                 }
+                // Cargar los espacios en la tabla
                 cargarEspacios();
+                // Mostrar el mensaje de éxito
                 JOptionPane.showMessageDialog(vistaGestEspacios, "Espacios eliminados con éxito.");
             } else {
+                // Mostrar el mensaje de error
                 JOptionPane.showMessageDialog(vistaGestEspacios, "Seleccione una opción antes de iniciar.");
             }
         } catch (Exception e) {

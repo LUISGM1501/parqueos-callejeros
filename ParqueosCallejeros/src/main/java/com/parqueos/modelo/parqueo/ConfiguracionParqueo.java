@@ -23,7 +23,7 @@ public class ConfiguracionParqueo implements Serializable {
     
     private static ConfiguracionParqueo instancia;
     
-    @JsonProperty("horarioInicio")
+    @JsonProperty("horarioInicio") // JsonProperty sirve para indicar que el atributo se usa en un json
     private LocalTime horarioInicio;
     
     @JsonProperty("horarioFin")
@@ -129,7 +129,10 @@ public class ConfiguracionParqueo implements Serializable {
     public LocalTime getHorarioFin() { return horarioFin; }
     public int getPrecioHora() { return precioHora; }
     public int getTiempoMinimo() { return tiempoMinimo; }
-    public int getCostoMulta() { return costoMulta; }
+    public int getCostoMulta() {
+        // Asegurarnos que nunca retorne un valor negativo
+        return Math.max(0, costoMulta);
+    }
     public List<EspacioParqueo> getEspacios() { return new ArrayList<>(espacios); }
 
     // Setters

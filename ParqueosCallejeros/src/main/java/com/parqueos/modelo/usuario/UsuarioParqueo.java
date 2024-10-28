@@ -71,32 +71,43 @@ public class UsuarioParqueo extends Usuario {
         return vehiculos;
     }
 
+    // Metodo para recuperar las referencias de los vehiculos
     @PostLoad
     public void recuperarReferencias() {
         if (vehiculos != null) {
+            // Recuperar las referencias de los vehiculos
             for (Vehiculo vehiculo : vehiculos) {
+                // Establecer el propietario del vehiculo
                 vehiculo.setPropietario(this);
+                // Establecer el id del propietario del vehiculo
                 vehiculo.setPropietarioId(this.getId());
             }
         }
     }
 
+    // Metodo para recuperar las referencias de los vehiculos
     @PostLoad
     public void onLoad() {
         if (vehiculos != null) {
+            // Recuperar las referencias de los vehiculos
             for (Vehiculo vehiculo : vehiculos) {
+                // Establecer el propietario del vehiculo
                 vehiculo.setPropietario(this);
+                // Establecer el id del propietario del vehiculo
                 vehiculo.setPropietarioId(this.getId());
             }
         }
     }
 
+    // Setter para los vehiculos
     @JsonProperty("vehiculos")
     public void setVehiculos(List<Vehiculo> vehiculos) {
         this.vehiculos = vehiculos;
         if (vehiculos != null) {
             for (Vehiculo vehiculo : vehiculos) {
+                // Establecer el propietario del vehiculo
                 vehiculo.setPropietario(this);
+                // Establecer el id del propietario del vehiculo
                 vehiculo.setPropietarioId(this.getId());
                 // Guardar cada vehículo en el archivo
                 vehiculo.guardar();
@@ -104,15 +115,20 @@ public class UsuarioParqueo extends Usuario {
         }
     }
 
+    // Metodo para sincronizar los vehiculos
     public void sincronizarVehiculos() {
         // Obtener los vehículos del usuario del gestor de vehículos
         List<Vehiculo> vehiculosActualizados = new ArrayList<>();
         List<Vehiculo> todosLosVehiculos = Vehiculo.cargarTodos();
         
+        // Iterar sobre todos los vehiculos
         for (Vehiculo vehiculo : todosLosVehiculos) {
+            // Verificar si el vehiculo tiene un propietario y si es el mismo usuario
             if (vehiculo.getPropietarioId() != null && 
                 vehiculo.getPropietarioId().equals(this.getId())) {
+                // Establecer el propietario del vehiculo
                 vehiculo.setPropietario(this);
+                // Agregar el vehiculo a la lista de vehiculos actualizados
                 vehiculosActualizados.add(vehiculo);
             }
         }
@@ -161,11 +177,14 @@ public class UsuarioParqueo extends Usuario {
         this.codigoValidacionTarjeta = codigoValidacionTarjeta;
     }   
     
+    // Getter para las reservas activas
     @JsonProperty("reservasActivas")
     public List<Reserva> getReservasActivas() {
         if (sistemaParqueo == null) {
+            // Inicializar el sistema de parqueo
             inicializarSistemaParqueo();
         }
+        // Obtener las reservas activas del sistema de parqueo
         return sistemaParqueo.getGestorReservas()
             .getReservas().stream()
             .filter(r -> r.getUsuario().getId().equals(this.getId()) && r.estaActiva())
@@ -182,6 +201,7 @@ public class UsuarioParqueo extends Usuario {
         for (Vehiculo vehiculo : vehiculos) {
             vehiculo.actualizar();
         }
+        // Actualizar las reservas activas
         for (Reserva reserva : reservasActivas) {
             reserva.actualizar();
         }

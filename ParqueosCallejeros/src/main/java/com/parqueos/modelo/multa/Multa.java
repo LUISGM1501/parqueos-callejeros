@@ -2,16 +2,26 @@ package com.parqueos.modelo.multa;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.parqueos.modelo.parqueo.ConfiguracionParqueo;
 import com.parqueos.modelo.parqueo.EspacioParqueo;
+import com.parqueos.modelo.parqueo.Reserva;
 import com.parqueos.modelo.usuario.Inspector;
+import com.parqueos.modelo.usuario.Usuario;
+import com.parqueos.modelo.usuario.UsuarioParqueo;
 import com.parqueos.modelo.vehiculo.Vehiculo;
 import com.parqueos.util.GestorArchivos;
+
+import java.util.Comparator;
+import java.time.LocalTime;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.CLASS,
@@ -39,20 +49,176 @@ public class Multa implements Serializable {
     private final LocalDateTime fechaHora;
     
     @JsonProperty("monto")
-    private double monto;
+    private int monto;
     
     @JsonProperty("pagada")
     private boolean pagada;
 
+    @JsonProperty("detallesInfraccion")
+    private final String detallesInfraccion;
+
     // Constructor de la multa
-    public Multa(Vehiculo vehiculo, EspacioParqueo espacio, Inspector inspector, double monto) {
+    public Multa(Vehiculo vehiculo, EspacioParqueo espacio, Inspector inspector, int montoBase) {
         this.idMulta = UUID.randomUUID().toString();
         this.vehiculo = vehiculo;
         this.espacio = espacio;
         this.inspector = inspector;
         this.fechaHora = LocalDateTime.now();
-        this.monto = monto;
         this.pagada = false;
+        
+        // Calcular el monto total incluyendo el tiempo sin pagar
+        this.monto = calcularMontoTotal(montoBase);
+        this.detallesInfraccion = generarDetallesInfraccion();
+    }
+
+    // Metodo para cargar las referencias del vehiculo
+    public void cargarReferencias() {
+        // Cargar el propietario del vehiculo
+        if (vehiculo != null && vehiculo.getPropietarioId() != null) {
+            // Si el propietario del vehiculo existe, cargar el usuario parqueo
+            UsuarioParqueo propietario = (UsuarioParqueo) Usuario.cargar(vehiculo.getPropietarioId());
+            
+            // Asignar el propietario al vehiculo
+            vehiculo.setPropietario(propietario);
+        }
+    }
+
+    // Metodo para calcular el monto total de la multa
+    private int calcularMontoTotal(int montoBase) {
+        // Obtener la configuracion del parqueo
+        ConfiguracionParqueo config = ConfiguracionParqueo.obtenerInstancia();
+        int montoTotal = montoBase; // Monto base de la multa
+
+        // Si el espacio esta ocupado, calcular el monto total
+        if (espacio != null && espacio.estaOcupado()) {
+            // Obtener la última reserva del espacio
+            List<Reserva> reservas = Reserva.cargarTodas().stream()
+                // Filtrar las reservas por el espacio
+                .filter(r -> r.getEspacio().getId().equals(espacio.getId()))
+                // Ordenar las reservas por la hora de inicio de manera descendente
+                .sorted((r1, r2) -> r2.getHoraInicio().compareTo(r1.getHoraInicio()))
+                // Convertir las reservas a una lista
+                .collect(Collectors.toList());
+
+            // Obtener la fecha y hora actual
+            LocalDateTime inicioTiempoSinPago;
+            LocalDateTime ahora = LocalDateTime.now();
+
+            // Si hay reservas, obtener la última reserva
+            if (!reservas.isEmpty()) {
+                // Obtener la última reserva
+                Reserva ultimaReserva = reservas.get(0);
+                if (ahora.isAfter(ultimaReserva.getHoraFin())) {
+                    // Si la última reserva ya venció
+                    inicioTiempoSinPago = ultimaReserva.getHoraFin();
+                } else {
+                    // Si hay una reserva activa, no debería generarse multa
+                    return montoBase;
+                }
+            } else {
+                // Si no hay reservas, considerar desde el inicio del día
+                inicioTiempoSinPago = ahora.toLocalDate().atTime(config.getHorarioInicio());
+            }
+
+            // Calcular horas sin pago dentro del horario de regulación
+            long horasSinPago = calcularHorasEnHorarioRegulacion(inicioTiempoSinPago, ahora, config);
+            
+            // Agregar el costo por cada hora sin pago
+            montoTotal += horasSinPago * config.getPrecioHora();
+        }
+
+        // Retornar el monto total
+        return montoTotal;
+    }
+
+    // Metodo para calcular las horas en el horario de regulación
+    private long calcularHorasEnHorarioRegulacion(LocalDateTime inicio, LocalDateTime fin, ConfiguracionParqueo config) {
+        // Inicializar el contador de horas
+        long horasTotal = 0;
+        LocalDateTime actual = inicio;
+
+        // Mientras la fecha y hora actual sea antes de la fecha y hora de fin  
+        while (actual.isBefore(fin)) {
+            // Obtener la hora actual
+            LocalTime tiempoActual = actual.toLocalTime();
+
+            // Si la hora actual es después del horario de inicio y antes del horario de fin
+            if (tiempoActual.isAfter(config.getHorarioInicio()) && 
+                tiempoActual.isBefore(config.getHorarioFin())) {
+                // Incrementar el contador de horas
+                horasTotal++;
+            }
+
+            // Incrementar la hora actual en una hora
+            actual = actual.plusHours(1);
+        }
+
+        // Retornar el total de horas en el horario de regulación
+        return horasTotal;
+    }
+
+    // Metodo para obtener la reserva actual
+    public Reserva obtenerReservaActual() {
+        // Cargar todas las reservas
+        List<Reserva> reservas = Reserva.cargarTodas();
+
+        // Filtrar las reservas por el espacio y que esten activas
+        return reservas.stream()
+            .filter(r -> r.getEspacioId().equals(espacio.getId()) && r.estaActiva())
+            .findFirst()
+            .orElse(null);
+    }
+
+    // Metodo para generar los detalles de la infraccion
+    private String generarDetallesInfraccion() {
+        // Crear un StringBuilder para almacenar los detalles
+        StringBuilder detalles = new StringBuilder();
+
+        // Agregar los detalles de la infraccion
+        detalles.append("INFRACCIÓN DE PARQUEO\n");
+        detalles.append("Fecha y hora: ").append(fechaHora.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))).append("\n");
+        detalles.append("Espacio: ").append(espacio.getNumero()).append("\n");
+        detalles.append("Terminal de inspección: ").append(inspector.getTerminalId()).append("\n");
+        detalles.append("Inspector: ").append(inspector.getNombre()).append(" ").append(inspector.getApellidos()).append("\n");
+        detalles.append("Motivo: Vehículo estacionado sin pago válido\n");
+        detalles.append("Monto base de multa: ₡").append(String.format("%d", ConfiguracionParqueo.obtenerInstancia().getCostoMulta())).append("\n");
+        detalles.append("Monto total: ₡").append(String.format("%d", monto)).append("\n");
+        
+        // Si el vehiculo tiene un propietario, agregar los detalles del propietario
+        if(vehiculo != null && vehiculo.getPropietario() != null) {
+            // Agregar los detalles del propietario
+            detalles.append("\nPropietario registrado: ").append(vehiculo.getPropietario().getNombre())
+                   .append(" ").append(vehiculo.getPropietario().getApellidos());
+        }
+
+        // Retornar los detalles de la infraccion
+        return detalles.toString();
+    }
+
+    // Metodo para obtener los detalles completos de la multa
+    public String getDetallesCompletos() {
+        // Crear un StringBuilder para almacenar los detalles
+        StringBuilder detalles = new StringBuilder(detallesInfraccion);
+
+        // Agregar el monto de la multa
+        detalles.append("\nMonto de la multa: ₡").append(String.format("%d", monto));
+
+        // Si el vehiculo existe, agregar los detalles del vehiculo
+        if (vehiculo != null) {
+            detalles.append("\nPlaca del vehículo: ").append(vehiculo.getPlaca());
+            if (vehiculo.getPropietario() != null) {
+                // Obtener el propietario del vehiculo  
+                UsuarioParqueo propietario = vehiculo.getPropietario();
+                // Agregar los detalles del propietario
+                detalles.append("\nPropietario: ")
+                        .append(propietario.getNombre())
+                        .append(" ")
+                        .append(propietario.getApellidos());
+            }
+        }
+
+        // Retornar los detalles completos de la multa
+        return detalles.toString();
     }
 
     // Metodo para guardar la multa
@@ -146,11 +312,11 @@ public class Multa implements Serializable {
         return fechaHora;
     }
 
-    public double getMonto() {
+    public int getMonto() {
         return monto;
     }
 
-    public void setMonto(double monto) {
+    public void setMonto(int monto) {
         if (monto <= 0) {
             // Excepcion para cuando el monto es negativo o cero
             throw new IllegalArgumentException("El monto de la multa debe ser positivo");
@@ -163,6 +329,10 @@ public class Multa implements Serializable {
         return pagada;
     }
 
+    public String getDetallesInfraccion() {
+        return detallesInfraccion;
+    }
+
     @Override
     public String toString() {
         return "Multa{" +
@@ -173,6 +343,7 @@ public class Multa implements Serializable {
                 ", fechaHora=" + fechaHora +
                 ", monto=" + monto +
                 ", pagada=" + pagada +
+                ", detallesInfraccion='" + detallesInfraccion + '\'' +
                 '}';
     }
 }

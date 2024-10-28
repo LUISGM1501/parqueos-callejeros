@@ -3,6 +3,7 @@ package com.parqueos.servicios;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import com.parqueos.modelo.multa.Multa;
 import com.parqueos.modelo.usuario.UsuarioParqueo;
@@ -51,12 +52,20 @@ public class GestorMultas {
 
     // Metodo para obtener las multas de un usuario
     public List<Multa> obtenerMultasUsuario(UsuarioParqueo usuario) {
+        if (multas == null) {
+            // Si las multas son nulas, retornar una lista vacia
+            return new ArrayList<>();
+        }
+        
+        // Filtrar las multas que tienen un vehiculo y un propietario id igual al id del usuario
         return multas.stream()
-                     // Filtrar las multas que tienen el vehiculo igual al usuario
-                     .filter(m -> m.getVehiculo().getPropietario().equals(usuario))
-                     // Ordenar las multas por la fecha y hora de la multa
+                     // Filtrar las multas que tienen un vehiculo y un propietario id igual al id del usuario
+                     .filter(m -> m.getVehiculo() != null && 
+                                  m.getVehiculo().getPropietarioId() != null && 
+                                  m.getVehiculo().getPropietarioId().equals(usuario.getId()))
+                     // Ordenar las multas por fecha y hora de manera descendente
                      .sorted((m1, m2) -> m2.getFechaHora().compareTo(m1.getFechaHora()))
-                     // Convertir las multas a una lista
+                     // Convertir el stream a una lista
                      .collect(Collectors.toList());
     }
 

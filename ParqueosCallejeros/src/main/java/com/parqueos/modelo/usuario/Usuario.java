@@ -177,22 +177,27 @@ public class Usuario implements Serializable {
     public void guardar() {
         // Obtener la lista de usuarios según el tipo
         List<?> usuarios = switch (tipoUsuario) {
+            // Cargar todos los administradores
             case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoAdministradores(), 
                 Administrador.class
             );
+            // Cargar todos los inspectores
             case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoInspectores(), 
                 Inspector.class
             );
+            // Cargar todos los usuarios parqueo
             case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoUsuariosParqueo(), 
                 UsuarioParqueo.class
             );
         };
 
+        // Crear una lista de usuarios
         List<Usuario> listaUsuarios = new ArrayList<>();
         if (usuarios != null) {
+            // Agregar todos los usuarios a la lista
             listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
         }
 
@@ -208,22 +213,27 @@ public class Usuario implements Serializable {
         try {
             // Obtener la lista de usuarios según el tipo
             List<?> usuarios = switch (tipoUsuario) {
+                // Cargar todos los administradores
                 case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
                     GestorUsuarios.getArchivoAdministradores(), 
                     Administrador.class
                 );
+                // Cargar todos los inspectores
                 case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
                     GestorUsuarios.getArchivoInspectores(), 
                     Inspector.class
                 );
+                // Cargar todos los usuarios parqueo
                 case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
                     GestorUsuarios.getArchivoUsuariosParqueo(), 
                     UsuarioParqueo.class
                 );
             };
             
+            // Crear una lista de usuarios
             List<Usuario> listaUsuarios = new ArrayList<>();
             if (usuarios != null) {
+                // Agregar todos los usuarios a la lista
                 listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
             }
             
@@ -237,6 +247,7 @@ public class Usuario implements Serializable {
             GestorArchivos.guardarTodo(listaUsuarios, obtenerArchivoSegunTipo());
             
         } catch (Exception e) {
+            // Lanzar una excepcion si ocurre un error al actualizar el usuario en el archivo
             throw new RuntimeException("Error al actualizar el usuario en el archivo", e);
         }
     }
@@ -245,22 +256,27 @@ public class Usuario implements Serializable {
     public void eliminar() {
         // Obtener la lista de usuarios según el tipo
         List<?> usuarios = switch (tipoUsuario) {
+            // Cargar todos los administradores
             case ADMINISTRADOR -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoAdministradores(), 
                 Administrador.class
             );
+            // Cargar todos los inspectores
             case INSPECTOR -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoInspectores(), 
                 Inspector.class
             );
+            // Cargar todos los usuarios parqueo
             case USUARIO_PARQUEO -> GestorArchivos.cargarTodosLosElementos(
                 GestorUsuarios.getArchivoUsuariosParqueo(), 
                 UsuarioParqueo.class
             );
         };
 
+        // Crear una lista de usuarios
         List<Usuario> listaUsuarios = new ArrayList<>();
         if (usuarios != null) {
+            // Agregar todos los usuarios a la lista
             listaUsuarios.addAll((Collection<? extends Usuario>) usuarios);
         }
 
@@ -279,7 +295,9 @@ public class Usuario implements Serializable {
             Administrador.class
         );
         if (administradores != null) {
+            // Buscar el usuario en la lista
             for (Administrador admin : administradores) {
+                // Retornar el usuario si se encuentra
                 if (admin.getId().equals(id)) return admin;
             }
         }
@@ -290,7 +308,9 @@ public class Usuario implements Serializable {
             Inspector.class
         );
         if (inspectores != null) {
+            // Buscar el usuario en la lista
             for (Inspector inspector : inspectores) {
+                // Retornar el usuario si se encuentra
                 if (inspector.getId().equals(id)) return inspector;
             }
         }
@@ -301,7 +321,9 @@ public class Usuario implements Serializable {
             UsuarioParqueo.class
         );
         if (usuariosParqueo != null) {
+            // Buscar el usuario en la lista
             for (UsuarioParqueo usuarioParqueo : usuariosParqueo) {
+                // Retornar el usuario si se encuentra
                 if (usuarioParqueo.getId().equals(id)) return usuarioParqueo;
             }
         }
@@ -319,6 +341,7 @@ public class Usuario implements Serializable {
             Administrador.class
         );
         if (administradores != null) {
+            // Agregar todos los usuarios a la lista
             todosLosUsuarios.addAll(administradores);
         }
 
@@ -328,6 +351,7 @@ public class Usuario implements Serializable {
             Inspector.class
         );
         if (inspectores != null) {
+            // Agregar todos los usuarios a la lista
             todosLosUsuarios.addAll(inspectores);
         }
 
@@ -337,6 +361,7 @@ public class Usuario implements Serializable {
             UsuarioParqueo.class
         );
         if (usuariosParqueo != null) {
+            // Agregar todos los usuarios a la lista
             todosLosUsuarios.addAll(usuariosParqueo);
         }
 

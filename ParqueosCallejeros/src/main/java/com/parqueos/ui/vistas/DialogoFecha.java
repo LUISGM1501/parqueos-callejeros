@@ -9,8 +9,8 @@ import java.util.Date;
 
 public class DialogoFecha {
 
-    private JDateChooser dateChooserInicio;
-    private JDateChooser dateChooserFin;
+    private JDateChooser dateChooserInicio; // JDateChooser para la fecha de inicio
+    private JDateChooser dateChooserFin; // JDateChooser para la fecha de fin
 
     public DialogoFecha() {
         // Inicializar los JDateChooser
@@ -26,6 +26,7 @@ public class DialogoFecha {
         dateChooserFin.setPreferredSize(new Dimension(150, 20));
     }
 
+    // Metodo para mostrar el dialogo de fechas
     public LocalDate[] mostrarDialogo() {
         // Crear un panel para los JDateChooser
         JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));

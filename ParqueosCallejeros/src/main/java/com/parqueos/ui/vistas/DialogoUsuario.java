@@ -201,12 +201,16 @@ public class DialogoUsuario extends JDialog {
         Usuario.TipoUsuario tipoSeleccionado = (Usuario.TipoUsuario) cmbTipoUsuario.getSelectedItem();
         // Deshabilitar los campos segun el tipo de usuario
         txtNumeroTarjeta.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.USUARIO_PARQUEO);
+        // Deshabilitar el campo de fecha de vencimiento si el tipo de usuario no es usuario parqueo
         txtFechaVencimiento.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.USUARIO_PARQUEO);
+        // Deshabilitar el campo de codigo de validacion si el tipo de usuario no es usuario parqueo
         txtCodigoValidacion.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.USUARIO_PARQUEO);
-
+        // Deshabilitar el campo de terminal id si el tipo de usuario no es inspector
         txtTerminalId.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.INSPECTOR);
 
+        // Habilitar el boton de agregar vehiculo si el tipo de usuario es usuario parqueo
         btnAgregarVehiculo.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.USUARIO_PARQUEO);
+        // Habilitar la lista de vehiculos si el tipo de usuario es usuario parqueo
         listaVehiculos.setEnabled(tipoSeleccionado == Usuario.TipoUsuario.USUARIO_PARQUEO);
     }
 
@@ -248,7 +252,9 @@ public class DialogoUsuario extends JDialog {
     private void agregarVehiculo() {
         String placa = JOptionPane.showInputDialog(this, "Ingrese la placa del vehículo:");
         if (placa != null && !placa.trim().isEmpty()) {
+            // Mostrar el dialogo para ingresar la marca
             String marca = JOptionPane.showInputDialog(this, "Ingrese la marca del vehículo (opcional):");
+            // Mostrar el dialogo para ingresar el modelo
             String modelo = JOptionPane.showInputDialog(this, "Ingrese el modelo del vehículo (opcional):");
             
             // Crear el vehículo

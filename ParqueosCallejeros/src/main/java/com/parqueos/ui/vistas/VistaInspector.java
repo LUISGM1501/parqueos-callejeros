@@ -78,7 +78,9 @@ public class VistaInspector extends VistaBase {
         setLocationRelativeTo(null);
     }
 
+    // Metodo para crear el panel de la sección
     private JPanel crearPanelSeccion(String titulo) {
+        // Crear el panel
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(41, 128, 185), 2), titulo));
@@ -90,6 +92,7 @@ public class VistaInspector extends VistaBase {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.weightx = 1.0;
 
+        // Si el titulo es "Revisión de Parqueo"
         if (titulo.equals("Revisión de Parqueo")) {
             txtEspacio = new JTextField(15);
             txtPlaca = new JTextField(15);
@@ -102,6 +105,8 @@ public class VistaInspector extends VistaBase {
             panel.add(txtPlaca, gbc);
             panel.add(btnRevisarParqueo, gbc);
             panel.add(btnGenerarMulta, gbc);
+
+        // Si el titulo es "Resultados y Multas"
         } else if (titulo.equals("Resultados y Multas")) {
             txtResultadoRevision = new JTextArea(5, 20);
             txtResultadoRevision.setEditable(false);
@@ -114,6 +119,8 @@ public class VistaInspector extends VistaBase {
             panel.add(scrollResultado, gbc);
             panel.add(new JLabel("Multas Generadas:"), gbc);
             panel.add(scrollTabla, gbc);
+
+        // Si el titulo es "Reportes"
         } else if (titulo.equals("Reportes")) {
             btnVerReporteEspacios = new BotonPersonalizado("Ver Reporte de Espacios");
             btnVerReporteMultas = new BotonPersonalizado("Ver Reporte de Multas");

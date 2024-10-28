@@ -19,11 +19,13 @@ public class VistaGestionUsuarios extends JDialog {
     private BotonPersonalizado btnEliminar;
     private BotonPersonalizado btnCerrar;
 
+    // Constructor de la clase
     public VistaGestionUsuarios(JFrame parent) {
         super(parent, "Gestión de Usuarios", true);
         inicializarComponentes();
     }
 
+    // Metodo para inicializar los componentes
     private void inicializarComponentes() {
         setLayout(new BorderLayout());
         

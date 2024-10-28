@@ -30,6 +30,7 @@ public class GestorNotificaciones {
     private static final String REMITENTE_PASSWORD = System.getenv("REMITENTE_PASSWORD");
     private static boolean emailConfigured = false;
 
+    // Constructor
     public GestorNotificaciones() {
         // Verificar si la configuración de correo está disponible
         emailConfigured = verificarConfiguracionEmail();
@@ -38,7 +39,9 @@ public class GestorNotificaciones {
         }
     }
 
+    // Metodo para verificar la configuracion de correo
     private boolean verificarConfiguracionEmail() {
+        // Verificar si el correo y la contraseña son validos
         return REMITENTE_EMAIL != null && !REMITENTE_EMAIL.isEmpty() 
             && REMITENTE_PASSWORD != null && !REMITENTE_PASSWORD.isEmpty();
     }
